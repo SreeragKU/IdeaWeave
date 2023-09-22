@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Quicksand&display=swap');
+
+.glass{
+    background: rgba(red, green, blue, alpha);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px #4747470b;
+    backdrop-filter: blur(7.1px);
+    border: 1px solid rgba(red, green, blue, alpha);
+    @apply shrink-0 h-[50%] w-[30%] rounded-3xl py-20 px-7 min-w-max;
+}
+
+.heading{
+    font-family: 'Cinzel Decorative', cursive;
+    font-weight: 700;
+    -webkit-text-stroke: 1px rgb(75, 168, 112);
+}
+.text{
+    font-family: 'Quicksand', sans-serif;
+}
+
+.body{
+    background: #dcdce6;
+    background-image: url('../assets/homebg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;              
+}
