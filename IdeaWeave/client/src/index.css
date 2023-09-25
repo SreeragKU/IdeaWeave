@@ -3,18 +3,8 @@
 @tailwind utilities;
 
 #root {
-    flex-grow: 1;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    @apply grow flex justify-center items-center;
 }
-
 .App {
-    width: 100%;
-    max-width: 800px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+    @apply w-full max-w-[800px] h-screen flex flex-col justify-start items-center;
 }
