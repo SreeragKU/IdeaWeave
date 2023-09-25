@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/HomePage.css'; 
+import '../styles/HomePage.css';
 
 import background from '../assets/HomePage/Background.png';
 import tree from '../assets/HomePage/Central_Tree.png';
@@ -52,7 +52,7 @@ function HomePage() {
     <div className="HomePage">
       <header>
         <nav>
-          <img src={logo} alt="IdeaWeave" className="logo" />
+          <img src={logo} alt="IdeaWeave Logo" className="logo" />
           <ul>
             <li>
               <a href="#">Login</a>
@@ -70,14 +70,63 @@ function HomePage() {
       </header>
       <main>
         <div className="vignette"></div>
-        <img src={background} data-speedx="0.006" data-speedy="0.08" data-speedz="0" className="parallax bg-img" />
-        <img src={tree} data-speedx="0.037" data-speedy="0.07" data-speedz="0" className="parallax tree" />
-        <img src={flower1} data-speedx="0.0195" data-speedy="0.0305" data-speedz="0" className="parallax flower1" />
-        <img src={flower2} data-speedx="0.025" data-speedy="0.028" data-speedz="0" className="parallax flower2" />
-        <img src={globe} data-speedx="0.16" data-speedy="0.105"  data-speedz="0.3" className="parallax globe" />
-        <img src={title} data-speedx="0.125" data-speedy="0.115" data-speedz="0.2" className="parallax title" />
-        <img src={fly} data-speedx="0.1" data-speedy="0.11" data-speedz="0.16" className="parallax fbooks" />
-        <img src={sun} className="sun-rays" />
+        <img
+          src={background}
+          alt="Background Image"
+          data-speedx="0.006"
+          data-speedy="0.08"
+          data-speedz="0"
+          className="parallax bg-img"
+        />
+        <img
+          src={tree}
+          alt="Central Tree"
+          data-speedx="0.037"
+          data-speedy="0.07"
+          data-speedz="0"
+          className="parallax tree"
+        />
+        <img
+          src={flower1}
+          alt="Flower 1"
+          data-speedx="0.0195"
+          data-speedy="0.0305"
+          data-speedz="0"
+          className="parallax flower1"
+        />
+        <img
+          src={flower2}
+          alt="Flower 2"
+          data-speedx="0.025"
+          data-speedy="0.028"
+          data-speedz="0"
+          className="parallax flower2"
+        />
+        <img
+          src={globe}
+          alt="Globe"
+          data-speedx="0.16"
+          data-speedy="0.105"
+          data-speedz="0.3"
+          className="parallax globe"
+        />
+        <img
+          src={title}
+          alt="Title"
+          data-speedx="0.125"
+          data-speedy="0.115"
+          data-speedz="0.2"
+          className="parallax title"
+        />
+        <img
+          src={fly}
+          alt="Flying Books"
+          data-speedx="0.1"
+          data-speedy="0.11"
+          data-speedz="0.16"
+          className="parallax fbooks"
+        />
+        <img src={sun} alt="Sun Rays" className="sun-rays" />
       </main>
     </div>
   );
