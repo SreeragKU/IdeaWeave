@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-#root {
-    @apply grow flex justify-center items-center;
-}
-.App {
-    @apply w-full max-w-[800px] h-screen flex flex-col justify-start items-center;
-}
+* > *{
+    font-family: 'Poppins', sans-serif;
+} 

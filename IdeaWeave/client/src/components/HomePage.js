@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/HomePage.css';
+import styles from '../styles/HomePage.module.css'; 
 
 import background from '../assets/HomePage/Background.png';
 import tree from '../assets/HomePage/Central_Tree.png';
@@ -17,7 +17,7 @@ function HomePage() {
 
   useEffect(() => {
     function update(cursorPosition) {
-      const parallaxElements = document.querySelectorAll(".parallax");
+      const parallaxElements = document.querySelectorAll(`.${styles.parallax}`);
       parallaxElements.forEach((el) => {
         const speedx = el.dataset.speedx;
         const speedy = el.dataset.speedy;
@@ -49,34 +49,34 @@ function HomePage() {
   }, [xValue, yValue]);
 
   return (
-    <div className="HomePage">
+    <div className={styles.HomePage}> 
       <header>
         <nav>
-          <img src={logo} alt="IdeaWeave Logo" className="logo" />
+          <img src={logo} alt="IdeaWeave Logo" className={styles.logo} /> 
           <ul>
             <li>
-              <a href="#">Login</a>
+              <a href="/username">Login</a>
             </li>
             <li>
-              <a href="#">Sign Up</a>
+              <a href="/register">Sign Up</a>
             </li>
-            <li className="hamburger">
+            <li className={styles.hamburger}>
               <a href="#">
-                <div className="bar"></div>
+                <div className={styles.bar}></div> 
               </a>
             </li>
           </ul>
         </nav>
       </header>
       <main>
-        <div className="vignette"></div>
+        <div className={styles.vignette}></div> 
         <img
           src={background}
           alt="Background Image"
           data-speedx="0.006"
-          data-speedy="0.08"
+          data-speedy="0.008"
           data-speedz="0"
-          className="parallax bg-img"
+          className={`${styles.parallax} ${styles.bgImg}`}
         />
         <img
           src={tree}
@@ -84,7 +84,7 @@ function HomePage() {
           data-speedx="0.037"
           data-speedy="0.07"
           data-speedz="0"
-          className="parallax tree"
+          className={`${styles.parallax} ${styles.tree}`} 
         />
         <img
           src={flower1}
@@ -92,7 +92,7 @@ function HomePage() {
           data-speedx="0.0195"
           data-speedy="0.0305"
           data-speedz="0"
-          className="parallax flower1"
+          className={`${styles.parallax} ${styles.flower1}`} 
         />
         <img
           src={flower2}
@@ -100,7 +100,7 @@ function HomePage() {
           data-speedx="0.025"
           data-speedy="0.028"
           data-speedz="0"
-          className="parallax flower2"
+          className={`${styles.parallax} ${styles.flower2}`} 
         />
         <img
           src={globe}
@@ -108,7 +108,7 @@ function HomePage() {
           data-speedx="0.16"
           data-speedy="0.105"
           data-speedz="0.3"
-          className="parallax globe"
+          className={`${styles.parallax} ${styles.globe}`} 
         />
         <img
           src={title}
@@ -116,7 +116,7 @@ function HomePage() {
           data-speedx="0.125"
           data-speedy="0.115"
           data-speedz="0.2"
-          className="parallax title"
+          className={`${styles.parallax} ${styles.title}`} 
         />
         <img
           src={fly}
@@ -124,9 +124,9 @@ function HomePage() {
           data-speedx="0.1"
           data-speedy="0.11"
           data-speedz="0.16"
-          className="parallax fbooks"
+          className={`${styles.parallax} ${styles.fbooks}`} 
         />
-        <img src={sun} alt="Sun Rays" className="sun-rays" />
+        <img src={sun} alt="Sun Rays" className={styles["sun-rays"]} /> 
       </main>
     </div>
   );
