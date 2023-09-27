@@ -1,4 +1,4 @@
-import UserModel from "../model/User.model.js";
+import UserModel from '../model/User.model.js';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import ENV from '../config.js';
@@ -16,7 +16,6 @@ export async function verifyUser(req, res, next){
         return res.status(404).send({error : "Authentication Error"});
     }
 }
-
 
 export async function register(req, res) {
     try {
@@ -99,19 +98,49 @@ export async function login(req, res) {
     }
 }
 
-
-export async function getUser(req, res){
+export async function getUser(req, res) {
     const { username } = req.params;
-    try{
-        if(!username) return res.status(501).send({error: "Invalid Username"});
-        UserModel.findOne({username}, function(err, user){
-            if(err) return res.status(500).send({err});
-            if(!user) return res.status(501).send({error : "Couldn't find the User"});
 
-            return res.status(201).send(user);
-        })
-    }catch (error){
-        return res.status(404).send({error : "Cannot find User data"});
+    try {
+        if (!username) return res.status(400).json({ error: "Invalid Username" });
+
+        const user = await UserModel.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Exclude the password field from the response
+        const { password, ...rest } = Object.assign({}, user.toJSON());
+
+        return res.status(200).json(rest);
+    } catch (error) {
+        console.error("Error in getUser:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+export async function updateUser(req, res) {
+    try {
+        const id = req.query.id;
+
+        if (!id) {
+            return res.status(401).send({ error: "User not Found!" });
+        }
+
+        const body = req.body;
+
+        // Use async/await to handle asynchronous operations
+        const updatedUser = await UserModel.updateOne({ _id: id }, body);
+
+        if (updatedUser.nModified === 0) {
+            return res.status(404).send({ error: "User not found or no changes made." });
+        }
+
+        return res.status(200).send({ msg: "Record Updated!" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ error: "Internal Server Error" });
     }
 }
 
@@ -131,6 +160,3 @@ export async function resetPassword(req, res){
     res.json('resetPassword route');
 }
 
-export async function updateUser(req, res){
-    res.json('updateUser route');
-}
