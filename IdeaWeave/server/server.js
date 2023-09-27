@@ -36,4 +36,3 @@ connect().then(() =>{
 }).catch(error =>{
     console.log("Invalid database connection.");
 })
-

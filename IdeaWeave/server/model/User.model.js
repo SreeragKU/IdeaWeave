@@ -2,21 +2,21 @@ import mongoose from "mongoose";
 
 export const UserSchema = new mongoose.Schema({
     username : {
-        type : String,
+        type: String,
         required : [true, "Please provide unique Username"],
         unique: [true, "Username Exist"]
     },
-    password : {
-        type : String,
-        required : [true, "Please provide a password"],
+    password: {
+        type: String,
+        required: [true, "Please provide a password"],
         unique : false,
     },
-    email : {
-        type : String,
-        required : [true, "Please provide a email"],
-        unique : true,
+    email: {
+        type: String,
+        required : [true, "Please provide a unique email"],
+        unique: true,
     },
-    profile : { type : String }
-}); 
+    profile: { type: String}
+});
 
 export default mongoose.model.Users || mongoose.model('User', UserSchema);
