@@ -122,16 +122,16 @@ export async function getUser(req, res) {
 
 export async function updateUser(req, res) {
     try {
-        const id = req.query.id;
+        const { userId } = req.user; // Corrected variable name from id to userId
 
-        if (!id) {
+        if (!userId) { // Corrected variable name from id to userId
             return res.status(401).send({ error: "User not Found!" });
         }
 
         const body = req.body;
 
         // Use async/await to handle asynchronous operations
-        const updatedUser = await UserModel.updateOne({ _id: id }, body);
+        const updatedUser = await UserModel.updateOne({ _id: userId }, body);
 
         if (updatedUser.nModified === 0) {
             return res.status(404).send({ error: "User not found or no changes made." });
@@ -143,6 +143,7 @@ export async function updateUser(req, res) {
         return res.status(500).send({ error: "Internal Server Error" });
     }
 }
+
 
 export async function generateOTP(req, res){
     res.json('generateOTP route');
