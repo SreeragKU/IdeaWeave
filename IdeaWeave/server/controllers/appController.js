@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import ENV from '../config.js';
 import otpGenerator from 'otp-generator';
 
-//middleware for verify user
+
 export async function verifyUser(req, res, next){
     try{
         const { username } = req.method == "GET" ? req.query : req.body;
@@ -145,7 +145,6 @@ export async function updateUser(req, res) {
     }
 }
 
-
 export async function generateOTP(req, res) {
     try {
         req.app.locals.OTP = await otpGenerator.generate(6, {
@@ -181,31 +180,29 @@ export function createResetSession(req, res) {
 
 export async function resetPassword(req, res) {
     try {
-      const { username, password } = req.body;
-  
-      // Check if the user exists
-      const user = await UserModel.findOne({ username });
-  
-      if (!user) {
-        return res.status(404).send({ error: "Username not Found" });
-      }
-  
-      // Hash the new password
-      const hashedPassword = await bcrypt.hash(password, 10);
-  
-      // Update the user's password
-      await UserModel.updateOne({ username: user.username }, { password: hashedPassword });
-  
-      return res.status(201).send({ msg: "Password Updated" });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).send({ error: "Internal Server Error" });
-    }
-  }
+        if (!req.app.locals.resetSession) {
+            return res.status(440).send({ error: "Session Expired" });
+        }
+        
+        const { username, password } = req.body;
 
-  
-  
-  
-  
-  
+        try {
+            const user = await UserModel.findOne({ username });
+
+            if (!user) {
+                return res.status(404).send({ error: "Username not Found" });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            await UserModel.updateOne({ username: user.username }, { password: hashedPassword });
+
+            req.app.locals.resetSession = false; // Reset the session flag only on success.
+            return res.status(201).send({ msg: "Record Updated" });
+        } catch (error) {
+            return res.status(500).send({ error: "Unable to update password" });
+        }
+    } catch (error) {
+        return res.status(401).send({ error });
+    }
+}
 
