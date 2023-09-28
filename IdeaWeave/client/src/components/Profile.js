@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import { registerValidation } from '../helper/validate';
 import convertToBase64 from '../helper/convert';
 
-export default function profile() {
+export default function Profile() {
   const [showPassword, setShowPassword] = useState(false);
   const [file, setFile] = useState()
 

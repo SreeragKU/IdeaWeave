@@ -5,16 +5,16 @@ import ENV from '../config.js';
 import otpGenerator from 'otp-generator';
 
 
-export async function verifyUser(req, res, next){
-    try{
+export async function verifyUser(req, res, next) {
+    try {
         const { username } = req.method == "GET" ? req.query : req.body;
 
-        //check the user
-        let exist = await UserModel.findOne({ username });
-        if(!exist) return res.status(404).send({ error : "Can't find User!"});
+        const exist = await UserModel.findOne({ username });
+        if (!exist) return res.status(404).send({ error: "User not found" });
         next();
-    }catch (error) {
-        return res.status(404).send({error : "Authentication Error"});
+    } catch (error) {
+        console.error("Authentication Error:", error);
+        return res.status(500).send({ error: "Authentication Error" });
     }
 }
 
