@@ -2,6 +2,7 @@ import UserModel from '../model/User.model.js';
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import ENV from '../config.js';
+import otpGenerator from 'otp-generator';
 
 //middleware for verify user
 export async function verifyUser(req, res, next){
@@ -145,19 +146,66 @@ export async function updateUser(req, res) {
 }
 
 
-export async function generateOTP(req, res){
-    res.json('generateOTP route');
+export async function generateOTP(req, res) {
+    try {
+        req.app.locals.OTP = await otpGenerator.generate(6, {
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false
+        });
+        res.status(201).send({ code: req.app.locals.OTP });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
 }
 
-export async function verifyOTP(req, res){
-    res.json('verifyOTP route');
+export function verifyOTP(req, res) {
+    const { code } = req.query;
+    if (parseInt(req.app.locals.OTP) === parseInt(code)) {
+        req.app.locals.OTP = null; // Reset OTP value
+        req.app.locals.resetSession = true; // Start session for reset password
+        res.status(201).send({ msg: 'Verify Successfully' });
+    } else {
+        res.status(400).send({ error: 'Invalid OTP' });
+    }
 }
 
-export async function createResetSession(req, res){
-    res.json('createResetSession route');
+export function createResetSession(req, res) {
+    if (req.app.locals.resetSession) {
+        req.app.locals.resetSession = false; // Allow access only once
+        return res.status(201).send({ msg: "Access granted" });
+    }
+    return res.status(440).send({ error: "Session Expired" });
 }
 
-export async function resetPassword(req, res){
-    res.json('resetPassword route');
-}
+export async function resetPassword(req, res) {
+    try {
+      const { username, password } = req.body;
+  
+      // Check if the user exists
+      const user = await UserModel.findOne({ username });
+  
+      if (!user) {
+        return res.status(404).send({ error: "Username not Found" });
+      }
+  
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      // Update the user's password
+      await UserModel.updateOne({ username: user.username }, { password: hashedPassword });
+  
+      return res.status(201).send({ msg: "Password Updated" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
+
+  
+  
+  
+  
+  
 
