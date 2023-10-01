@@ -1,21 +1,10 @@
-
 import express from "express";
-
 const router = express.Router();
 
-// controllers
-const {
-  signup,
-  signin,
-  forgotPassword,
-  resetPassword,
-} = require("../controllers/auth");
+// Import your authentication controllers
+import { signup, signin, forgotPassword, resetPassword } from "../controllers/auth";
 
-router.get("/", (req, res) => {
-  return res.json({
-    data: "hello world from kaloraat auth API",
-  });
-});
+// Define your authentication routes
 router.post("/signup", signup);
 router.post("/signin", signin);
 router.post("/forgot-password", forgotPassword);

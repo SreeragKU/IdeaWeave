@@ -1,6 +1,6 @@
+// config.js
+export const DATABASE = "mongodb+srv://ideaweave:6QVSJS0z4yDNUEGz@ideaweave.hyw5hjl.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp";
+export const JWT_SECRET = "KSALFK879832R0P2GU30EWP";
+export const EMAIL_FROM = "ideaweaveproject@gmail.com";
 
-// const DATABASE = "mongodb+srv://dbuser:dbpassword@your_db_name.pbn7j.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const DATABASE = "mongodb://localhost:27017/dbname";
-const JWT_SECRET = "some_secret_letters_numbers";
-const SENDGRID_KEY = "SG.your.secret-key";
-const EMAIL_FROM = "yourname@gmail.com";
+
