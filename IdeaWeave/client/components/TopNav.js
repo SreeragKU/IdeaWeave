@@ -26,7 +26,7 @@ const TopNav = () => {
       mode="horizontal"
       theme="dark"
     >
-      <Menu.Item key="mail" icon={<MailOutlined />}>
+      <Menu.Item key="ideaweave" icon={<MailOutlined />}>
         <Link href="/">IdeaWeave</Link>
       </Menu.Item>
       <Menu.Item key="signup" icon={<UserAddOutlined />}>
@@ -49,7 +49,7 @@ const TopNav = () => {
           </Menu.Item>
         </Menu.ItemGroup>
       </SubMenu>
-      <Menu.Item>
+      <Menu.Item key="toggleTheme">
         <ToggleTheme />
       </Menu.Item>
     </Menu>

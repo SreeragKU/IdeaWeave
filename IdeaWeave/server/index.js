@@ -1,28 +1,42 @@
-import express from "express";
-import cors from "cors";
-import mongoose from "mongoose";
-import { DATABASE } from "./config";
-
-import authRoutes from "./routes/auth";
-
+// server.js
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 const morgan = require("morgan");
+const { DATABASE } = require("./config");
+
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
-// db connection
-mongoose.set("strictQuery", false); // required for version 6
+// Connect to the database
 mongoose
-  .connect(DATABASE)
-  .then(() => console.log("DB connected"))
-  .catch((err) => console.log("DB CONNECTION ERROR: ", err));
+  .connect(DATABASE, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log("DB connected");
+  })
+  .catch((err) => {
+    console.error("DB CONNECTION ERROR:", err);
+    process.exit(1); // Exit the application on DB connection failure
+  });
 
-// middlewares
+// Middleware
 app.use(express.json({ limit: "4mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan("dev"));
 
-// route middlewares
+// Route Middlewares
 app.use("/api", authRoutes);
 
-app.listen(8000, () => console.log("Server running on port 8000"));
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
+// Start the server
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useState, useContext } from "react";
 import { Form, Input, Button, Col, Row } from "antd";
 import {
   UserOutlined,
@@ -9,12 +9,42 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { ThemeContext } from "../context/theme";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { AuthContext } from "../context/auth";
+import {useRouter} from "next/router";
 
 function Signup() {
+  const [auth, setAuth] = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
   const [theme] = useContext(ThemeContext);
 
-  const onFinish = (values) => {
-    console.log("values => ", values);
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post(`/signup`, values);
+      if(data?.error) {
+        toast.error(data.error);
+        setLoading(false);
+      }
+      else{
+        //save in context
+        setAuth(data);
+        
+        //save in local storage
+        localStorage.setItem("auth", JSON.stringify(data));
+        
+        toast.success('Successfully signed up');
+        setLoading(false);
+        router.push("/admin");
+      }
+    } catch (err) {
+      toast.error("Signup failed. Try again");
+      console.log(err);
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,6 +115,7 @@ function Signup() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
+              loading={loading}
             >
               Register
             </Button>

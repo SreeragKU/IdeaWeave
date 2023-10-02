@@ -8,14 +8,38 @@ import {
 } from "@ant-design/icons";
 import Link from "next/link";
 import { ThemeContext } from "../context/theme";
+import axios from "axios";
+import { AuthContext } from "../context/auth";
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
 
 function Signin() {
   const [theme] = useContext(ThemeContext);
+  const [auth, setAuth] = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  const onFinish = (values) => {
-    console.log("values => ", values);
+  const onFinish = async (values) => {
+    // console.log("values => ", values);
+    try {
+      setLoading(true);
+      const { data } = await axios.post("/signin", values);
+
+      // save to context
+      setAuth(data);
+      // save to local storage
+      localStorage.setItem("auth", JSON.stringify(data));
+
+      toast.success("Successfully signed in");
+      router.push("/");
+    } catch (err) {
+      console.log("err => ", err);
+      setLoading(false);
+      toast.error("Signin failed. Try again.");
+    }
   };
+
 
   return (
     <Row>
