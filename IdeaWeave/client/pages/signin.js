@@ -18,6 +18,7 @@ function Signin() {
   const [auth, setAuth] = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  //const [form] = Form.useForm();
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const onFinish = async (values) => {
@@ -33,6 +34,7 @@ function Signin() {
 
       toast.success("Successfully signed in");
       router.push("/");
+      //form.resetFields();
     } catch (err) {
       console.log("err => ", err);
       setLoading(false);
@@ -46,9 +48,10 @@ function Signin() {
       <Col span={8} offset={8}>
         <h1 style={{ paddingTop: "100px" }}>Sign In</h1>
         <Form
+          form = {form}
           name="normal_login"
           className="login-form"
-          initialValues={{ remember: true }}
+          initialValues={{ remember: true, email: "sku@gmail.com", password: "sku@MCA20"}}
           onFinish={onFinish}
         >
           {/* email */}
