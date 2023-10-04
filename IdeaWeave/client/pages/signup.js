@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Form, Input, Button, Col, Row } from "antd";
 import {
   UserOutlined,
@@ -20,6 +20,13 @@ function Signup() {
 
   const router = useRouter();
   const [theme] = useContext(ThemeContext);
+
+  useEffect(() =>{
+    if(auth?.token){
+      router.push("/");
+    }
+  }, [auth]);
+
 
   const onFinish = async (values) => {
     setLoading(true);

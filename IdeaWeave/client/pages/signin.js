@@ -1,10 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Form, Input, Button, Col, Row } from "antd";
 import {
   LockOutlined,
   MailOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { ThemeContext } from "../context/theme";
@@ -19,7 +20,28 @@ function Signin() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   //const [form] = Form.useForm();
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false); 
+
+  useEffect(() =>{
+    if(auth?.token){
+      router.push("/");
+    }
+  }, [auth]);
+
+  if (loading) {
+    return (
+      <LoadingOutlined
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontSize: "50px",
+          color: "red",
+        }}
+      />
+    );
+  }
 
   const onFinish = async (values) => {
     // console.log("values => ", values);
@@ -36,7 +58,13 @@ function Signin() {
         localStorage.setItem("auth", JSON.stringify(data));
 
         toast.success("Successfully signed in");
-        router.push("/");
+        if(data?.user?.role === 'Admin'){
+          router.push('/admin');
+        } else if(data?.user?.role === 'Author'){
+          router.push('/author');
+        } else{
+          router.push('/subscriber');
+        }
         //form.resetFields();
       }
     } catch (err) {

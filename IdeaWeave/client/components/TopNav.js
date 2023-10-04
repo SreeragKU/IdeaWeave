@@ -36,6 +36,16 @@ const TopNav = () => {
     router.push("/signin");
   };
 
+  const roleBasedLink = () => {
+    if(auth?.user?.role === 'Admin'){
+      return "/admin";
+    } else if(auth?.user?.role === 'Author'){
+      return "/author";
+    } else{
+      return "/subscriber";
+    }
+  }
+
   return (
     <Menu
       onClick={handleClick}
@@ -60,14 +70,14 @@ const TopNav = () => {
         <SubMenu
           key="SubMenu"
           icon={<SettingOutlined />}
-          title="Dashboard"
+          title={auth?.user?.name || "Dashboard"}
           style={{ marginLeft: "auto" }}
         >
           <Menu.ItemGroup
             title={<span style={{ color: "gray" }}>Management</span>}
           >
             <Menu.Item key="setting:1">
-              <Link href="/admin">Admin</Link>
+              <Link href={roleBasedLink()}>Dashboard</Link>
             </Menu.Item>
           </Menu.ItemGroup>
         </SubMenu>
