@@ -16,3 +16,22 @@ export const create = async (req, res) => {
             console.log(error);
         }
 };
+
+export const category = async (req, res) => {
+    try {
+        const categories = await Category.find().sort({createdAt: -1});
+        res.json(categories);
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const removeCategory = async (req, res) => {
+    try {
+        const {slug} = req.params;
+        const category = await Category.findOneAndDelete({slug});
+        res.json(category);  
+    } catch (error) {
+        console.log(error);
+    }
+};

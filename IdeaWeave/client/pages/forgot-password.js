@@ -49,7 +49,7 @@ function ForgotPassword() {
             setLoading(false);
         } else {
             toast.success("Password changed successfully. Please login with your new password");
-            form.resetFields(["email"]);
+            form.resetFields();
             setLoading(false);
             setVisible(false);
         }

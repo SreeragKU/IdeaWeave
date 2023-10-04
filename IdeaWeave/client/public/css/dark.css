@@ -17049,6 +17049,12 @@ _:-ms-fullscreen .ant-picker-range-wrapper .ant-picker-year-panel .ant-picker-ce
 .ant-drawer .ant-tree-show-line .ant-tree-switcher {
   background: #1f1f1f;
 }
+/* dark-theme.css */
+.dark-form-item {
+  color: white; /* Set the text color for dark theme */
+  background-color: #333; /* Set the background color for dark theme */
+  /* Add other styles as needed */
+}
 
 /* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
 /* stylelint-disable no-duplicate-selectors */

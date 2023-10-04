@@ -16945,6 +16945,13 @@ _:-ms-fullscreen .ant-picker-range-wrapper .ant-picker-year-panel .ant-picker-ce
   margin-left: 12px;
 }
 
+/* light-theme.css */
+.light-form-item {
+  color: black; /* Set the text color for light theme */
+  background-color: #fff; /* Set the background color for light theme */
+  /* Add other styles as needed */
+}
+
 /* stylelint-disable at-rule-empty-line-before,at-rule-name-space-after,at-rule-no-unknown */
 /* stylelint-disable no-duplicate-selectors */
 /* stylelint-disable */

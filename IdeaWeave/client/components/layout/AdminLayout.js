@@ -14,7 +14,7 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    getCurrentAdmin();
+    if(auth?.token) getCurrentAdmin();
   }, [auth?.token]);
 
   const getCurrentAdmin = async () => {
