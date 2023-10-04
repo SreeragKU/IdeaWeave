@@ -1,6 +1,17 @@
+import Category from '../models/category';
+import slugify from 'slugify';
+
 export const create = async (req, res) => {
         try {
-            console.log("create category =>", req.body);
+            const {name} = req.body;
+            const category = await new Category({
+                name,
+                slug: slugify(name),
+            }).save();
+
+            //console.log("saved", category);
+            res.json(category);
+
         } catch (error) {
             console.log(error);
         }

@@ -55,7 +55,7 @@ function Signin() {
           //form = {form}
           name="normal_login"
           className="login-form"
-          initialValues={{ remember: true, email: "sku@gmail.com", password: "sku@MCA20"}}
+          initialValues={{ remember: true, email: "ideaweavep@gmail.com", password: "sku@ADMIN20"}}
           onFinish={onFinish}
         >
           {/* email */}
