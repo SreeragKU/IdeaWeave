@@ -3,7 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+require('dotenv').config();
 const { DATABASE } = require("./config");
+import categoryRoutes from "./routes/category";
 
 const authRoutes = require("./routes/auth");
 
@@ -28,6 +30,7 @@ app.use(morgan("dev"));
 
 // Route Middlewares
 app.use("/api", authRoutes);
+app.use("/api", categoryRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -26,15 +26,19 @@ function Signin() {
     try {
       setLoading(true);
       const { data } = await axios.post("/signin", values);
+      if(data?.error){
+        toast.error(data.error);
+        setLoading(false);
+      } else{
+        // save to context
+        setAuth(data);
+        // save to local storage
+        localStorage.setItem("auth", JSON.stringify(data));
 
-      // save to context
-      setAuth(data);
-      // save to local storage
-      localStorage.setItem("auth", JSON.stringify(data));
-
-      toast.success("Successfully signed in");
-      router.push("/");
-      //form.resetFields();
+        toast.success("Successfully signed in");
+        router.push("/");
+        //form.resetFields();
+      }
     } catch (err) {
       console.log("err => ", err);
       setLoading(false);
@@ -48,7 +52,7 @@ function Signin() {
       <Col span={8} offset={8}>
         <h1 style={{ paddingTop: "100px" }}>Sign In</h1>
         <Form
-          form = {form}
+          //form = {form}
           name="normal_login"
           className="login-form"
           initialValues={{ remember: true, email: "sku@gmail.com", password: "sku@MCA20"}}

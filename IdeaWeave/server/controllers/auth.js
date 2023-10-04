@@ -3,14 +3,13 @@ const jwt = require("jsonwebtoken");
 const { hashPassword, comparePassword } = require("../helpers/auth");
 const nanoid = require("nanoid");
 const nodemailer = require("nodemailer");
-const { JWT_SECRET } = require("../config"); 
-
+const { JWT_SECRET, EMAIL_FROM, EMAIL_APP_PASSWORD } = require("../config");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "ideaweavep@gmail.com",
-    pass: "ideaweave@20",
+    user: process.env.EMAIL_FROM, 
+    pass: EMAIL_APP_PASSWORD, 
   },
 });
 
@@ -18,29 +17,18 @@ exports.signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!password || password.length < 8) {
+    // Password validation
+    if (
+      !password ||
+      password.length < 8 ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password)
+    ) {
       return res.json({
-        error: "Password is required and should be at least 8 characters long",
-      });
-    }
-    if (!/[0-9]/.test(password)) {
-      return res.json({
-        error: "Password must contain at least one number",
-      });
-    }
-    if (!/[^A-Za-z0-9]/.test(password)) {
-      return res.json({
-        error: "Password must contain at least one special character",
-      });
-    }
-    if (!/[A-Z]/.test(password)) {
-      return res.json({
-        error: "Password must contain at least one uppercase letter",
-      });
-    }
-    if (!/[a-z]/.test(password)) {
-      return res.json({
-        error: "Password must contain at least one lowercase letter",
+        error:
+          "Password must be 8+ characters with numbers, special characters, uppercase, and lowercase letters.",
       });
     }
 
@@ -99,10 +87,10 @@ exports.signup = async (req, res) => {
         user: rest,
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -154,12 +142,22 @@ exports.forgotPassword = async (req, res) => {
   user.resetCode = resetCode;
   user.save();
 
-  // prepare email
+  // prepare email using EMAIL_FROM from config.js
   const emailData = {
-    from: "ideaweavep@gmail.com",
+    from: EMAIL_FROM,
     to: user.email,
-    subject: "Password reset code",
-    text: `Your password reset code is: ${resetCode}`,
+    subject: "Password Reset Request",
+    text: `Dear ${user.name},\n\n`
+        + "We received a request to reset your password. Please use the following code to reset your password:\n\n"
+        + `Reset Code: ${resetCode}\n\n`
+        + "If you did not make this request, please disregard this email. Your account's security is important to us.\n\n"
+        + "Sincerely,\n"
+        + "The IdeaWeave Team", 
+    html: `<p>Dear ${user.name},</p>
+          <p>We received a request to reset your password. Please use the following code to reset your password:</p>
+          <p><strong>Reset Code:</strong> ${resetCode}</p>
+          <p>If you did not make this request, please disregard this email. Your account's security is important to us.</p>
+          <p>Sincerely,<br>The IdeaWeave Team</p>`, 
   };
 
   // send email
@@ -181,10 +179,18 @@ exports.resetPassword = async (req, res) => {
     if (!user) {
       return res.json({ error: "Email or reset code is invalid" });
     }
-    // if password is short
-    if (!password || password.length < 6) {
+    // Password validation
+    if (
+      !password ||
+      password.length < 8 ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password) ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password)
+    ) {
       return res.json({
-        error: "Password is required and should be 6 characters long",
+        error:
+          "Password must be 8+ characters with numbers, special characters, uppercase, and lowercase letters.",
       });
     }
     // hash password
@@ -197,3 +203,4 @@ exports.resetPassword = async (req, res) => {
     console.log(err);
   }
 };
+
