@@ -64,6 +64,28 @@ export default function Categories({ children }) {
     setVisible(true);
   };
 
+  const handleUpdate = async (values) => {
+    try {
+      const { data } = await axios.put(
+        `/category/${updatingCategory.slug}`,
+        values
+      );
+      const newCategories = categories.map((cat) => {
+        if (cat._id === data.id) {
+          return data;
+        }
+        return cat;
+      });
+      setCategories(newCategories);
+      toast.success("Category updated successfully");
+      setVisible(false);
+      setupdatingCategory({});
+    } catch (error) {
+      console.error(error);
+      toast.error("Category update failed");
+    }
+  };
+
   return (
     <AdminLayout>
       <Row>
@@ -73,7 +95,16 @@ export default function Categories({ children }) {
             <h1>Categories</h1>
             <p>Add a new category</p>
             <Form onFinish={onFinish} form={form}>
-              <Form.Item name="name" style={{ marginBottom: "16px" }}>
+              <Form.Item
+                name="name"
+                style={{ marginBottom: "16px" }}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please provide a Category Name",
+                  },
+                ]}
+              >
                 <Input
                   prefix={<EditOutlined className="site-form-item-icon" />}
                   placeholder="Provide a Category Name"
@@ -100,7 +131,9 @@ export default function Categories({ children }) {
               >
                 <List.Item.Meta
                   title={
-                    <span style={{ color: theme === "light" ? "black" : "white" }}>
+                    <span
+                      style={{ color: theme === "light" ? "black" : "white" }}
+                    >
                       {item.name}
                     </span>
                   }
@@ -109,7 +142,15 @@ export default function Categories({ children }) {
             )}
           />
         </Col>
-        <CategoryUpdateModal visible={visible} setVisible={setVisible} />
+        {updatingCategory._id && (
+          <CategoryUpdateModal
+            visible={visible}
+            setVisible={setVisible}
+            handleUpdate={handleUpdate}
+            updatingCategory={updatingCategory}
+            setCategories={setCategories}
+          />
+        )}
       </Row>
     </AdminLayout>
   );

@@ -114,15 +114,15 @@ const AdminNav = () => {
             <Link href="/admin/posts">All Posts</Link>
           </Menu.Item>
           <Menu.Item
-            key="/admin/post/new"
-            className={current === "/admin/post/new" ? "active" : ""}
+            key="/admin/posts/new"
+            className={current === "/admin/posts/new" ? "active" : ""}
             style={
-              current === "/admin/post/new"
+              current === "/admin/posts/new"
                 ? customStyles.activeItem
                 : customStyles.item
             }
           >
-            <Link href="/admin/post/new">Add New</Link>
+            <Link href="/admin/posts/new">Add New</Link>
           </Menu.Item>
           <Menu.Item
             key="/admin/categories"

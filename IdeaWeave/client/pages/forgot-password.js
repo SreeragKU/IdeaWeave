@@ -6,7 +6,6 @@ import {
   EyeInvisibleOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import Link from "next/link";
 import { ThemeContext } from "../context/theme";
 import axios from "axios";
 import { AuthContext } from "../context/auth";

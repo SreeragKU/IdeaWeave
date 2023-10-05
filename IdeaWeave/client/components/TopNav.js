@@ -86,7 +86,7 @@ const TopNav = () => {
           key="signout"
           icon={<LogoutOutlined />}
         >
-          <a>Sign Out</a>
+          Sign Out
         </Menu.Item>
       </>)}
       <Menu.Item key="toggleTheme">
