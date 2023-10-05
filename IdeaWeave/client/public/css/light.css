@@ -16945,6 +16945,10 @@ _:-ms-fullscreen .ant-picker-range-wrapper .ant-picker-year-panel .ant-picker-ce
   margin-left: 12px;
 }
 
+.theme-light .custom-modal-content {
+  background-color: white;
+}
+
 /* light-theme.css */
 .light-form-item {
   color: black; /* Set the text color for light theme */

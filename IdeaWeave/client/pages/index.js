@@ -9,9 +9,9 @@ export default function Home() {
   return (  
     <div>
       <h1> Home </h1>
-      <Button type="primary">Click me</Button>
+      {/* <Button type="primary">Click me</Button> */}
       <br />
-      <pre>{JSON.stringify(auth,  null, 4)}</pre>
+      {/* <pre>{JSON.stringify(auth,  null, 4)}</pre> */}
     </div>
   );
 }

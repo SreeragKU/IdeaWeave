@@ -17066,6 +17066,7 @@ _:-ms-fullscreen .ant-picker-range-wrapper .ant-picker-year-panel .ant-picker-ce
 .ant-form-item .ant-upload.ant-upload-drag {
   background: rgba(255, 255, 255, 0.04);
 }
+
 .ant-form-item input[type='radio'],
 .ant-form-item input[type='checkbox'] {
   width: 14px;
