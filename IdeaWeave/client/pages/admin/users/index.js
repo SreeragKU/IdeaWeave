@@ -55,9 +55,9 @@ export default function AllUsers() {
             renderItem={(user) => (
               <List.Item
                 actions={[
-                  <Link href={`/admin/users/${user._id}`}>
-                    <span>edit</span>
-                  </Link>,
+                  // <Link href={`/admin/users/${user._id}`}>
+                  //   <span>edit</span>
+                  // </Link>,
                   <a disabled={user?._id === auth?.user?._id}
                     onClick={() => handleDelete(user)}
                   >delete</a>,
@@ -73,10 +73,10 @@ export default function AllUsers() {
                   description={user.role}
                   style={{ marginLeft: 10 }}
                 />
-                <List.Item.Meta
+                {/* <List.Item.Meta
                   description={`${user?.posts?.length || 0} post`}
                   style={{ marginLeft: 10 }}
-                />
+                /> */}
               </List.Item>
             )}
           />

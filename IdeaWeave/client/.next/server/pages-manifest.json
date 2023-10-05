@@ -2,7 +2,11 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/admin/posts/new": "pages/admin/posts/new.js",
   "/admin/posts": "pages/admin/posts.js",
-  "/admin/users": "pages/admin/users.js"
+  "/admin/posts/new": "pages/admin/posts/new.js",
+  "/admin/users": "pages/admin/users.js",
+  "/admin": "pages/admin.js",
+  "/": "pages/index.js",
+  "/signin": "pages/signin.js",
+  "/signup": "pages/signup.js"
 }
