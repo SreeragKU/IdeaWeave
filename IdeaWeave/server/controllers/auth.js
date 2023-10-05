@@ -212,3 +212,23 @@ exports.currentUser = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.users = async (req, res) => {
+  try {
+    const all = await User.find().select('-password -secret  -resetCode');
+    res.json(all);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const {userId} = req.params;
+    if(userId === req.user._id) return;
+    const user = await User.findByIdAndDelete(userId);
+    res.json(user);
+  } catch (error) {
+    console.log(error);
+  }
+};
