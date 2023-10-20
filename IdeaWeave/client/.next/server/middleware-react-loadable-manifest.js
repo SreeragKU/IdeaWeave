@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"admin\\\\posts\\\\new.js -> react-quill\":{\"id\":\"admin\\\\posts\\\\new.js -> react-quill\",\"files\":[\"static/chunks/node_modules_react-quill_lib_index_js.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST="{}"

@@ -124,7 +124,7 @@ function Signin() {
           </Form.Item>
 
           <div>
-            <Link href="/forgot-password">Forgot</Link>
+            <Link href="/forgot-password">Forgot Password</Link>
           </div>
           <br />
 

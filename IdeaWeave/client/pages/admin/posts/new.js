@@ -132,7 +132,7 @@ function NewPost() {
 
           <br />
           <br />
-          <pre>{JSON.stringify(loadedCategories, null, 4)}</pre>
+          {/* <pre>{JSON.stringify(loadedCategories, null, 4)}</pre> */}
         </Col>
         <Col span={6} offset={1}>
           <h4>Categories</h4>
