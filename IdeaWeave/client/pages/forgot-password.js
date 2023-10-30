@@ -20,6 +20,44 @@ function ForgotPassword() {
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
+  const [password, setPassword] = useState(""); // Define password state
+
+  const [showRequirements, setShowRequirements] = useState(false);
+
+  const checkPasswordStrength = (value) => {
+    setPassword(value); // Set the password state
+    const requirements = {
+      length: value.length >= 8,
+      uppercase: /[A-Z]/.test(value),
+      lowercase: /[a-z]/.test(value),
+      number: /[0-9]/.test(value),
+      special: /[!@#$%^&*]/.test(value),
+    };
+    setPasswordStrength(requirements);
+    const allConditionsMet = Object.values(requirements).every(
+      (condition) => condition
+    );
+    setShowRequirements(!allConditionsMet);
+  }
+  const renderRequirementStatus = (condition, requirement) => {
+    return (
+      <p
+        style={{
+          color: condition ? "green" : "red",
+          textDecoration: condition ? "line-through" : "none",
+        }}
+      >
+        {condition ? "✔" : "✘"} {requirement}
+      </p>
+    );
+  };
   const forgotPasswordRequest = async (values) =>{
     try {
         setLoading(true);
@@ -92,29 +130,41 @@ function ForgotPassword() {
               placeholder="Enter Reset Code"
             />
           </Form.Item>
-            <Form.Item
+          <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please enter your new password!" }]}
-            style={{ marginBottom: "16px" }}
+            rules={[
+              { required: true, message: "Please input your Password!" }
+            ]}
+            style={{ marginBottom: "20px" }}
           >
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type={showPassword ? "text" : "password"} // Toggle password visibility
-              placeholder="New Password"
+              type="password"
+              placeholder="Password"
               iconRender={(visible) =>
                 visible ? (
                   <EyeOutlined
                     style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                    onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
                   />
                 ) : (
                   <EyeInvisibleOutlined
                     style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                    onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
                   />
                 )
               }
+              onChange={(e) => {
+                checkPasswordStrength(e.target.value);
+              }}
             />
+            {showRequirements && (
+              <div className="password-strength">
+                {renderRequirementStatus(passwordStrength.length, "At least 8 characters")}
+                {renderRequirementStatus(passwordStrength.uppercase, "At least one uppercase character")}
+                {renderRequirementStatus(passwordStrength.lowercase, "At least one lowercase character")}
+                {renderRequirementStatus(passwordStrength.number, "At least one number")}
+                {renderRequirementStatus(passwordStrength.special, "At least one special character")}
+              </div>
+            )}
           </Form.Item>
           </>
           )}

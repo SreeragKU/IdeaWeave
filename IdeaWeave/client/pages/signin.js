@@ -21,12 +21,29 @@ function Signin() {
   const router = useRouter();
   //const [form] = Form.useForm();
   const [showPassword, setShowPassword] = useState(false); 
+  const [isDisabled, setIsDisabled] = useState(false);
 
-  useEffect(() =>{
-    if(auth?.token){
+  useEffect(() => {
+    if (auth?.token) {
       router.push("/");
     }
   }, [auth]);
+
+  if (isDisabled) {
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <h1>Your account has been disabled. Please contact support.</h1>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -44,36 +61,36 @@ function Signin() {
   }
 
   const onFinish = async (values) => {
-    // console.log("values => ", values);
     try {
       setLoading(true);
       const { data } = await axios.post("/signin", values);
-      if(data?.error){
-        toast.error(data.error);
-        setLoading(false);
-      } else{
-        // save to context
-        setAuth(data);
-        // save to local storage
-        localStorage.setItem("auth", JSON.stringify(data));
-
-        toast.success("Successfully signed in");
-        if(data?.user?.role === 'Admin'){
-          router.push('/admin');
-        } else if(data?.user?.role === 'Author'){
-          router.push('/author');
-        } else{
-          router.push('/subscriber');
+      if (data?.error) {
+        if (data.error === "User not found") {
+          toast.error("User not found");
+        } else if (data.error === "Account is disabled") {
+          setIsDisabled(true); 
+        } else {
+          toast.error(data.error);
         }
-        //form.resetFields();
+        setLoading(false);
+      } else {
+        setAuth(data);
+        localStorage.setItem("auth", JSON.stringify(data));
+        toast.success("Successfully signed in");
+        if (data?.user?.role === "Admin") {
+          router.push("/admin");
+        } else if (data?.user?.role === "Author") {
+          router.push("/author");
+        } else {
+          router.push("/subscriber");
+        }
       }
     } catch (err) {
       console.log("err => ", err);
       setLoading(false);
       toast.error("Signin failed. Try again.");
     }
-  };
-
+  }
 
   return (
     <Row>

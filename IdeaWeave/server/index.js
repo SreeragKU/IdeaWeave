@@ -6,7 +6,7 @@ const morgan = require("morgan");
 require('dotenv').config();
 const { DATABASE } = require("./config");
 import categoryRoutes from "./routes/category";
-
+import uploadRoutes from "./routes/post";
 const authRoutes = require("./routes/auth");
 
 const app = express();
@@ -31,6 +31,7 @@ app.use(morgan("dev"));
 // Route Middlewares
 app.use("/api", authRoutes);
 app.use("/api", categoryRoutes);
+app.use("/api", uploadRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

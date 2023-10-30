@@ -1,8 +1,7 @@
-// CategoryUpdateModal.js
-
 import React from "react";
 import { Modal, Form, Input, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import { toast } from "react-hot-toast"; // Import the toast component
 
 const CategoryUpdateModal = ({
   visible,
@@ -14,6 +13,11 @@ const CategoryUpdateModal = ({
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
+    if (!values.name) {
+      toast.error("Category name cannot be empty");
+      return;
+    }
+
     try {
       await handleUpdate(values);
       setCategories((prevCategories) =>
@@ -24,6 +28,7 @@ const CategoryUpdateModal = ({
       setVisible(false);
     } catch (error) {
       console.error(error);
+      toast.error("Category update failed");
     }
   };
 

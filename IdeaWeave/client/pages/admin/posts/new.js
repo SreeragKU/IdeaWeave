@@ -1,10 +1,11 @@
-import { Layout, Select, Row, Col, Input } from "antd";
-import AdminLayout from "../../../components/layout/AdminLayout";
-import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
 import htmlToMd from "html-to-md";
 import axios from "axios";
+import { Layout, Select, Row, Col, Input, Modal } from "antd";
+import AdminLayout from "../../../components/layout/AdminLayout";
+import dynamic from "next/dynamic";
+import Resizer from "react-image-file-resizer";
 
 const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -56,7 +57,6 @@ const quillFormats = [
 ];
 
 function NewPost() {
-  // Load from local storage (only on the client side)
   const savedTitle =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("post-title")) || ""
@@ -66,19 +66,17 @@ function NewPost() {
       ? JSON.parse(localStorage.getItem("post-content")) || ""
       : "";
 
-  // Initialize state with the saved values or defaults
   const [quillContent, setQuillContent] = useState(savedContent);
   const [title, setTitle] = useState(savedTitle);
+  
 
   useEffect(() => {
-    // Save the title to local storage whenever it changes (only on the client side)
     if (typeof window !== "undefined") {
       localStorage.setItem("post-title", JSON.stringify(title));
     }
   }, [title]);
 
   useEffect(() => {
-    // Save the quillContent as markdown to local storage whenever it changes (only on the client side)
     if (typeof window !== "undefined") {
       localStorage.setItem("post-content", JSON.stringify(quillContent));
     }
@@ -104,6 +102,91 @@ function NewPost() {
     }
   };
 
+  const handleQuillChange = async (content, delta, source, editor) => {
+    const insertedImages = delta.ops.filter((op) => op.insert && op.insert.image);
+    const insertedVideos = delta.ops.filter((op) => op.insert && op.insert.video);
+
+    console.log("Uploaded Images:");
+    for (const op of insertedImages) {
+      if (op.insert.image.startsWith("data:image/")) {
+        // The image is in base64 format, directly upload it
+        const imageUrl = await uploadBase64Image(op.insert.image);
+        if (imageUrl) {
+          op.insert.image = imageUrl;
+          console.log("Image URL (Uploaded from Base64):", imageUrl);
+        }
+      } else {
+        // The image is not in base64 format, proceed with regular upload
+        const imageUrl = await uploadImage(op.insert.image);
+        if (imageUrl) {
+          op.insert.image = imageUrl;
+          console.log("Image URL:", imageUrl);
+        }
+      }
+    }
+
+    console.log("Uploaded Videos:");
+    insertedVideos.forEach((op) => {
+      console.log("Video URL:", op.insert.video);
+    });
+
+    setQuillContent(content);
+  };
+
+  const uploadBase64Image = async (base64Image) => {
+    try {
+      const blob = dataURItoBlob(base64Image);
+      const imageUrl = await uploadImage(blob);
+      return imageUrl;
+    } catch (error) {
+      console.error("Base64 image upload error:", error);
+      return null;
+    }
+  };
+
+  const dataURItoBlob = (dataURI) => {
+    const byteString = atob(dataURI.split(",")[1]);
+    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  };
+
+  const uploadImage = async (file) => {
+    try {
+      // Resize the image
+      const resizedImage = await resizeImage(file);
+      console.log(resizedImage);
+      // Send the resized image to the server using Axios
+      const {data} = await axios.post('/upload-image',{resizedImage});
+      // Handle the server's response here if needed
+      console.log("Server response:", data);
+      return data;
+    } catch (error) {
+      console.error("Image upload error:", error);
+      return null;
+    }
+  }; 
+  
+  const resizeImage = (file) =>
+    new Promise((resolve) => {
+      Resizer.imageFileResizer(
+        file,
+        720,
+        400,
+        "JPEG",
+        100,
+        0,
+        (uri) => {
+          resolve(uri);
+        },
+        "base64"
+      );
+    });
+
   return (
     <AdminLayout>
       <Row>
@@ -124,15 +207,12 @@ function NewPost() {
             formats={quillFormats}
             placeholder="Compose here..."
             value={quillContent}
-            onChange={(v) => {
-              setQuillContent(v);
-            }}
+            onChange={handleQuillChange}
             theme="snow"
           />
-
           <br />
           <br />
-          {/* <pre>{JSON.stringify(loadedCategories, null, 4)}</pre> */}
+          {/* Your other content */}
         </Col>
         <Col span={6} offset={1}>
           <h4>Categories</h4>
