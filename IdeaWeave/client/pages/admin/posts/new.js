@@ -14,7 +14,6 @@ const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
 
 const { Content } = Layout;
 const { Option } = Select;
-
 const quillModules = {
   toolbar: [
     [{ font: [] }],
@@ -68,7 +67,7 @@ function NewPost() {
 
   const [quillContent, setQuillContent] = useState(savedContent);
   const [title, setTitle] = useState(savedTitle);
-  
+  const [markdownContent, setMarkdownContent] = useState(""); 
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -78,12 +77,15 @@ function NewPost() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("post-content", JSON.stringify(quillContent));
+      const markdown = convertToMarkdown(quillContent);
+      setMarkdownContent(markdown);
+      localStorage.setItem("post-content", JSON.stringify(markdown)); 
     }
   }, [quillContent]);
+  
 
   function convertToMarkdown(htmlContent) {
-    return htmlToMd(htmlContent);
+    return htmlToMd(htmlContent); 
   }
 
   const [categories, setCategories] = useState([]);
@@ -212,7 +214,6 @@ function NewPost() {
           />
           <br />
           <br />
-          {/* Your other content */}
         </Col>
         <Col span={6} offset={1}>
           <h4>Categories</h4>

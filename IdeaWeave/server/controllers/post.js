@@ -10,7 +10,7 @@ export const uploadImage = async (req, res) => {
   try {
     //console.log(req.body);
     const result = await cloudinary.uploader.upload(req.body.resizedImage);
-    //console.log(result);
+    console.log(result);
     res.json(result.secure_url);
   } catch (err) {
     console.log(err);
