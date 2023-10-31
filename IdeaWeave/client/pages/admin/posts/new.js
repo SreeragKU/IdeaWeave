@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import "react-quill/dist/quill.snow.css";
 import htmlToMd from "html-to-md";
 import axios from "axios";
-import { Layout, Select, Row, Col, Input, Modal } from "antd";
+import { Layout, Select, Row, Col, Input, Button, Modal} from "antd";
 import AdminLayout from "../../../components/layout/AdminLayout";
 import dynamic from "next/dynamic";
-import Resizer from "react-image-file-resizer";
+import {toast} from "react-hot-toast";
+import {useRouter} from "next/router";
 
 const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -26,13 +27,9 @@ const quillModules = {
     [{ indent: "-1" }, { indent: "+1" }],
     [{ direction: "rtl" }],
     [{ align: [] }],
-    ["link", "image", "video"],
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     ["clean"],
   ],
-  clipboard: {
-    matchVisual: false,
-  },
 };
 
 const quillFormats = [
@@ -47,7 +44,6 @@ const quillFormats = [
   "bullet",
   "indent",
   "link",
-  "image",
   "video",
   "script",
   "align",
@@ -67,7 +63,11 @@ function NewPost() {
 
   const [quillContent, setQuillContent] = useState(savedContent);
   const [title, setTitle] = useState(savedTitle);
-  const [markdownContent, setMarkdownContent] = useState(""); 
+  const [markdownContent, setMarkdownContent] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [loadedCategories, setLoadedCategories] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,23 +77,23 @@ function NewPost() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Convert Quill content to Markdown
       const markdown = convertToMarkdown(quillContent);
+
       setMarkdownContent(markdown);
-      localStorage.setItem("post-content", JSON.stringify(markdown)); 
+
+      // Store the content in localStorage
+      localStorage.setItem("post-content", JSON.stringify(markdown));
     }
   }, [quillContent]);
-  
-
-  function convertToMarkdown(htmlContent) {
-    return htmlToMd(htmlContent); 
-  }
-
-  const [categories, setCategories] = useState([]);
-  const [loadedCategories, setLoadedCategories] = useState([]);
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  function convertToMarkdown(htmlContent) {
+    return htmlToMd(htmlContent);
+  }
 
   const loadCategories = async () => {
     try {
@@ -104,90 +104,29 @@ function NewPost() {
     }
   };
 
-  const handleQuillChange = async (content, delta, source, editor) => {
-    const insertedImages = delta.ops.filter((op) => op.insert && op.insert.image);
-    const insertedVideos = delta.ops.filter((op) => op.insert && op.insert.video);
-
-    console.log("Uploaded Images:");
-    for (const op of insertedImages) {
-      if (op.insert.image.startsWith("data:image/")) {
-        // The image is in base64 format, directly upload it
-        const imageUrl = await uploadBase64Image(op.insert.image);
-        if (imageUrl) {
-          op.insert.image = imageUrl;
-          console.log("Image URL (Uploaded from Base64):", imageUrl);
-        }
+  const handlePublish = async () => {
+    try {
+      const { data } = await axios.post("/create-post", {
+        title,
+        content: quillContent,
+        categories,
+      });
+      if (data?.error) {
+        toast.error(data?.error);
       } else {
-        // The image is not in base64 format, proceed with regular upload
-        const imageUrl = await uploadImage(op.insert.image);
-        if (imageUrl) {
-          op.insert.image = imageUrl;
-          console.log("Image URL:", imageUrl);
-        }
+        console.log("POST PUBLISHED RES => ", data);
+        toast.success("Post created successfully");
+        // You can uncomment and implement redirection logic here
+        // localStorage.removeItem("post-title");
+        // localStorage.removeItem("post-content");
+        // router.push("/admin/posts");
       }
-    }
-
-    console.log("Uploaded Videos:");
-    insertedVideos.forEach((op) => {
-      console.log("Video URL:", op.insert.video);
-    });
-
-    setQuillContent(content);
-  };
-
-  const uploadBase64Image = async (base64Image) => {
-    try {
-      const blob = dataURItoBlob(base64Image);
-      const imageUrl = await uploadImage(blob);
-      return imageUrl;
-    } catch (error) {
-      console.error("Base64 image upload error:", error);
-      return null;
+    } catch (err) {
+      console.log(err);
+      toast.error("Post create failed. Try again.");
     }
   };
-
-  const dataURItoBlob = (dataURI) => {
-    const byteString = atob(dataURI.split(",")[1]);
-    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-  };
-
-  const uploadImage = async (file) => {
-    try {
-      // Resize the image
-      const resizedImage = await resizeImage(file);
-      console.log(resizedImage);
-      // Send the resized image to the server using Axios
-      const {data} = await axios.post('/upload-image',{resizedImage});
-      // Handle the server's response here if needed
-      console.log("Server response:", data);
-      return data;
-    } catch (error) {
-      console.error("Image upload error:", error);
-      return null;
-    }
-  }; 
   
-  const resizeImage = (file) =>
-    new Promise((resolve) => {
-      Resizer.imageFileResizer(
-        file,
-        720,
-        400,
-        "JPEG",
-        100,
-        0,
-        (uri) => {
-          resolve(uri);
-        },
-        "base64"
-      );
-    });
 
   return (
     <AdminLayout>
@@ -209,13 +148,20 @@ function NewPost() {
             formats={quillFormats}
             placeholder="Compose here..."
             value={quillContent}
-            onChange={handleQuillChange}
+            onChange={(content, delta, source, editor) => {
+              setQuillContent(content);
+            }}
             theme="snow"
           />
-          <br />
-          <br />
         </Col>
         <Col span={6} offset={1}>
+        <Button
+            style={{ margin: "10px 0px 10px 0px", width: "100%" }}
+            onClick={() => setVisible(true)}
+          >
+            Preview
+          </Button>
+
           <h4>Categories</h4>
           <Select
             mode="multiple"
@@ -228,8 +174,31 @@ function NewPost() {
               <Option key={item.name}>{item.name}</Option>
             ))}
           </Select>
+          <Button
+            style={{ margin: "10px 0px 10px 0px", width: "100%" }}
+            type="primary"
+            onClick={handlePublish}
+          >
+            Publish
+          </Button>
         </Col>
       </Row>
+      <Modal
+        title="Preview"
+        centered
+        visible={visible}
+        onOk={() => setVisible(false)}
+        onCancel={()=>setVisible(false)}
+        width={720}
+        footer={null}
+      >
+        <h1>{title}</h1>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: quillContent, 
+          }}
+        />
+      </Modal>
     </AdminLayout>
   );
 }
