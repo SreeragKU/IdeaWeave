@@ -61,3 +61,15 @@ export const createPost = async (req, res) => {
     console.log(err);
   }
 };
+
+export const posts = async (req, res) => {
+  try {
+    const all = await Post.find()
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .sort({ createdAt: -1 });
+    res.json(all);
+  } catch (err) {
+    console.log(err);
+  }
+};

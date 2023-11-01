@@ -67,6 +67,7 @@ function NewPost() {
   const [categories, setCategories] = useState([]);
   const [loadedCategories, setLoadedCategories] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -106,6 +107,7 @@ function NewPost() {
 
   const handlePublish = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.post("/create-post", {
         title,
         content: quillContent,
@@ -113,17 +115,18 @@ function NewPost() {
       });
       if (data?.error) {
         toast.error(data?.error);
+        setLoading(false);
       } else {
-        console.log("POST PUBLISHED RES => ", data);
+        //console.log("POST PUBLISHED RES => ", data);
         toast.success("Post created successfully");
-        // You can uncomment and implement redirection logic here
-        // localStorage.removeItem("post-title");
-        // localStorage.removeItem("post-content");
-        // router.push("/admin/posts");
+        localStorage.removeItem("post-title");
+        localStorage.removeItem("post-content");
+        router.push("/admin/posts");
       }
     } catch (err) {
       console.log(err);
       toast.error("Post create failed. Try again.");
+      setLoading(false);
     }
   };
   
@@ -152,6 +155,7 @@ function NewPost() {
               setQuillContent(content);
             }}
             theme="snow"
+            style={{ height: "400px" }}
           />
         </Col>
         <Col span={6} offset={1}>
@@ -175,6 +179,7 @@ function NewPost() {
             ))}
           </Select>
           <Button
+            loading={loading}
             style={{ margin: "10px 0px 10px 0px", width: "100%" }}
             type="primary"
             onClick={handlePublish}
