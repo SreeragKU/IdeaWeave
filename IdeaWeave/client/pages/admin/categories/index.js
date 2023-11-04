@@ -7,7 +7,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { ThemeContext } from "../../../context/theme";
 import CategoryUpdateModal from "../../../components/modal/CategoryUpdateModal";
-import { useSpring, animated, config } from "react-spring";
+import { PostContext } from "../../../context/post";
 
 const { Content } = Layout;
 
@@ -17,26 +17,12 @@ export default function Categories({ children }) {
 
   const [updatingCategory, setupdatingCategory] = useState({});
   const [visible, setVisible] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [pendingCategories, setPendingCategories] = useState([]);
   const [editedCategory, setEditedCategory] = useState({});
   const [form] = Form.useForm();
-  const [pendingUpdates, setPendingUpdates] = useState([]);
+  const [post, setPost] = useContext(PostContext);
 
-  const [reloadAnimation, setReloadAnimation] = useState(false);
-
-  const startReloadAnimation = () => {
-    setReloadAnimation(true);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
-
-  const reloadSpring = useSpring({
-    from: { opacity: 0, transform: "translateY(-100%)" },
-    to: { opacity: reloadAnimation ? 1 : 0, transform: reloadAnimation ? "translateY(0)" : "translateY(-100%)" },
-    config: config.slow, // Adjust animation speed
-  });
+  const {categories} = post;
 
   useEffect(() => {
     getCategories();
@@ -45,26 +31,26 @@ export default function Categories({ children }) {
   const getCategories = async () => {
     try {
       const { data } = await axios.get("/category");
-      setCategories(data);
+      setPost((prev) => ({...prev, categories: data}));
       setPendingCategories(data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }
 
   const onFinish = async (values) => {
     if (!values.name) {
       toast.error("Category name cannot be empty");
       return;
     }
-
+  
     const existingCategory = categories.find((category) => category.name === values.name);
-
+  
     if (existingCategory) {
-      toast.error("Category already exists");
-      return;
+      toast.error("Category already exists"); 
+      return; 
     }
-
+  
     try {
       setLoading(true);
       const { data } = await axios.post("/category", values);
@@ -77,8 +63,8 @@ export default function Categories({ children }) {
       toast.error("Category create failed");
       setLoading(false);
     }
-  };
-
+  }
+  
   const handleDelete = async (item) => {
     try {
       const { data } = await axios.delete(`/category/${item.slug}`);
@@ -88,12 +74,12 @@ export default function Categories({ children }) {
       console.log(error);
       toast.error("Category delete failed");
     }
-  };
+  }
 
   const handleEdit = async (item) => {
     setupdatingCategory(item);
     setVisible(true);
-  };
+  }
 
   const handleUpdate = async (values) => {
     if (!values.name) {
@@ -114,36 +100,26 @@ export default function Categories({ children }) {
       const { data } = await axios.put(`/category/${updatingCategory.slug}`, values);
 
       if (data) {
-        setPendingUpdates((prevPendingUpdates) => [
-          ...prevPendingUpdates,
-          { oldCategory: updatingCategory, newCategory: data },
-        ]);
-
-        if (editedCategory._id === updatingCategory._id) {
-          setEditedCategory(data);
-        }
-
-        toast.success("Category update pending");
+        toast.success("Category update successfully");
         setVisible(false);
         setupdatingCategory({});
-
-        startReloadAnimation();
+        getCategories();
       } else {
         toast.error("Category update failed");
-
-        startReloadAnimation();
       }
     } catch (error) {
       console.error(error);
       toast.error("Category update failed");
-
-      startReloadAnimation();
     }
-  };
+  }
 
   const combinedCategories = [editedCategory, ...pendingCategories]
     .filter((item) => item.name !== "")
     .filter((item) => item._id !== updatingCategory._id && item.slug !== editedCategory.slug);
+
+  if (!visible && updatingCategory._id) {
+    combinedCategories.push(updatingCategory);
+  }
 
   return (
     <AdminLayout>
@@ -179,93 +155,35 @@ export default function Categories({ children }) {
             itemLayout="horizontal"
             dataSource={combinedCategories}
             renderItem={(item) => {
-              const updatedCategory = pendingUpdates.find((update) => update.oldCategory._id === item._id);
-
-              if (updatedCategory) {
-                return (
-                  <List.Item
-                    actions={[
-                      <a onClick={() => handleEdit(updatedCategory.newCategory)}>Edit</a>,
-                      <a onClick={() => handleDelete(item)}>Remove</a>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <span style={{ color: theme === "light" ? "black" : "white" }}>
-                          {updatedCategory.newCategory.name}
-                        </span>
-                      }
-                    />
-                  </List.Item>
-                );
-              } else {
-                return (
-                  <List.Item
-                    actions={[
-                      <a onClick={() => handleEdit(item)}>Edit</a>,
-                      <a onClick={() => handleDelete(item)}>Remove</a>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <span style={{ color: theme === "light" ? "black" : "white" }}>
-                          {item.name}
-                        </span>
-                      }
-                    />
-                  </List.Item>
-                );
-              }
+              return (
+                <List.Item
+                  actions={[
+                    <a onClick={() => handleEdit(item)}>Edit</a>,
+                    <a onClick={() => handleDelete(item)}>Remove</a>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={
+                      <span style={{ color: theme === "light" ? "black" : "white" }}>
+                        {item.name}
+                      </span>
+                    }
+                  />
+                </List.Item>
+              );
             }}
           />
         </Col>
         {updatingCategory._id && (
           <CategoryUpdateModal
-            visible={visible}
-            setVisible={setVisible}
-            handleUpdate={handleUpdate}
-            updatingCategory={updatingCategory}
-            setCategories={setCategories}
-          />
+          visible={visible}
+          setVisible={setVisible}
+          handleUpdate={handleUpdate}
+          updatingCategory={updatingCategory}
+          setPost={setPost} 
+        />
         )}
       </Row>
-
-      <animated.div
-        style={{
-          position: "fixed",
-          width: "100%",
-          height: "100%",
-          display: reloadAnimation ? "flex" : "none",
-          justifyContent: "center",
-          alignItems: "flex-start", 
-          background: "rgba(0, 0, 0, 0)",
-          ...reloadSpring,
-        }}
-      >
-        <animated.div
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0)",
-            padding: "16px",
-            borderRadius: "8px",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: "70%", 
-            ...reloadSpring,
-          }}
-        >
-          <div style={{ fontSize: "24px", marginBottom: "8px", color: "red" }}>
-            Reloading...
-          </div>
-          <div style={{ fontSize: "16px", color: "green" }}>
-            Your Edit is being processed
-          </div>
-          <div style={{ fontSize: "16px", color: "green" }}>
-            Thank you for your patience!
-          </div>
-        </animated.div>
-      </animated.div>
     </AdminLayout>
   );
 }

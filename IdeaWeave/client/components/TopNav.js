@@ -1,11 +1,12 @@
 import { useState, useContext } from "react";
 import { Menu } from "antd";
 import {
-  MailOutlined,
   SettingOutlined,
+  AppstoreOutlined,
   UserAddOutlined,
   UserOutlined,
   LogoutOutlined,
+  BookOutlined,
 } from "@ant-design/icons";
 import ToggleTheme from "./ToggleTheme";
 import Link from "next/link";
@@ -53,8 +54,11 @@ const TopNav = () => {
       mode="horizontal"
       theme="dark"
     >
-      <Menu.Item key="ideaweave" icon={<MailOutlined />}>
+      <Menu.Item key="ideaweave" icon={<AppstoreOutlined />}>
         <Link href="/">IdeaWeave</Link>
+      </Menu.Item>
+      <Menu.Item key="posts" icon={<BookOutlined />}>
+        <Link href="/posts">Books</Link>
       </Menu.Item>
       {auth?.user === null && (
             <>

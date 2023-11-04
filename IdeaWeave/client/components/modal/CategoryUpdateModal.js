@@ -1,14 +1,14 @@
 import React from "react";
 import { Modal, Form, Input, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
-import { toast } from "react-hot-toast"; // Import the toast component
+import { toast } from "react-hot-toast"; 
 
 const CategoryUpdateModal = ({
   visible,
   setVisible,
   handleUpdate,
   updatingCategory,
-  setCategories, 
+  setPost, 
 }) => {
   const [form] = Form.useForm();
 
@@ -20,11 +20,12 @@ const CategoryUpdateModal = ({
 
     try {
       await handleUpdate(values);
-      setCategories((prevCategories) =>
-        prevCategories.map((cat) =>
+      setPost((prevPost) => ({
+        ...prevPost,
+        categories: prevPost.categories.map((cat) =>
           cat._id === updatingCategory._id ? { ...cat, name: values.name } : cat
-        )
-      );
+        ),
+      }));
       setVisible(false);
     } catch (error) {
       console.error(error);

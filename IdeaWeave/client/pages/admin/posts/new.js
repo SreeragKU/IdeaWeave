@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "react-quill/dist/quill.snow.css";
 import htmlToMd from "html-to-md";
 import axios from "axios";
@@ -7,6 +7,10 @@ import AdminLayout from "../../../components/layout/AdminLayout";
 import dynamic from "next/dynamic";
 import {toast} from "react-hot-toast";
 import {useRouter} from "next/router";
+import {UploadOutlined, EyeOutlined} from '@ant-design/icons'
+import Media from "../../../components/media";
+import { MediaContext } from "../../../context/media";
+import ImagePreviewModal from "../../../components/modal/ImagePreviewModal";
 
 const QuillNoSSRWrapper = dynamic(() => import("react-quill"), {
   ssr: false,
@@ -69,6 +73,12 @@ function NewPost() {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  // const [visibleMedia, setVisibleMedia] = useState(false);
+
+  const [media, setMedia] = useContext(MediaContext);
+
+  const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -78,13 +88,8 @@ function NewPost() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Convert Quill content to Markdown
-      const markdown = convertToMarkdown(quillContent);
-
-      setMarkdownContent(markdown);
-
       // Store the content in localStorage
-      localStorage.setItem("post-content", JSON.stringify(markdown));
+      localStorage.setItem("post-content", JSON.stringify(quillContent));
     }
   }, [quillContent]);
 
@@ -112,6 +117,7 @@ function NewPost() {
         title,
         content: quillContent,
         categories,
+        coverImage: media?.selected._id,
       });
       if (data?.error) {
         toast.error(data?.error);
@@ -121,6 +127,7 @@ function NewPost() {
         toast.success("Post created successfully");
         localStorage.removeItem("post-title");
         localStorage.removeItem("post-content");
+        setMedia({...media, selected: ""});
         router.push("/admin/posts");
       }
     } catch (err) {
@@ -130,12 +137,18 @@ function NewPost() {
     }
   };
   
+  const handleClick = () => {
+    if (media?.selected) {
+      setImagePreviewUrl(media?.selected?.url);
+      setImagePreviewVisible(true);
+    }
+  };
 
-  return (
+   return (
     <AdminLayout>
       <Row>
         <Col span={14} offset={1}>
-          <h1>Create new post</h1>
+          <h1>Create a new post</h1>
           <Input
             value={title}
             size="large"
@@ -159,11 +172,17 @@ function NewPost() {
           />
         </Col>
         <Col span={6} offset={1}>
-        <Button
+          <Button
             style={{ margin: "10px 0px 10px 0px", width: "100%" }}
             onClick={() => setVisible(true)}
           >
             Preview
+          </Button>
+          <Button
+            style={{ margin: "10px 0px 10px 0px", width: "100%" }}
+            onClick={() => setMedia({ ...media, showMediaModal: true})}
+          >
+            <UploadOutlined /> Cover Image
           </Button>
 
           <h4>Categories</h4>
@@ -178,6 +197,67 @@ function NewPost() {
               <Option key={item.name}>{item.name}</Option>
             ))}
           </Select>
+          <br />
+          {media?.selected && (
+            <div
+              style={{
+                marginTop: "15px",
+                position: "relative",
+                cursor: "pointer",
+                overflow: "hidden",
+                transition: "transform 0.3s",
+              }}
+              className="image-container"
+              onMouseEnter={() => {
+                const overlay = document.querySelector(".overlay");
+                overlay.style.opacity = 1;
+              }}
+              onMouseLeave={() => {
+                const overlay = document.querySelector(".overlay");
+                overlay.style.opacity = 0;
+              }}
+              onClick={handleClick} 
+            >
+              <img
+                style={{
+                  width: "100%",
+                  transition: "transform 0.3s",
+                }}
+                src={media?.selected?.url}
+                alt="Image"
+              />
+              <div
+                className="overlay"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "rgba(0, 0, 0, 0.5)",
+                  color: "white",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: 0,
+                  transition: "opacity 0.3s",
+                }}
+              >
+                <div
+                  className="overlay-content"
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  <EyeOutlined style={{ fontSize: "25px", color: "white" }} />
+                  <br />
+                  Click to Preview
+                </div>
+              </div>
+            </div>
+          )}
+          <br />
           <Button
             loading={loading}
             style={{ margin: "10px 0px 10px 0px", width: "100%" }}
@@ -188,21 +268,39 @@ function NewPost() {
           </Button>
         </Col>
       </Row>
+
+      <ImagePreviewModal
+        visible={imagePreviewVisible}
+        imageUrl={imagePreviewUrl}
+        onClose={() => setImagePreviewVisible(false)}
+      />
+
       <Modal
         title="Preview"
         centered
         visible={visible}
         onOk={() => setVisible(false)}
-        onCancel={()=>setVisible(false)}
+        onCancel={() => setVisible(false)}
         width={720}
         footer={null}
       >
         <h1>{title}</h1>
         <div
           dangerouslySetInnerHTML={{
-            __html: quillContent, 
+            __html: quillContent,
           }}
         />
+      </Modal>
+
+      <Modal
+        visible={media.showMediaModal}
+        title="Media"
+        onOk={() => setMedia({ ...media, showMediaModal: false})}
+        onCancel={() => setMedia({ ...media, showMediaModal: false})}
+        width={720}
+        footer={null}
+      >
+        <Media />
       </Modal>
     </AdminLayout>
   );

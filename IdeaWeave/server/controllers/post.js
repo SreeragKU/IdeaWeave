@@ -2,6 +2,7 @@ import Post from "../models/post";
 import Category from "../models/category";
 import slugify from "slugify";
 import cloudinary from "cloudinary";
+import Media from "../models/media";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -45,9 +46,8 @@ export const createPost = async (req, res) => {
     setTimeout(async () => {
       try {
         const post = await new Post({
-          title,
+          ...req.body,
           slug: slugify(title),
-          content,
           categories: ids,
           postedBy: req.user._id,
         }).save();
@@ -65,11 +65,53 @@ export const createPost = async (req, res) => {
 export const posts = async (req, res) => {
   try {
     const all = await Post.find()
+      .populate('coverImage')
       .populate("postedBy", "name")
       .populate("categories", "name slug")
       .sort({ createdAt: -1 });
     res.json(all);
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const uploadImageFile = async (req, res) => {
+  try {
+    //console.log(req.files);
+    const result = await cloudinary.uploader.upload(req.files.file.path);
+    // save to db
+    const media = await new Media({
+      url: result.secure_url,
+      public_id: result.public_id,
+      postedBy: req.user._id,
+    }).save();
+    res.json(media);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const media = async (req, res) => {
+  try {
+    const media = await Media.find()
+      .populate("postedBy", "_id")
+      .sort({ createdAt: -1 });
+    res.json(media);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const removeMedia = async (req, res) => {
+  try {
+    const mediaId = req.params.id;
+    const media = await Media.findByIdAndDelete(mediaId);
+    if (!media) {
+      return res.status(404).json({ error: "Media not found" });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
