@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import "react-quill/dist/quill.snow.css";
-import htmlToMd from "html-to-md";
 import axios from "axios";
 import { Layout, Select, Row, Col, Input, Button, Modal} from "antd";
 import AdminLayout from "../../../components/layout/AdminLayout";
@@ -30,8 +29,6 @@ const quillModules = {
     [{ script: "sub" }, { script: "super" }],
     [{ indent: "-1" }, { indent: "+1" }],
     [{ direction: "rtl" }],
-    [{ align: [] }],
-    [{ header: [1, 2, 3, 4, 5, 6, false] }],
     ["clean"],
   ],
 };
@@ -47,10 +44,7 @@ const quillFormats = [
   "list",
   "bullet",
   "indent",
-  "link",
-  "video",
   "script",
-  "align",
   "color",
   "background",
 ];
@@ -73,7 +67,6 @@ function NewPost() {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  // const [visibleMedia, setVisibleMedia] = useState(false);
 
   const [media, setMedia] = useContext(MediaContext);
 
@@ -88,7 +81,6 @@ function NewPost() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Store the content in localStorage
       localStorage.setItem("post-content", JSON.stringify(quillContent));
     }
   }, [quillContent]);
@@ -96,10 +88,6 @@ function NewPost() {
   useEffect(() => {
     loadCategories();
   }, []);
-
-  function convertToMarkdown(htmlContent) {
-    return htmlToMd(htmlContent);
-  }
 
   const loadCategories = async () => {
     try {
@@ -113,9 +101,11 @@ function NewPost() {
   const handlePublish = async () => {
     try {
       setLoading(true);
+      const formattedContent = `<div style="font-size: 1.2rem; line-height: 1.6">${quillContent}</div>`;
+  
       const { data } = await axios.post("/create-post", {
-        title,
-        content: quillContent,
+        title, 
+        content: formattedContent,
         categories,
         coverImage: media?.selected._id,
       });
@@ -123,12 +113,12 @@ function NewPost() {
         toast.error(data?.error);
         setLoading(false);
       } else {
-        //console.log("POST PUBLISHED RES => ", data);
-        toast.success("Post created successfully");
         localStorage.removeItem("post-title");
         localStorage.removeItem("post-content");
-        setMedia({...media, selected: ""});
+        localStorage.removeItem("post-image");
+        setMedia({ ...media, selected: null });
         router.push("/admin/posts");
+        toast.success("Post created successfully");
       }
     } catch (err) {
       console.log(err);
@@ -148,7 +138,7 @@ function NewPost() {
     <AdminLayout>
       <Row>
         <Col span={14} offset={1}>
-          <h1>Create a new post</h1>
+          <h1>Create a new Book</h1>
           <Input
             value={title}
             size="large"
@@ -284,24 +274,26 @@ function NewPost() {
         width={720}
         footer={null}
       >
-        <h1>{title}</h1>
+        <h1 style={{ fontSize: "1.2rem", lineHeight: "1.6" }}>{title}</h1>
         <div
           dangerouslySetInnerHTML={{
             __html: quillContent,
           }}
+          style={{ fontSize: "1.2rem", lineHeight: "1.6" }}
         />
       </Modal>
 
       <Modal
         visible={media.showMediaModal}
         title="Media"
-        onOk={() => setMedia({ ...media, showMediaModal: false})}
-        onCancel={() => setMedia({ ...media, showMediaModal: false})}
+        onOk={() => setMedia({ ...media, showMediaModal: false })}
+        onCancel={() => setMedia({ ...media, showMediaModal: false })}
         width={720}
         footer={null}
       >
-        <Media />
+        <Media style={{ fontSize: "1.2rem", lineHeight: "1.6" }} />
       </Modal>
+
     </AdminLayout>
   );
 }

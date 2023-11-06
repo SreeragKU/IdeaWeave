@@ -22,15 +22,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/posts/new": [
+    "/admin": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/posts/new.js"
+      "static/chunks/pages/admin.js"
     ],
-    "/posts": [
+    "/post/[slug]": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/posts.js"
+      "static/chunks/pages/post/[slug].js"
     ]
   },
   "ampFirstPages": []

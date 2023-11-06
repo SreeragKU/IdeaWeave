@@ -55,7 +55,7 @@ const MediaLibrary = () => {
   
   const handleImageDelete = async (imageId) => {
     try {
-      const response = await axios.delete(`/api/media/${imageId}`);
+      const response = await axios.delete(`/media/${imageId}`);
       if (response.data.ok) {
         setMedia((prev) => ({
           ...prev,

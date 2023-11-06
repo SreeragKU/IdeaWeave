@@ -12,18 +12,25 @@ import {
   uploadImageFile,
   media,
   removeMedia,
+  singlePost, 
+  removePost,
+  editPost,
 } from "../controllers/post";
 
 router.post("/upload-image", requireSignin, isAdmin, uploadImage);
-router.post("/create-post", requireSignin, isAdmin, createPost);
 router.post(
   "/upload-image-file",
   formidable(),
   requireSignin,
   isAdmin,
-  uploadImageFile
+  uploadImageFile,
 );
+router.post("/create-post", requireSignin, isAdmin, createPost);
 router.get("/posts", posts);
+router.get("/post/:slug", singlePost);
 router.get("/media", requireSignin, isAdmin, media);
-router.delete("/api/media/:id", requireSignin, isAdmin, removeMedia);
+router.delete("/media/:id", requireSignin, isAdmin, removeMedia);
+router.delete("/post/:postId", requireSignin, isAdmin, removePost);
+router.put("/edit-post/:postId", requireSignin, isAdmin, editPost);
+
 export default router;
