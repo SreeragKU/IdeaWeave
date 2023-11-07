@@ -12,7 +12,11 @@ function ImagePreviewModal({ visible, imageUrl, onClose }) {
       width="67%"
       style={{ top: 0, height: "100%" }} 
     >
-      <img alt="Image Preview" style={{ width: "100%", height: "100%" }} src={imageUrl} />
+      <img alt="Image Preview" style={{ 
+          width: "100%",
+          display: "flex",
+          overflow: "hidden"
+          }} src={imageUrl} />
     </Modal>
   );
 }
