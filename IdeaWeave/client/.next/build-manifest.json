@@ -22,20 +22,25 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/posts/new": [
+    "/author": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/posts/new.js"
+      "static/chunks/pages/author.js"
     ],
-    "/admin/users": [
+    "/author/posts": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/users.js"
+      "static/chunks/pages/author/posts.js"
     ],
-    "/admin/users/new": [
+    "/author/posts/[slug]": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/users/new.js"
+      "static/chunks/pages/author/posts/[slug].js"
+    ],
+    "/author/posts/new": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/author/posts/new.js"
     ]
   },
   "ampFirstPages": []

@@ -48,7 +48,7 @@ const quillFormats = [
   "background",
 ];
 
-function NewPostComponent() {
+function NewPostComponent({page = "admin"}) {
   const savedTitle =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("post-title")) || ""
@@ -116,7 +116,7 @@ function NewPostComponent() {
         localStorage.removeItem("post-content");
         localStorage.removeItem("post-image");
         setMedia({ ...media, selected: null });
-        router.push("/admin/posts");
+        router.push(`/${page}/posts`);
         toast.success("Post created successfully");
       }
     } catch (err) {

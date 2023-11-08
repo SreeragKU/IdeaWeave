@@ -175,3 +175,16 @@ export const editPost = async (req, res) => {
     console.log(err);
   }
 };
+
+export const postByAuthor = async (req, res) => {
+  try {
+    const posts = await Post.find({ postedBy: req.user._id })
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .populate("coverImage", "url")
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    console.log(err);
+  }
+};

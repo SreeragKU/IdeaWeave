@@ -33,7 +33,9 @@ const BookFront = ({ post }) => {
         <div style={{ marginTop: "20px", textAlign: "center" }}>
           <Title style={{ fontSize: "2rem", marginBottom: "10px" }}>{post.title}</Title>
           <p style={{ fontSize: "0.9rem", color: "#888" }}>
-            {dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")} / 0 Comments / in{" "}
+            Author: {post.postedBy.name} </p>
+            <p style={{ fontSize: "0.9rem", color: "#888" }}>
+            {dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")} / 0 Comments / in{" "} 
             {post?.categories.map((c) => (
               <span key={c._id} style={{ marginRight: "10px" }}>
                 <Link href={`/category/${c.slug}`}>@{c.name}</Link>

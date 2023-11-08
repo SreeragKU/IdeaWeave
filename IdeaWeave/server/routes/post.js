@@ -3,7 +3,7 @@ import formidable from "express-formidable";
 const router = express.Router();
 
 // middleware
-import { requireSignin, isAdmin } from "../middlewares";
+import { requireSignin, isAdmin, canCreateRead, canDeleteMedia, canUpdateDeletePost} from "../middlewares";
 // controllers
 import {
   uploadImage,
@@ -15,22 +15,23 @@ import {
   singlePost, 
   removePost,
   editPost,
+  postByAuthor,
 } from "../controllers/post";
 
-router.post("/upload-image", requireSignin, isAdmin, uploadImage);
+router.post("/upload-image", requireSignin, canCreateRead, uploadImage);
 router.post(
   "/upload-image-file",
   formidable(),
   requireSignin,
-  isAdmin,
   uploadImageFile,
 );
-router.post("/create-post", requireSignin, isAdmin, createPost);
+router.post("/create-post", requireSignin, canCreateRead, createPost);
 router.get("/posts", posts);
 router.get("/post/:slug", singlePost);
-router.get("/media", requireSignin, isAdmin, media);
-router.delete("/media/:id", requireSignin, isAdmin, removeMedia);
-router.delete("/post/:postId", requireSignin, isAdmin, removePost);
-router.put("/edit-post/:postId", requireSignin, isAdmin, editPost);
+router.get("/media", requireSignin, canCreateRead, media);
+router.get("/post-by-author", requireSignin, postByAuthor);
+router.delete("/media/:id", requireSignin, canDeleteMedia, removeMedia);
+router.delete("/post/:postId", requireSignin, canUpdateDeletePost, removePost);
+router.put("/edit-post/:postId", requireSignin, canUpdateDeletePost, editPost);
 
 export default router;

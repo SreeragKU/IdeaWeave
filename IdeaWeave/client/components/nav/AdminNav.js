@@ -111,7 +111,7 @@ const AdminNav = () => {
                 : customStyles.item
             }
           >
-            <Link href="/admin/posts">All Posts</Link>
+            <Link href="/admin/posts">All Books</Link>
           </Menu.Item>
           <Menu.Item
             key="/admin/posts/new"
@@ -122,7 +122,7 @@ const AdminNav = () => {
                 : customStyles.item
             }
           >
-            <Link href="/admin/posts/new">Add New</Link>
+            <Link href="/admin/posts/new">Add New Book</Link>
           </Menu.Item>
           <Menu.Item
             key="/admin/categories"
@@ -158,7 +158,7 @@ const AdminNav = () => {
                 : customStyles.item
             }
           >
-            <Link href="/admin/media/new">Add New</Link>
+            <Link href="/admin/media/new">Add New Media</Link>
           </Menu.Item>
         </SubMenu>
 
