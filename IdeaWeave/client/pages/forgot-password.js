@@ -112,7 +112,7 @@ function ForgotPassword() {
           <Form.Item
             name="email"
             rules={[{ type: "email", message: "Please enter a valid email!" }]}
-            style={{ marginBottom: "16px" }} // Added margin to align with other form items
+            style={{ marginBottom: "16px" }}
           >
             <Input
               prefix={<MailOutlined className="site-form-item-icon" />}

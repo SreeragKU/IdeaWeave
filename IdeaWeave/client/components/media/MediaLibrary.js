@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/auth";
 import { CloseCircleOutlined, InboxOutlined } from "@ant-design/icons";
 import { MediaContext } from "../../context/media";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const { Dragger } = Upload;
 
@@ -55,19 +56,17 @@ const MediaLibrary = () => {
   
   const handleImageDelete = async (imageId) => {
     try {
-      const response = await axios.delete(`/media/${imageId}`);
-      if (response.data.ok) {
-        setMedia((prev) => ({
-          ...prev,
-          images: prev.images.filter((image) => image._id !== imageId),
+      const {data} = await axios.delete(`/media/${imageId}`);
+      if (data.ok) {
+        setMedia({
+          ...media,
+          images: media.images.filter((image) => image._id !== imageId),
           selected: null,
-        }));
-      } else {
-        message.error("Failed to delete the image");
+        });
+        toast.success("Image deleted successfully");
       }
     } catch (err) {
       console.log(err);
-      message.error("An error occurred while deleting the image");
     }
   };
 

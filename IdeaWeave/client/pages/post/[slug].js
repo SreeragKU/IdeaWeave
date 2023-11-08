@@ -4,7 +4,7 @@ import { Row, Col, Card, Typography, Button } from "antd";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import BookFront from "./BookFront";
-import BubbleNav from "../../components/nav/BookNav";
+import BubbleNav from "../../components/nav/BubbleNav";
 
 const { Title } = Typography;
 const { Meta } = Card;
@@ -80,7 +80,6 @@ export const SinglePost = ({ post }) => {
   const [postContent, setPostContent] = useState(post.content);
 
   const sendPostContentToBubbleNav = (content) => {
-    console.log(content);
     setPostContent(content);
   };
 

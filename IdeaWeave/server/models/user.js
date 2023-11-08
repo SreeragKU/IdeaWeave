@@ -14,7 +14,7 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    min: 6,
+    min: 8,
     max: 64,
   },
   role: {
@@ -24,6 +24,10 @@ const userSchema = new Schema({
   image: {
     public_id: "",
     url: "",
+  },
+  website: {
+    type: String,
+    default: "",
   },
   resetCode: {
     type: String,

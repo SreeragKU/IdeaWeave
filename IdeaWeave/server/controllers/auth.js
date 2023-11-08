@@ -173,7 +173,8 @@ exports.signin = async (req, res) => {
       });
     }
 
-    if (!user.isActive) { // Check if the user's account is disabled
+    if (!user.isActive) {
+      // Check if the user's account is disabled
       return res.json({
         error: "User is disabled. Please contact support for assistance.",
       });
@@ -219,17 +220,18 @@ exports.forgotPassword = async (req, res) => {
     from: EMAIL_FROM,
     to: user.email,
     subject: "Password Reset Request",
-    text: `Dear ${user.name},\n\n`
-        + "We received a request to reset your password. Please use the following code to reset your password:\n\n"
-        + `Reset Code: ${resetCode}\n\n`
-        + "If you did not make this request, please disregard this email. Your account's security is important to us.\n\n"
-        + "Sincerely,\n"
-        + "The IdeaWeave Team", 
+    text:
+      `Dear ${user.name},\n\n` +
+      "We received a request to reset your password. Please use the following code to reset your password:\n\n" +
+      `Reset Code: ${resetCode}\n\n` +
+      "If you did not make this request, please disregard this email. Your account's security is important to us.\n\n" +
+      "Sincerely,\n" +
+      "The IdeaWeave Team",
     html: `<p>Dear ${user.name},</p>
           <p>We received a request to reset your password. Please use the following code to reset your password:</p>
           <p><strong>Reset Code:</strong> ${resetCode}</p>
           <p>If you did not make this request, please disregard this email. Your account's security is important to us.</p>
-          <p>Sincerely,<br>The IdeaWeave Team</p>`, 
+          <p>Sincerely,<br>The IdeaWeave Team</p>`,
   };
 
   // send email
@@ -287,7 +289,7 @@ exports.currentUser = async (req, res) => {
 
 exports.users = async (req, res) => {
   try {
-    const all = await User.find().select('-password -secret  -resetCode');
+    const all = await User.find().select("-password -secret  -resetCode");
     res.json(all);
   } catch (error) {
     console.log(error);
@@ -345,3 +347,90 @@ exports.toggleUserStatus = async (req, res) => {
   }
 };
 
+exports.createUser = async (req, res) => {
+  try {
+    const { name, email, password, role, checked, website } = req.body;
+
+    if (!name) {
+      return res.json({
+        error: "Name is required",
+      });
+    }
+    if (!email) {
+      return res.json({
+        error: "Email is required",
+      });
+    }
+
+    // Password validation with regex
+    const passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+    if (!password || !passwordRegex.test(password)) {
+      return res.json({
+        error:
+          "Password must be 8+ characters with at least one number, one special character, one uppercase, and one lowercase letter.",
+      });
+    }
+
+    // if user exists
+    const exist = await User.findOne({ email });
+
+    if (exist) {
+      return res.json({ error: "Email is taken" });
+    }
+
+    // hash password
+    const hashedPassword = await hashPassword(password);
+
+    if (checked) {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: EMAIL_FROM, 
+          pass: EMAIL_APP_PASSWORD, 
+        },
+      });
+
+      const emailData = {
+        from: EMAIL_FROM,
+        to: email,
+        subject: "Account created",
+        html: `
+        <h1>Hi ${name}</h1>
+        <p>Your IdeaWeave account has been created successfully.</p>
+        <h3>Your login details</h3>
+        <p style="color:red;">Email: ${email}</p>
+        <p style="color:red;">Password: ${password}</p>
+        <small>We recommend you to change your password after login.</small>
+        `,
+      };
+
+      try {
+        const data = await transporter.sendMail(emailData);
+        //console.log("email sent => ", data);
+      } catch (err) {
+        console.log(err);
+        return res.json({ error: "Failed to send email using Gmail" });
+      }
+    }
+
+    try {
+      const user = await new User({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        website,
+      }).save();
+
+      const { password, ...rest } = user._doc;
+      return res.json(rest);
+    } catch (err) {
+      console.log(err);
+      return res.json({ error: "Failed to create user" });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.json({ error: "Error in createUser function" });
+  }
+};

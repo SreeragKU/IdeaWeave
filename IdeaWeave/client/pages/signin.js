@@ -100,14 +100,13 @@ function Signin() {
           //form = {form}
           name="normal_login"
           className="login-form"
-          initialValues={{ remember: true, email: "ideaweavep@gmail.com", password: "sku@ADMIN20"}}
-          onFinish={onFinish}
+          onFinish={onFinish}Q
         >
           {/* email */}
           <Form.Item
             name="email"
             rules={[{ type: "email", message: "Please enter a valid email!" }]}
-            style={{ marginBottom: "16px" }} // Added margin to align with other form items
+            style={{ marginBottom: "16px" }}
           >
             <Input
               prefix={<MailOutlined className="site-form-item-icon" />}
@@ -117,28 +116,36 @@ function Signin() {
           {/* password */}
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please input your Password!" }]}
+            rules={[
+              { required: true, message: "Please input your Password!" },
+              {
+                pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/,
+                message:
+                  "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+              },
+            ]}
             style={{ marginBottom: "16px" }}
           >
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type={showPassword ? "text" : "password"} // Toggle password visibility
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
-              iconRender={(visible) =>
+              iconRender={(visible) => (
                 visible ? (
                   <EyeOutlined
                     style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                    onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                    onClick={() => setShowPassword(!showPassword)}
                   />
                 ) : (
                   <EyeInvisibleOutlined
                     style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                    onClick={() => setShowPassword(!showPassword)} // Toggle password visibility
+                    onClick={() => setShowPassword(!showPassword)}
                   />
                 )
-              }
+              )}
             />
           </Form.Item>
+
 
           <div>
             <Link href="/forgot-password">Forgot Password</Link>

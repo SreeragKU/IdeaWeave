@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import AdminLayout from "../../../components/layout/AdminLayout";
 import Link from "next/link";
 import htmlToMd from "html-to-md";
+import dayjs from "dayjs"; 
 
 const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
@@ -86,6 +87,11 @@ function Posts() {
               />
               <Title level={5}>{post.title}</Title>
               <Text ellipsis>{htmlToMd(post.content)}</Text>
+              <div style={{ marginTop: "16px" }}>
+                <u>Posted On</u> : <i>{dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")}</i>
+                <br />
+                <u>Posted By</u> : {post.postedBy.name}
+              </div>
             </Card>
           </Col>
         ))}
