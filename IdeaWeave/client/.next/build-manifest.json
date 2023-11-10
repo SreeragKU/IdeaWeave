@@ -22,16 +22,6 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/author": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/author.js"
-    ],
-    "/author/posts": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/author/posts.js"
-    ],
     "/author/posts/[slug]": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",

@@ -27,7 +27,7 @@ export const isAuthor = async (req, res, next) => {
     try {
       const user = await User.findById(req.user._id);
       if (user.role !== "Author") {
-        return res.status(403).send("Unauhorized");
+        return res.status(403).send("Unauthorized");
       } else {
         next();
       }

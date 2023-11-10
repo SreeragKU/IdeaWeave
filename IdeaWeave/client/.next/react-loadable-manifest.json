@@ -1,6 +1,6 @@
 {
-  "..\\components\\posts\\EditPostComponent.js -> react-quill": {
-    "id": "..\\components\\posts\\EditPostComponent.js -> react-quill",
+  "..\\components\\layout\\EditPostComponent.js -> react-quill": {
+    "id": "..\\components\\layout\\EditPostComponent.js -> react-quill",
     "files": [
       "static/chunks/node_modules_react-quill_lib_index_js.js"
     ]

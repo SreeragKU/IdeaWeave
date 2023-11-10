@@ -1,9 +1,14 @@
-import AuthorLayout from "../../../components/layout/AuthorLayout"
-import EditPostComponent from "../../../components/posts/EditPostComponent";
+import AuthorLayout from "../../../components/layout/AuthorLayout";
+import EditPostComponent from "../../../components/layout/EditPostComponent";
 
-const EditPost = () => {
-  <AuthorLayout>
-    <EditPostComponent />
-  </AuthorLayout>
-};
+function EditPost() {
+  const user = "/author";
+  
+  return (
+    <AuthorLayout>
+      <EditPostComponent user={user} />
+    </AuthorLayout>
+  );
+}
+
 export default EditPost;

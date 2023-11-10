@@ -47,6 +47,12 @@ const AdminNav = () => {
   }, []);
 
   const customStyles = {
+    sider: {
+      width: collapsed ? 80 : 200,
+      height: "100vh",
+      transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
+      overflow: "hidden",
+    },
     menu: {
       background: theme === "dark" ? "#001529" : "#f0f2f5",
     },
@@ -62,19 +68,22 @@ const AdminNav = () => {
     activeItem: {
       background: theme === "dark" ? "#1890ff" : "#91d5ff",
       color: "#fff",
-      textDecoration: "underline", // Underline for active items
+      textDecoration: "underline",
     },
     activeSubMenu: {
       background: theme === "dark" ? "#1890ff" : "#91d5ff",
       color: "#fff",
+      transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0.1s", // Add a small delay
     },
   };
+  
 
   return (
     <Sider
       collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
+      style={customStyles.sider}
     >
       <Menu
         defaultOpenKeys={["2", "6", "10"]}
