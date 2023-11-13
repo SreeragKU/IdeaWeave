@@ -2,7 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/author/posts/[slug]": "pages/author/posts/[slug].js",
-  "/author/posts/new": "pages/author/posts/new.js",
-  "/author/posts": "pages/author/posts.js"
+  "/": "pages/index.js",
+  "/admin": "pages/admin.js",
+  "/signin": "pages/signin.js",
+  "/admin/posts/new": "pages/admin/posts/new.js"
 }
