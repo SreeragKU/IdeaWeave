@@ -23,42 +23,104 @@ export const uploadImage = async (req, res) => {
 
 export const createPost = async (req, res) => {
   try {
-    // console.log(req.body);
-    const { title, content, categories } = req.body;
-    // check if title is taken
-    const alreadyExist = await Post.findOne({
-      slug: slugify(title.toLowerCase()),
-    });
-    if (alreadyExist) return res.json({ error: "Title is taken" });
+    const { title, volumes, categories, coverImage } = req.body;
 
-    // get category ids based on category name
-    let ids = [];
-    for (let i = 0; i < categories.length; i++) {
-      Category.findOne({
-        name: categories[i],
-      }).exec((err, data) => {
-        if (err) return console.log(err);
-        ids.push(data._id);
-      });
+    // Validate data
+    if (!title || !volumes || !categories || !coverImage) {
+      return res.status(400).json({ error: "All fields are required" });
     }
 
-    // save post
-    setTimeout(async () => {
-      try {
-        const post = await new Post({
-          ...req.body,
-          slug: slugify(title),
-          categories: ids,
-          postedBy: req.user._id,
-        }).save();
+    // Check if the title is taken
+    const alreadyExist = await Post.findOne({ slug: slugify(title.toLowerCase()) });
+    if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
 
-        return res.json(post);
-      } catch (err) {
-        console.log(err);
-      }
-    }, 1000);
+    // Validate category names and get category ids
+    const categoryIds = await Promise.all(
+      categories.map(async (category) => {
+        const existingCategory = await Category.findOne({ name: category });
+        return existingCategory ? existingCategory._id : null;
+      })
+    );
+
+    // Create post
+    const post = await new Post({
+      title,
+      volumes,
+      categories: categoryIds.filter((categoryId) => categoryId), 
+      coverImage,
+      postedBy: req.user._id,
+      slug: slugify(title),
+    }).save();
+
+    return res.json(post);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const singlePost = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const post = await Post.findOne({ slug })
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .populate("coverImage", "url")
+      .populate({
+        path: "volumes",
+        populate: {
+          path: "chapters",
+          select: "name content",
+        },
+      });
+
+    res.json(post);
   } catch (err) {
     console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const editPost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { title, volumes, coverImage, categories } = req.body;
+
+    // Get category ids based on category name
+    const categoryIds = await Promise.all(
+      categories.map(async (category) => {
+        const existingCategory = await Category.findOne({ name: category });
+        return existingCategory ? existingCategory._id : null;
+      })
+    );
+
+    // Update post
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        title,
+        slug: slugify(title),
+        volumes,
+        categories: categoryIds.filter((categoryId) => categoryId),
+        coverImage,
+      },
+      { new: true }
+    )
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .populate("coverImage", "url")
+      .populate({
+        path: "volumes",
+        populate: {
+          path: "chapters",
+          select: "name content",
+        },
+      });
+
+    res.json(post);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -68,7 +130,9 @@ export const posts = async (req, res) => {
       .populate('coverImage')
       .populate("postedBy", "name")
       .populate("categories", "name slug")
+      .populate("volumes.chapters", "name content") 
       .sort({ createdAt: -1 });
+
     res.json(all);
   } catch (err) {
     console.log(err);
@@ -116,61 +180,10 @@ export const removeMedia = async (req, res) => {
   }
 };
 
-export const singlePost = async (req, res) => {
-  try {
-    const { slug } = req.params;
-    const post = await Post.findOne({ slug })
-      .populate("postedBy", "name")
-      .populate("categories", "name slug")
-      .populate("coverImage", "url");
-    res.json(post);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 export const removePost = async (req, res) => {
   try {
     const post = await Post.findByIdAndDelete(req.params.postId);
     res.json({ ok: true });
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-export const editPost = async (req, res) => {
-  try {
-    const { postId } = req.params;
-    const { title, content, coverImage, categories } = req.body;
-    // get category ids based on category name
-    let ids = [];
-    for (let i = 0; i < categories.length; i++) {
-      Category.findOne({
-        name: categories[i],
-      }).exec((err, data) => {
-        if (err) return console.log(err);
-        ids.push(data._id);
-      });
-    }
-
-    setTimeout(async () => {
-      const post = await Post.findByIdAndUpdate(
-        postId,
-        {
-          title,
-          slug: slugify(title),
-          content,
-          categories: ids,
-          coverImage,
-        },
-        { new: true }
-      )
-        .populate("postedBy", "name")
-        .populate("categories", "name slug")
-        .populate("coverImage", "url");
-
-      res.json(post);
-    }, 1000);
   } catch (err) {
     console.log(err);
   }

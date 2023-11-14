@@ -1,15 +1,12 @@
 import htmlToMd from "html-to-md";
 import dayjs from "dayjs";
-import { Card, Col, Space, Popconfirm } from "antd"; 
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons"; 
-import { Typography } from "antd"; 
+import { Card, Col, Space, Popconfirm } from "antd";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Typography } from "antd";
 
-const { Text, Title } = Typography; 
-
-
+const { Text, Title } = Typography;
 
 const PostsList = ({ posts, handleDelete, handleEdit }) => {
-  
   return (
     <>
       {posts.map((post) => (
@@ -27,7 +24,7 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
                 >
                   <DeleteOutlined />
                 </Popconfirm>
-              </Space>
+              </Space>,
             ]}
           >
             <img
@@ -36,7 +33,17 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
               style={{ width: "100%", height: "150px" }}
             />
             <Title level={5}>{post.title}</Title>
-            <Text ellipsis>{htmlToMd(post.content)}</Text>
+            {/* Displaying volume and chapter information */}
+            {post.volumes.map((volume) => (
+              <div key={volume.volume}>
+                <Text strong>{volume.volume}</Text>
+                {volume.chapters.map((chapter) => (
+                  <div key={chapter.name}>
+                    <Text ellipsis>{htmlToMd(chapter.content)}</Text>
+                  </div>
+                ))}
+              </div>
+            ))}
             <div style={{ marginTop: "16px" }}>
               <u>Posted On</u> :{" "}
               <i>{dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")}</i>

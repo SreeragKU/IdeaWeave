@@ -28,7 +28,7 @@ function Posts() {
     } catch (err) {
       console.log(err);
     }
-  };
+  };  
 
   const handleEdit = async (post) => {
     return router.push(`/admin/posts/${post.slug}`);
