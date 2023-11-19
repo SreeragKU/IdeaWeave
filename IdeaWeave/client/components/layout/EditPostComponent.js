@@ -22,6 +22,7 @@ import {
   EyeOutlined,
   PlusOutlined,
   EditOutlined,
+  DragOutlined,
 } from "@ant-design/icons";
 import Media from "../media";
 import { MediaContext } from "../../context/media";
@@ -126,7 +127,7 @@ function EditPostComponent({ page = "admin" }) {
           volume: volume.volume,
           chapters: volume.chapters.map((chapter) => {
             return {
-              name: chapter.name,
+              name: chapter.name || `Chapter ${chapterIndex + 1}`,
               content: chapter.content,
             };
           }),
@@ -210,13 +211,13 @@ function EditPostComponent({ page = "admin" }) {
         setLoading(false);
       } else {
         // Clear local storage data
-        localStorage.removeItem("post-title");
-        localStorage.removeItem("post-volumes");
+        localStorage.removeItem("post-edit-title");
+        localStorage.removeItem("post-edit-volumes");
         Object.keys(quillContent).forEach((key) => {
-          const chapterLocalStorageKey = `post-chapter-${key}`;
+          const chapterLocalStorageKey = `post-edit-chapter-${key}`;
           localStorage.removeItem(chapterLocalStorageKey);
         });
-        localStorage.removeItem("post-image");
+        localStorage.removeItem("post-edit-image");
 
         // Clear media and redirect
         setMedia({ ...media, selected: null });
@@ -230,15 +231,24 @@ function EditPostComponent({ page = "admin" }) {
     }
   };
 
+  const getChapterContentFromLocalStorage = (volumeIndex, chapterIndex) => {
+    const key = `${volumeIndex}-${chapterIndex}`;
+    const chapterLocalStorageKey = `post-edit-chapter-${key}`;
+    const storedChapter = JSON.parse(
+      localStorage.getItem(chapterLocalStorageKey)
+    );
+    return storedChapter?.content || "";
+  };
+
   const handleNextStep = () => {
     if (step === 0) {
-      localStorage.setItem("post-title", JSON.stringify(title));
+      localStorage.setItem("post-edit-title", JSON.stringify(title));
     } else if (step === 1) {
       // Load previous volumes and image from local storage
       const loadedVolumesFromLocalStorage =
-        JSON.parse(localStorage.getItem("post-volumes")) || [];
+        JSON.parse(localStorage.getItem("post-edit-volumes")) || [];
       const loadedImageFromLocalStorage =
-        JSON.parse(localStorage.getItem("post-image")) || {};
+        JSON.parse(localStorage.getItem("post-edit-image")) || {};
 
       // Check if volumes and chapters have been modified
       const volumesChanged = volumes.some((v, volumeIndex) => {
@@ -261,11 +271,11 @@ function EditPostComponent({ page = "admin" }) {
       if (!volumesChanged) {
         // Volumes and chapters have not been modified, use the loaded values
         localStorage.setItem(
-          "post-volumes",
+          "post-edit-volumes",
           JSON.stringify(loadedVolumesFromLocalStorage)
         );
         localStorage.setItem(
-          "post-image",
+          "post-edit-image",
           JSON.stringify(loadedImageFromLocalStorage)
         );
       } else {
@@ -279,8 +289,14 @@ function EditPostComponent({ page = "admin" }) {
           })),
         }));
 
-        localStorage.setItem("post-volumes", JSON.stringify(updatedVolumes));
-        localStorage.setItem("post-image", JSON.stringify(media?.selected));
+        localStorage.setItem(
+          "post-edit-volumes",
+          JSON.stringify(updatedVolumes)
+        );
+        localStorage.setItem(
+          "post-edit-image",
+          JSON.stringify(media?.selected)
+        );
       }
     }
 
@@ -293,21 +309,21 @@ function EditPostComponent({ page = "admin" }) {
 
   const handleRemoveChapter = (volumeIndex, chapterIndex) => {
     const updatedVolumes = [...volumes];
-  
+
     // Remove the selected chapter
     updatedVolumes[volumeIndex].chapters.splice(chapterIndex, 1);
-  
+
     // Renumber the remaining chapters
     updatedVolumes[volumeIndex].chapters.forEach((chapter, index) => {
       chapter.chapter = index + 1;
       chapter.name = `Chapter ${chapter.chapter}`;
     });
-  
+
     // Remove corresponding data from local storage
     const key = `${volumeIndex}-${chapterIndex}`;
-    const chapterLocalStorageKey = `post-chapter-${key}`;
+    const chapterLocalStorageKey = `post-edit-chapter-${key}`;
     localStorage.removeItem(chapterLocalStorageKey);
-  
+
     // Update state
     setVolumes(updatedVolumes);
     setQuillContent((prevContent) => {
@@ -315,7 +331,7 @@ function EditPostComponent({ page = "admin" }) {
       return rest;
     });
   };
-  
+
   const handleRemoveVolume = (volumeIndex) => {
     const updatedVolumes = [...volumes];
 
@@ -329,7 +345,7 @@ function EditPostComponent({ page = "admin" }) {
     // Remove corresponding data from local storage for each chapter in the volume
     removedVolume.chapters.forEach((_, chapterIndex) => {
       const key = `${volumeIndex}-${chapterIndex}`;
-      const chapterLocalStorageKey = `post-chapter-${key}`;
+      const chapterLocalStorageKey = `post-edit-chapter-${key}`;
       localStorage.removeItem(chapterLocalStorageKey);
     });
 
@@ -343,7 +359,7 @@ function EditPostComponent({ page = "admin" }) {
       const { [removedVolumeKey]: removedVolumeData, ...rest } = prevContent;
       return volumeContentKeys.reduce((acc, key) => {
         // Remove each chapter's content corresponding to the removed volume
-        const chapterLocalStorageKey = `post-chapter-${key}`;
+        const chapterLocalStorageKey = `post-edit-chapter-${key}`;
         localStorage.removeItem(chapterLocalStorageKey);
         return { ...acc, [key]: prevContent[key] };
       }, rest);
@@ -600,7 +616,7 @@ function EditPostComponent({ page = "admin" }) {
                                     },
                                   });
 
-                                  const chapterLocalStorageKey = `post-chapter-${key}`;
+                                  const chapterLocalStorageKey = `post-edit-chapter-${key}`;
                                   localStorage.setItem(
                                     chapterLocalStorageKey,
                                     JSON.stringify({
@@ -629,9 +645,11 @@ function EditPostComponent({ page = "admin" }) {
                             updatedVolumes[volumeIndex].chapters.length - 1;
                           const newChapterNumber =
                             lastChapterIndex >= 0
-                              ? updatedVolumes[volumeIndex].chapters[
-                                  lastChapterIndex
-                                ].chapter + 1
+                              ? Math.max(
+                                  ...updatedVolumes[volumeIndex].chapters.map(
+                                    (chapter) => chapter.chapter
+                                  )
+                                ) + 1
                               : 1;
 
                           updatedVolumes[volumeIndex].chapters.push({

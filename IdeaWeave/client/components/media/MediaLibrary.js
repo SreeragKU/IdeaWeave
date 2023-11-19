@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Upload, message, Image, Badge } from "antd";
+import { Upload, message, Image, Badge, Popconfirm } from "antd";
 import { AuthContext } from "../../context/auth";
 import { CloseCircleOutlined, InboxOutlined } from "@ant-design/icons";
 import { MediaContext } from "../../context/media";
@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 
 const { Dragger } = Upload;
 
-const MediaLibrary = () => {
+const MediaLibrary = ({ page = "admin" }) => {
   // context
   const [auth, setAuth] = useContext(AuthContext);
   const [media, setMedia] = useContext(MediaContext);
@@ -70,43 +70,94 @@ const MediaLibrary = () => {
   };
 
   return (
-    <>
-      <div style={{ width: "75%", margin: "0 auto" }}>
-        <Dragger {...props} accept="image/*">
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p className="ant-upload-text">
-            Click or drag file to this area to upload
-          </p>
-        </Dragger>
-      </div>
+    <div style={{ width: "75%", margin: "0 auto", marginTop: 40 }}>
+      <Dragger {...props} accept="image/*">
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">
+          Click or drag file to this area to upload
+        </p>
+      </Dragger>
 
-      <div style={{ textAlign: "center" }}>
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: 20,
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
         {media?.images?.map((image) => (
           <Badge key={image._id}>
-            <Image
-              onClick={() => setMedia({ ...media, selected: image })}
-              preview={showPreview}
-              src={image.url}
+            <div
               style={{
-                paddingTop: 5,
-                paddingRight: 10,
-                height: "100px",
-                width: "100px",
-                objectFit: "cover",
-                cursor: "pointer",
+                margin: "10px",
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                position: "relative",
               }}
-            />
-            <br />
-            <CloseCircleOutlined
-              onClick={() => handleImageDelete(image._id)}
-              style={{ marginTop: "7px", color: "#f5222d" }}
-            />
+            >
+              <Image
+                onClick={() => setMedia({ ...media, selected: image })}
+                preview={showPreview}
+                src={image.url}
+                style={{
+                  height: "100px",
+                  width: "100px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  borderRadius: "8px",
+                }}
+              />
+              <br />
+              {page === "author" && image?.postedBy?._id == auth?.user?._id ? (
+                <Popconfirm
+                  title="Are you sure to delete this image?"
+                  onConfirm={() => handleImageDelete(image._id)}
+                  okText="Yes"
+                  cancelText="No"
+                  placement="bottomRight"
+                >
+                  <CloseCircleOutlined
+                    style={{
+                      position: "absolute",
+                      bottom: "5px",
+                      right: "5px",
+                      color: "#f5222d",
+                      cursor: "pointer",
+                    }}
+                  />
+                </Popconfirm>
+              ) : page === "admin" ? (
+                <Popconfirm
+                  title="Are you sure to delete this image?"
+                  onConfirm={() => handleImageDelete(image._id)}
+                  okText="Yes"
+                  cancelText="No"
+                  placement="bottomRight"
+                >
+                  <CloseCircleOutlined
+                    style={{
+                      position: "absolute",
+                      bottom: "5px",
+                      right: "5px",
+                      color: "#f5222d",
+                      cursor: "pointer",
+                    }}
+                  />
+                </Popconfirm>
+              ) : (
+                ""
+              )}
+            </div>
           </Badge>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

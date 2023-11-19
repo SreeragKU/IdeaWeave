@@ -82,7 +82,7 @@ function Signin() {
         } else if (data?.user?.role === "Author") {
           router.push("/author");
         } else {
-          router.push("/subscriber");
+          router.push("/reader");
         }
       }
     } catch (err) {

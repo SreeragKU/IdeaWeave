@@ -58,7 +58,6 @@ const AuthorNav = () => {
       children: [
         { key: "/author/posts", text: "All Books" },
         { key: "/author/posts/new", text: "Write New Book" },
-        { key: "/author/categories", text: "Categories" },
       ],
     },
     {
@@ -66,7 +65,7 @@ const AuthorNav = () => {
       icon: <CameraOutlined />,
       text: "Media",
       children: [
-        { key: "/author/media/library", text: "Library" },
+        { key: "/author/media/library", text: "Media Library" },
         { key: "/author/media/new", text: "Add New Media" },
       ],
     },
@@ -91,6 +90,10 @@ const AuthorNav = () => {
       transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
       overflow: "hidden",
       paddingTop: "64px",
+      position: "fixed",  
+      left: 0,            
+      top: 0,             
+      zIndex: 1000,
     },
     fixedSider: {
       position: "fixed",

@@ -101,13 +101,13 @@ function NewPostComponent({ page = "admin" }) {
       ? JSON.parse(localStorage.getItem("post-volumes")) || [
           {
             volume: "",
-            chapters: [{ chapter: "1", name: "Chapter 1", content: "" }],
+            chapters: [{ chapter: "1", name: "", content: "" }],
           },
         ]
       : [
           {
             volume: "",
-            chapters: [{ chapter: "1", name: "Chapter 1", content: "" }],
+            chapters: [{ chapter: "1", name: "", content: "" }],
           },
         ]
   );

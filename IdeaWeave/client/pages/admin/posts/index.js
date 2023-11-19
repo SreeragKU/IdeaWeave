@@ -1,5 +1,5 @@
-import { useEffect, useContext } from "react";
-import { Row, Col, Button, Grid, Typography } from "antd";
+import { useEffect, useContext, useState } from "react";
+import { Row, Col, Button, Grid, Typography, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { PostContext } from "../../../context/post";
@@ -16,6 +16,7 @@ function Posts() {
   const { posts } = post;
   const router = useRouter();
   const screens = useBreakpoint();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPosts();
@@ -23,12 +24,15 @@ function Posts() {
 
   const fetchPosts = async () => {
     try {
+      setLoading(true);
       const { data } = await axios.get("/posts");
       setPost((prev) => ({ ...prev, posts: data }));
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
-  };  
+  };
 
   const handleEdit = async (post) => {
     return router.push(`/admin/posts/${post.slug}`);
@@ -58,10 +62,10 @@ function Posts() {
             </Link>
           </Button>
           <Title style={{ marginTop: 15 }} level={3}>
-            {posts?.length} Posts
+            {loading ? <Spin /> : `${posts?.length} Posts`}
           </Title>
         </Col>
-        <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit}/>
+        <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit} />
       </Row>
     </AdminLayout>
   );

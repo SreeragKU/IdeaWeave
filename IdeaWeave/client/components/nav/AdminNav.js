@@ -173,7 +173,7 @@ const AdminNav = () => {
                 : customStyles.item
             }
           >
-            <Link href="/admin/media/library">Library</Link>
+            <Link href="/admin/media/library">Media Library</Link>
           </Menu.Item>
           <Menu.Item
             key="/admin/media/new"

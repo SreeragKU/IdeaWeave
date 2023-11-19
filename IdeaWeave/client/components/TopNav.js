@@ -43,7 +43,7 @@ const TopNav = () => {
     } else if (auth?.user?.role === "Author") {
       return "/author";
     } else {
-      return "/subscriber";
+      return "/reader";
     }
   };
 

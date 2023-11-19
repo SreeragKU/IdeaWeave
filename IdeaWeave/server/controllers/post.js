@@ -3,6 +3,7 @@ import Category from "../models/category";
 import slugify from "slugify";
 import cloudinary from "cloudinary";
 import Media from "../models/media";
+import User from "../models/user";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -39,13 +40,12 @@ export const createPost = async (req, res) => {
       })
     );
 
-    // Adjust the volumes and chapters data
     const formattedVolumes = volumes.map((volume) => ({
       volume: volume.volume,
       chapters: volume.chapters.map((chapter) => ({
         chapter: chapter.chapter,
         name: chapter.name,
-        content: chapter.content, // Make sure to include content here
+        content: chapter.content, 
       })),
     }));
 
@@ -58,6 +58,10 @@ export const createPost = async (req, res) => {
       postedBy: req.user._id,
       slug: slugify(title),
     }).save();
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $addToSet: { posts: post._id },
+    });
 
     return res.json(post);
   } catch (err) {
