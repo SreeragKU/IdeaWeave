@@ -68,6 +68,12 @@ const quillFormats = [
   "background",
 ];
 
+const quillWrapperStyles = {
+  height: "500px",
+  overflowY: "auto",
+  padding: "20px",
+};
+
 function NewPostComponent({ page = "admin" }) {
   const [step, setStep] = useState(0);
   const [quillContent, setQuillContent] = useState({});
@@ -81,7 +87,6 @@ function NewPostComponent({ page = "admin" }) {
 
   const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Step 1: Book Title and Cover Image
   const [title, setTitle] = useState(
@@ -96,13 +101,13 @@ function NewPostComponent({ page = "admin" }) {
       ? JSON.parse(localStorage.getItem("post-volumes")) || [
           {
             volume: "",
-            chapters: [{ chapter: "", content: "" }],
+            chapters: [{ chapter: "1", name: "Chapter 1", content: "" }],
           },
         ]
       : [
           {
             volume: "",
-            chapters: [{ chapter: "", content: "" }],
+            chapters: [{ chapter: "1", name: "Chapter 1", content: "" }],
           },
         ]
   );
@@ -118,6 +123,14 @@ function NewPostComponent({ page = "admin" }) {
           const storedChapter = JSON.parse(
             localStorage.getItem(chapterLocalStorageKey)
           );
+
+          // Update post-volumes with loaded content
+          const updatedVolumes = [...storedVolumes];
+          updatedVolumes[volumeIndex].chapters[chapterIndex].content =
+            storedChapter ? storedChapter.content || "" : "";
+
+          localStorage.setItem("post-volumes", JSON.stringify(updatedVolumes));
+
           return {
             ...chapterAcc,
             [key]: storedChapter ? storedChapter.content || "" : "",
@@ -132,30 +145,43 @@ function NewPostComponent({ page = "admin" }) {
 
   const handleNextStep = () => {
     if (step === 0) {
-      localStorage.setItem("post-title", JSON.stringify(title));
-    } else if (step === 1) {
-      const invalidVolumes = volumes.filter(
-        (v) => !v.volume || v.chapters.length < 1
-      );
-      if (invalidVolumes.length > 0) {
-        toast.error("Please enter a valid volume name and at least 1 chapter.");
+      // Step 1 validation
+      if (!title || !media?.selected) {
+        toast.error("Please enter a title and select a cover image.");
         return;
       }
-
+      localStorage.setItem("post-title", JSON.stringify(title));
+    } else if (step === 1) {
+      // Step 2 validation
+      const invalidVolumes = volumes.filter(
+        (v) =>
+          !v.volume ||
+          v.chapters.length < 1 ||
+          !v.chapters.every((c) => c.name && c.content)
+      );
+      if (invalidVolumes.length > 0) {
+        toast.error(
+          "Please enter valid volume names and ensure each chapter has a name and content."
+        );
+        return;
+      }
       // Ensure that each chapter has initial values
       const updatedVolumes = volumes.map((volume) => ({
         volume: volume.volume,
         chapters: volume.chapters.map((chapter) => ({
-          chapter: chapter.chapter || "1", // Set a default value for chapter
-          name: chapter.name || "Untitled", // Set a default value for name
-          content: chapter.content || "", // Set a default value for content
+          chapter: chapter.chapter || "1",
+          name: chapter.name || "Untitled",
+          content: chapter.content || "",
         })),
       }));
-
       localStorage.setItem("post-volumes", JSON.stringify(updatedVolumes));
-
-      // Store selected cover image in localStorage
       localStorage.setItem("post-image", JSON.stringify(media?.selected));
+    } else if (step === 2) {
+      // Step 3 validation
+      if (selectedCategories.length === 0) {
+        toast.error("Please choose at least one category before publishing.");
+        return;
+      }
     }
 
     setStep(step + 1);
@@ -177,10 +203,6 @@ function NewPostComponent({ page = "admin" }) {
     }
   }, []);
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
   const loadCategories = async () => {
     try {
       const { data } = await axios.get("/category");
@@ -190,25 +212,108 @@ function NewPostComponent({ page = "admin" }) {
     }
   };
 
+  const handleRemoveChapter = (volumeIndex, chapterIndex) => {
+    const updatedVolumes = [...volumes];
+
+    // Remove the selected chapter
+    updatedVolumes[volumeIndex].chapters.splice(chapterIndex, 1);
+
+    // Renumber the remaining chapters
+    updatedVolumes[volumeIndex].chapters.forEach((chapter, index) => {
+      chapter.chapter = index + 1;
+      chapter.name = `Chapter ${chapter.chapter}`;
+    });
+
+    // Remove corresponding data from local storage
+    const key = `${volumeIndex}-${chapterIndex}`;
+    const chapterLocalStorageKey = `post-chapter-${key}`;
+    localStorage.removeItem(chapterLocalStorageKey);
+
+    // Update state
+    setVolumes(updatedVolumes);
+    setQuillContent((prevContent) => {
+      const { [key]: removed, ...rest } = prevContent;
+      return rest;
+    });
+  };
+
+  const getChapterContentFromLocalStorage = (volumeIndex, chapterIndex) => {
+    const key = `${volumeIndex}-${chapterIndex}`;
+    const chapterLocalStorageKey = `post-chapter-${key}`;
+    const storedChapter = JSON.parse(
+      localStorage.getItem(chapterLocalStorageKey)
+    );
+    return storedChapter?.content || "";
+  };
+
+  const handleRemoveVolume = (volumeIndex) => {
+    const updatedVolumes = [...volumes];
+
+    // Remove the selected volume
+    const removedVolume = updatedVolumes.splice(volumeIndex, 1)[0];
+
+    // Remove corresponding data from local storage for the volume
+    const removedVolumeKey = `volume-${volumeIndex}`;
+    localStorage.removeItem(removedVolumeKey);
+
+    // Remove corresponding data from local storage for each chapter in the volume
+    removedVolume.chapters.forEach((_, chapterIndex) => {
+      const key = `${volumeIndex}-${chapterIndex}`;
+      const chapterLocalStorageKey = `post-chapter-${key}`;
+      localStorage.removeItem(chapterLocalStorageKey);
+    });
+
+    // Update state
+    setVolumes(updatedVolumes);
+    setQuillContent((prevContent) => {
+      // Remove content corresponding to the removed volume
+      const volumeContentKeys = Object.keys(prevContent).filter((key) =>
+        key.startsWith(`${volumeIndex}-`)
+      );
+      const { [removedVolumeKey]: removedVolumeData, ...rest } = prevContent;
+      return volumeContentKeys.reduce((acc, key) => {
+        // Remove each chapter's content corresponding to the removed volume
+        const chapterLocalStorageKey = `post-chapter-${key}`;
+        localStorage.removeItem(chapterLocalStorageKey);
+        return { ...acc, [key]: prevContent[key] };
+      }, rest);
+    });
+  };
+
+  const [selectedCategories, setSelectedCategories] = useState(
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("selected-categories")) || []
+      : []
+  );
+
   const handlePublish = async () => {
     try {
       setLoading(true);
 
       const formattedVolumesChapters = volumes
         .filter((v) => v.volume && v.chapters.length >= 1)
-        .map(
-          (v, volumeIndex) =>
-            `${v.volume}: ${v.chapters
-              .map(
-                (c, chapterIndex) =>
-                  `Chapter ${c.chapter || "1"}: ${c.name} - ${
-                    quillContent[`${volumeIndex}-${chapterIndex}`]?.content ||
-                    ""
-                  }`
-              )
-              .join(", ")}`
-        )
-        .join("; ");
+        .map((v, volumeIndex) => {
+          const formattedChapters = v.chapters
+            .map((c, chapterIndex) => {
+              return {
+                chapterNumber: c.chapter,
+                chapterName: c.name,
+                chapterContent:
+                  quillContent[`${volumeIndex}-${chapterIndex}`]?.content ||
+                  getChapterContentFromLocalStorage(
+                    volumeIndex,
+                    chapterIndex
+                  ) ||
+                  "",
+              };
+            })
+            .filter((chapter) => chapter.chapterContent.trim() !== "");
+
+          return {
+            volumeName: v.volume,
+            chapters: formattedChapters,
+          };
+        });
 
       const formattedContent = `<div style="font-size: 1.2rem; line-height: 1.6">${formattedVolumesChapters}</div>`;
 
@@ -220,15 +325,22 @@ function NewPostComponent({ page = "admin" }) {
         coverImage: media?.selected?._id,
         volumes: volumes.map((volume, volumeIndex) => ({
           volume: volume.volume,
-          chapters: volume.chapters.map((chapter, chapterIndex) => ({
-            chapter: chapter.chapter,
-            name: chapter.name,
-            content:
-              quillContent[`${volumeIndex}-${chapterIndex}`]?.content || "",
-          })),
+          chapters: volume.chapters.map((chapter, chapterIndex) => {
+            if (!chapter.chapter) {
+              toast.error("Chapter number cannot be empty");
+            }
+            return {
+              chapter: chapter.chapter,
+              name: chapter.name,
+              content:
+                quillContent[`${volumeIndex}-${chapterIndex}`]?.content ||
+                getChapterContentFromLocalStorage(volumeIndex, chapterIndex) ||
+                "",
+            };
+          }),
         })),
       };
-      
+
       const { data } = await axios.post("/create-post", postData);
 
       if (data?.error) {
@@ -258,7 +370,7 @@ function NewPostComponent({ page = "admin" }) {
 
   return (
     <>
-      <Row justify="center" style={{ marginTop: "50px" }}>
+      <Row justify="center" style={{ paddingLeft: "30px", paddingTop: "50px" }}>
         <Col span={18}>
           <Card style={{ padding: "20px", marginBottom: "20px" }}>
             <Steps current={step} style={{ marginBottom: "20px" }}>
@@ -364,7 +476,7 @@ function NewPostComponent({ page = "admin" }) {
             )}
 
             {step === 1 && (
-              <Card>
+              <Card style={{ marginBottom: "20px" }}>
                 <h1>Volumes and Chapters</h1>
 
                 <Collapse accordion>
@@ -383,13 +495,27 @@ function NewPostComponent({ page = "admin" }) {
                           setVolumes(updatedVolumes);
                         }}
                       />
-
+                      <div style={{ marginBottom: "10px" }}></div>
                       <Tabs tabPosition="left">
                         {volume.chapters.map((chapter, chapterIndex) => (
                           <TabPane
                             key={`chapter-${volumeIndex}-${chapterIndex}`}
                             tab={`Chapter ${chapterIndex + 1}`}
                           >
+                            <div style={{ marginBottom: "10px" }}>
+                              <Button
+                                style={{ marginRight: "8px" }}
+                                type="danger"
+                                onClick={() =>
+                                  handleRemoveChapter(volumeIndex, chapterIndex)
+                                }
+                              >
+                                Remove Chapter {chapterIndex + 1}
+                              </Button>
+                              <span>{`Chapter ${chapterIndex + 1}: ${
+                                chapter.name
+                              }`}</span>
+                            </div>
                             <Input
                               value={chapter.name}
                               placeholder={`Chapter ${chapterIndex + 1} Name`}
@@ -401,44 +527,45 @@ function NewPostComponent({ page = "admin" }) {
                                 setVolumes(updatedVolumes);
                               }}
                             />
-                            <QuillNoSSRWrapper
-                              modules={quillModules}
-                              formats={quillFormats}
-                              placeholder="Compose here..."
-                              value={chapter.content}
-                              onChange={(content, delta, source, editor) => {
-                                const updatedVolumes = [...volumes];
-                                updatedVolumes[volumeIndex].chapters[
-                                  chapterIndex
-                                ].content = content;
-                                setVolumes(updatedVolumes);
+                            <div style={quillWrapperStyles}>
+                              <QuillNoSSRWrapper
+                                modules={quillModules}
+                                formats={quillFormats}
+                                placeholder="Compose here..."
+                                value={chapter.content}
+                                onChange={(content, delta, source, editor) => {
+                                  const updatedVolumes = [...volumes];
+                                  updatedVolumes[volumeIndex].chapters[
+                                    chapterIndex
+                                  ].content = content;
+                                  setVolumes(updatedVolumes);
 
-                                const key = `${volumeIndex}-${chapterIndex}`;
-                                setQuillContent({
-                                  ...quillContent,
-                                  [key]: {
-                                    content,
-                                    name: `Chapter ${chapterIndex + 1}: ${
-                                      chapter.name
-                                    }`,
-                                  },
-                                });
+                                  const key = `${volumeIndex}-${chapterIndex}`;
+                                  setQuillContent({
+                                    ...quillContent,
+                                    [key]: {
+                                      content,
+                                      name: `Chapter ${chapterIndex + 1}: ${
+                                        chapter.name
+                                      }`,
+                                    },
+                                  });
 
-                                // Store chapter content and name separately in local storage
-                                const chapterLocalStorageKey = `post-chapter-${key}`;
-                                localStorage.setItem(
-                                  chapterLocalStorageKey,
-                                  JSON.stringify({
-                                    content,
-                                    name: `Chapter ${chapterIndex + 1}: ${
-                                      chapter.name
-                                    }`,
-                                  })
-                                );
-                              }}
-                              theme="snow"
-                              style={{ height: "400px" }}
-                            />
+                                  const chapterLocalStorageKey = `post-chapter-${key}`;
+                                  localStorage.setItem(
+                                    chapterLocalStorageKey,
+                                    JSON.stringify({
+                                      content,
+                                      name: `Chapter ${chapterIndex + 1}: ${
+                                        chapter.name
+                                      }`,
+                                    })
+                                  );
+                                }}
+                                theme="snow"
+                                style={{ height: "400px", marginTop: "10px" }}
+                              />
+                            </div>
                           </TabPane>
                         ))}
                       </Tabs>
@@ -449,15 +576,36 @@ function NewPostComponent({ page = "admin" }) {
                         icon={<PlusOutlined />}
                         onClick={() => {
                           const updatedVolumes = [...volumes];
-                          updatedVolumes[volumeIndex].chapters.push({
-                            name: "", // Add the name property
-                            chapter: "",
+                          const lastVolumeIndex = updatedVolumes.length - 1;
+                          const lastChapterIndex =
+                            updatedVolumes[lastVolumeIndex].chapters.length - 1;
+                          const newChapterNumber =
+                            lastChapterIndex >= 0
+                              ? parseInt(
+                                  updatedVolumes[lastVolumeIndex].chapters[
+                                    lastChapterIndex
+                                  ].chapter,
+                                  10
+                                ) + 1
+                              : 1;
+
+                          updatedVolumes[lastVolumeIndex].chapters.push({
+                            name: `Chapter ${newChapterNumber}`,
+                            chapter: newChapterNumber.toString(),
                             content: "",
                           });
+
                           setVolumes(updatedVolumes);
                         }}
                       >
                         Add Chapter
+                      </Button>
+
+                      <Button
+                        style={{ margin: "10px 0px 20px", width: "100%" }}
+                        onClick={() => handleRemoveVolume(volumeIndex)}
+                      >
+                        Remove Volume {volumeIndex + 1}
                       </Button>
                     </Panel>
                   ))}
@@ -468,13 +616,18 @@ function NewPostComponent({ page = "admin" }) {
                   type="dashed"
                   icon={<PlusOutlined />}
                   onClick={() => {
-                    setVolumes([
-                      ...volumes,
-                      {
-                        volume: "",
-                        chapters: [{ chapter: "", content: "" }],
-                      },
-                    ]);
+                    const updatedVolumes = [...volumes];
+
+                    const newVolume = {
+                      volume: "",
+                      chapters: [
+                        { chapter: "1", name: "Chapter 1", content: "" },
+                      ],
+                    };
+
+                    updatedVolumes.push(newVolume);
+
+                    setVolumes(updatedVolumes);
                   }}
                 >
                   Add Volume
@@ -545,25 +698,35 @@ function NewPostComponent({ page = "admin" }) {
                       key={volumeIndex.toString()}
                     >
                       <Tabs type="card">
-                        {volume.chapters.map((chapter, chapterIndex) => (
-                          <TabPane
-                            tab={`Chapter ${chapterIndex + 1}: ${chapter.name}`}
-                            key={`${volumeIndex}-${chapterIndex}`}
-                          >
-                            <div
-                              dangerouslySetInnerHTML={{
-                                __html:
-                                  quillContent[`${volumeIndex}-${chapterIndex}`]
-                                    ?.content || "",
-                              }}
-                              style={{
-                                fontSize: "1.2rem",
-                                lineHeight: "1.6",
-                                padding: "20px",
-                              }}
-                            />
-                          </TabPane>
-                        ))}
+                        {volume.chapters.map((chapter, chapterIndex) => {
+                          const key = `${volumeIndex}-${chapterIndex}`;
+                          const loadedContent =
+                            quillContent[key]?.content || ""; // Content loaded from localStorage
+                          const currentContent = chapter.content || ""; // Current content
+
+                          return (
+                            <TabPane
+                              tab={`Chapter ${chapterIndex + 1}: ${
+                                chapter.name
+                              }`}
+                              key={key}
+                            >
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    currentContent !== loadedContent
+                                      ? currentContent
+                                      : loadedContent,
+                                }}
+                                style={{
+                                  fontSize: "1.2rem",
+                                  lineHeight: "1.6",
+                                  padding: "20px",
+                                }}
+                              />
+                            </TabPane>
+                          );
+                        })}
                       </Tabs>
                     </TabPane>
                   ))}
@@ -571,6 +734,7 @@ function NewPostComponent({ page = "admin" }) {
 
                 <h2>Categories:</h2>
                 <h4>Select categories for your post:</h4>
+
                 <Select
                   mode="multiple"
                   allowClear={true}
@@ -583,13 +747,23 @@ function NewPostComponent({ page = "admin" }) {
                     <Option key={item.name}>{item.name}</Option>
                   ))}
                 </Select>
+                <div style={{ marginBottom: "10px" }}></div>
 
                 <Button
-                  style={{ width: "100%", marginBottom: "20px" }}
+                  style={{ width: "100%", marginBottom: "10px" }}
                   type="primary"
                   loading={loading}
                   icon={<EditOutlined />}
-                  onClick={handlePublish}
+                  onClick={() => {
+                    // Step 3 validation
+                    if (selectedCategories.length === 0) {
+                      toast.error(
+                        "Please choose at least one category before publishing."
+                      );
+                      return;
+                    }
+                    handlePublish();
+                  }}
                 >
                   Publish
                 </Button>

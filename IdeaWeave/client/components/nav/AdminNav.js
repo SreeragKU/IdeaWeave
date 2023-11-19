@@ -23,7 +23,7 @@ const AdminNav = () => {
 
   const [collapsed, setCollapsed] = useState(false);
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 900);
+    setCollapsed(window.innerWidth < 1000000);
   };
 
   useEffect(() => {
@@ -48,32 +48,49 @@ const AdminNav = () => {
 
   const customStyles = {
     sider: {
-      width: collapsed ? 80 : 200,
+      width: collapsed ? 50 : 100,
       height: "100vh",
       transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
       overflow: "hidden",
+      paddingTop: "64px",
+    },
+    fixedSider: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      height: "100vh",
+      zIndex: 1000,
+      background: theme === "dark" ? "#001529" : "#fff",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
     },
     menu: {
-      background: theme === "dark" ? "#001529" : "#f0f2f5",
+      background: theme === "dark" ? "#001529" : "#fff",
     },
     item: {
-      background: theme === "dark" ? "#001529" : "#f0f2f5",
+      background: "transparent",
+      transition: "background 0.3s",
     },
     itemHover: {
-      background: theme === "dark" ? "#1890ff" : "#91d5ff",
+      background: theme === "dark" ? "#004080" : "#4da1ff",
     },
     text: {
       color: theme === "dark" ? "#fff" : "#000",
     },
     activeItem: {
-      background: theme === "dark" ? "#1890ff" : "#91d5ff",
+      background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
-      textDecoration: "underline",
     },
+    
     activeSubMenu: {
-      background: theme === "dark" ? "#1890ff" : "#91d5ff",
+      background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
-      transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0.1s", // Add a small delay
+      transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) 0.1s",
+    },
+    subMenu: {
+      width: collapsed ? "auto" : "100%",
+    },
+    subMenuItem: {
+      width: "100%",
     },
   };
   
@@ -83,7 +100,7 @@ const AdminNav = () => {
       collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
-      style={customStyles.sider}
+      style={{ ...customStyles.sider, ...customStyles.fixedSider }}
     >
       <Menu
         defaultOpenKeys={["2", "6", "10"]}

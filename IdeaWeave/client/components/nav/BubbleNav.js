@@ -17,7 +17,7 @@ const htmlToMd = require('html-to-md');
 
 const { Sider } = Layout;
 
-const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, onTextToSpeech, postContent }) => {
+const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, postContent, post, currentVolume, currentChapter }) => {
   const [theme] = useContext(ThemeContext);
   const [visible, setVisible] = useState(false);
   const [activeIcon, setActiveIcon] = useState(null);
@@ -113,6 +113,13 @@ const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, onTextToSpeech, postCon
     if ("speechSynthesis" in window) {
       const synthesis = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(text);
+
+      // Add an event listener to the utterance object to handle the end of speech
+      utterance.addEventListener("end", () => {
+        setT2SActive(false); // Update T2S state when speech ends
+        setActiveIcon(null); // Remove the active icon styling
+      });
+
       synthesis.speak(utterance);
     } else {
       alert("Text-to-Speech is not supported in your browser.");
@@ -130,9 +137,15 @@ const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, onTextToSpeech, postCon
   };
 
   const startTextToSpeech = () => {
-    if (postContent) {
-      const markdownContent = htmlToMd(postContent);
-      const cleanedMarkdownContent = markdownContent.replace(/<u>/g, "").replace(/<\/u>/g, "");
+    if (post && postContent && currentVolume !== undefined && currentChapter !== undefined) {
+      const currentChapterContent =
+        post.volumes[currentVolume].chapters[currentChapter].content;
+
+      const markdownContent = htmlToMd(currentChapterContent);
+      const cleanedMarkdownContent = markdownContent
+        .replace(/<u>/g, "")
+        .replace(/<\/u>/g, "");
+
       speakText(cleanedMarkdownContent);
     }
   };
@@ -144,7 +157,6 @@ const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, onTextToSpeech, postCon
     }
   };
   
-
   const bubbleIcons = [
     { icon: <ZoomInOutlined />, label: "ZoomIn" },
     { icon: <ZoomOutOutlined />, label: "ZoomOut" },

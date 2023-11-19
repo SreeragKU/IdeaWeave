@@ -73,7 +73,7 @@ export default function AllUsers() {
 
   return (
     <AdminLayout>
-      <Row>
+      <Row style={{ paddingLeft: "100px", paddingTop: "60px" }}>
         <Col span={24}>
           <h4>All Users ({users?.length})</h4>
 

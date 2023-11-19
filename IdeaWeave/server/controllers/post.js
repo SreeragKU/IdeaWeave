@@ -23,18 +23,15 @@ export const uploadImage = async (req, res) => {
 
 export const createPost = async (req, res) => {
   try {
-    const { title, volumes, categories, coverImage } = req.body;
+    const { title, content, volumes, categories, coverImage } = req.body;
 
-    // Validate data
-    if (!title || !volumes || !categories || !coverImage) {
+    if (!title || !content || !volumes || !categories || !coverImage) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    // Check if the title is taken
     const alreadyExist = await Post.findOne({ slug: slugify(title.toLowerCase()) });
     if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
 
-    // Validate category names and get category ids
     const categoryIds = await Promise.all(
       categories.map(async (category) => {
         const existingCategory = await Category.findOne({ name: category });
@@ -42,11 +39,21 @@ export const createPost = async (req, res) => {
       })
     );
 
-    // Create post
+    // Adjust the volumes and chapters data
+    const formattedVolumes = volumes.map((volume) => ({
+      volume: volume.volume,
+      chapters: volume.chapters.map((chapter) => ({
+        chapter: chapter.chapter,
+        name: chapter.name,
+        content: chapter.content, // Make sure to include content here
+      })),
+    }));
+
     const post = await new Post({
       title,
-      volumes,
-      categories: categoryIds.filter((categoryId) => categoryId), 
+      content,
+      volumes: formattedVolumes,
+      categories: categoryIds.filter((categoryId) => categoryId),
       coverImage,
       postedBy: req.user._id,
       slug: slugify(title),
@@ -62,24 +69,27 @@ export const createPost = async (req, res) => {
 export const singlePost = async (req, res) => {
   try {
     const { slug } = req.params;
+
     const post = await Post.findOne({ slug })
-      .populate("postedBy", "name")
-      .populate("categories", "name slug")
+      .populate("postedBy", "name") 
+      .populate("categories", "name slug") 
       .populate("coverImage", "url")
       .populate({
         path: "volumes",
         populate: {
           path: "chapters",
-          select: "name content",
+          select: "chapter name content",
         },
       });
 
+    console.log("Fetched post data:", post);
     res.json(post);
   } catch (err) {
-    console.log(err);
+    console.error("Error fetching post data:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const editPost = async (req, res) => {
   try {
@@ -94,13 +104,23 @@ export const editPost = async (req, res) => {
       })
     );
 
+    // Adjust the volumes and chapters data
+    const formattedVolumes = volumes.map((volume) => ({
+      volume: volume.volume,
+      chapters: volume.chapters.map((chapter) => ({
+        chapter: chapter.chapter,
+        name: chapter.name,
+        content: chapter.content,
+      })),
+    }));
+
     // Update post
     const post = await Post.findByIdAndUpdate(
       postId,
       {
         title,
         slug: slugify(title),
-        volumes,
+        volumes: formattedVolumes,
         categories: categoryIds.filter((categoryId) => categoryId),
         coverImage,
       },
@@ -113,7 +133,7 @@ export const editPost = async (req, res) => {
         path: "volumes",
         populate: {
           path: "chapters",
-          select: "name content",
+          select: "chapter name content",
         },
       });
 

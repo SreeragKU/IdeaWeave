@@ -1,4 +1,4 @@
-import { useState, useContext} from "react";
+import { useState, useContext } from "react";
 import { Menu } from "antd";
 import {
   SettingOutlined,
@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 const { SubMenu } = Menu;
 
 const TopNav = () => {
-  const [current, setCurrent] = useState("mail");
+  const [current, setCurrent] = useState("ideaweave");
   const [auth, setAuth] = useContext(AuthContext);
   const router = useRouter();
 
@@ -38,14 +38,14 @@ const TopNav = () => {
   };
 
   const roleBasedLink = () => {
-    if(auth?.user?.role === 'Admin'){
+    if (auth?.user?.role === "Admin") {
       return "/admin";
-    } else if(auth?.user?.role === 'Author'){
+    } else if (auth?.user?.role === "Author") {
       return "/author";
-    } else{
+    } else {
       return "/subscriber";
     }
-  }
+  };
 
   return (
     <Menu
@@ -53,6 +53,12 @@ const TopNav = () => {
       selectedKeys={[current]}
       mode="horizontal"
       theme="dark"
+      style={{
+        position: "fixed",
+        top: 0,
+        width: "100%",
+        zIndex: 1001, // Above the Sider
+      }}
     >
       <Menu.Item key="ideaweave" icon={<AppstoreOutlined />}>
         <Link href="/">IdeaWeave</Link>

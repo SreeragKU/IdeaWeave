@@ -123,7 +123,7 @@ export default function Categories({ children }) {
 
   return (
     <AdminLayout>
-      <Row>
+      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
         <Col xs={22} sm={22} lg={10} offset={1}>
           <Content>
             <h1>Categories</h1>

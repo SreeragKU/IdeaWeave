@@ -39,7 +39,6 @@ const MediaLibrary = () => {
       }
       if (info.file.status === "done") {
         message.success(`${info.file.name} file uploaded successfully`);
-        // console.log("info.file on drag drop => ", info.file);
         setMedia({
           images: [...media.images, info.file.response],
           selected: info.file.response,
@@ -53,10 +52,10 @@ const MediaLibrary = () => {
       console.log("Dropped files", e.dataTransfer.files);
     },
   };
-  
+
   const handleImageDelete = async (imageId) => {
     try {
-      const {data} = await axios.delete(`/media/${imageId}`);
+      const { data } = await axios.delete(`/media/${imageId}`);
       if (data.ok) {
         setMedia({
           ...media,
@@ -71,48 +70,42 @@ const MediaLibrary = () => {
   };
 
   return (
-    <> 
-      <Dragger {...props} accept="image/*">
-      <style>
-        {`
-          .ant-upload-drag{
-            height: 150px !important;
-          }
-        `}
-      </style>
-        <p className="ant-upload-drag-icon">
-          <InboxOutlined />
-        </p>
-        <p className="ant-upload-text">
-          Click or drag file to this area to upload
-        </p>
-      </Dragger>
+    <>
+      <div style={{ width: "75%", margin: "0 auto" }}>
+        <Dragger {...props} accept="image/*">
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">
+            Click or drag file to this area to upload
+          </p>
+        </Dragger>
+      </div>
 
       <div style={{ textAlign: "center" }}>
         {media?.images?.map((image) => (
-          <Badge>
-          <Image
-            onClick={() => setMedia({ ...media, selected: image })}
-            preview={showPreview}
-            src={image.url}
-            style={{
-              paddingTop: 5,
-              paddingRight: 10,
-              height: "100px",
-              width: "100px",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-          />
-          <br />
-        <CloseCircleOutlined 
-          onClick={() => handleImageDelete(image._id)}
-          style={{marginTop: "7px", color: "#f5222d"}} 
-        />
-        </Badge>
+          <Badge key={image._id}>
+            <Image
+              onClick={() => setMedia({ ...media, selected: image })}
+              preview={showPreview}
+              src={image.url}
+              style={{
+                paddingTop: 5,
+                paddingRight: 10,
+                height: "100px",
+                width: "100px",
+                objectFit: "cover",
+                cursor: "pointer",
+              }}
+            />
+            <br />
+            <CloseCircleOutlined
+              onClick={() => handleImageDelete(image._id)}
+              style={{ marginTop: "7px", color: "#f5222d" }}
+            />
+          </Badge>
         ))}
       </div>
-      
     </>
   );
 };

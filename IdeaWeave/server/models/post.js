@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Schema;
 
+// Define chapter schema
 const chapterSchema = new Schema(
   {
     chapter: {
@@ -13,13 +14,14 @@ const chapterSchema = new Schema(
       required: true,
     },
     content: {
-      type: String,
+      type: String, 
       required: true,
     },
   },
   { _id: false }
 );
 
+// Define volume schema
 const volumeSchema = new Schema(
   {
     volume: {
@@ -35,6 +37,10 @@ const postSchema = new Schema(
   {
     title: {
       type: String,
+      required: true,
+    },
+    content: {
+      type: String, 
       required: true,
     },
     volumes: [volumeSchema],
