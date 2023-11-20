@@ -102,11 +102,6 @@ const SinglePost = ({ post }) => {
     sendPostContentToBubbleNav(post.content);
   };
 
-  const navigateToChapter = (volumeIndex, chapterIndex) => {
-    setCurrentVolume(volumeIndex);
-    setCurrentChapter(chapterIndex);
-  };
-
   const handleNextChapter = () => {
     // Move to the next chapter within the current volume
     if (currentChapter < post.volumes[currentVolume].chapters.length - 1) {

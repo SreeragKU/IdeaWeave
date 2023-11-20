@@ -94,7 +94,6 @@ export const singlePost = async (req, res) => {
   }
 };
 
-
 export const editPost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -206,10 +205,29 @@ export const removeMedia = async (req, res) => {
 
 export const removePost = async (req, res) => {
   try {
-    const post = await Post.findByIdAndDelete(req.params.postId);
-    res.json({ ok: true });
+    const postId = req.params.postId;
+
+    // Find the post and remove it
+    const post = await Post.findByIdAndDelete(postId);
+
+    // If the post was successfully removed, update the user model
+    if (post) {
+      // Find the user by the post's author
+      const user = await User.findOne({ posts: postId });
+
+      // Remove the post from the user's posts array
+      if (user) {
+        user.posts.pull(postId);
+        await user.save();
+      }
+
+      res.json({ ok: true });
+    } else {
+      res.json({ ok: false, error: "Post not found" });
+    }
   } catch (err) {
     console.log(err);
+    res.status(500).json({ ok: false, error: "Internal Server Error" });
   }
 };
 

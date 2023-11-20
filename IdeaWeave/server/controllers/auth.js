@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { hashPassword, comparePassword } = require("../helpers/auth");
 const nanoid = require("nanoid");
 const nodemailer = require("nodemailer");
+const emailValidator = require("email-validator");
 const { JWT_SECRET, EMAIL_FROM, EMAIL_APP_PASSWORD } = require("../config");
 
 const transporter = nodemailer.createTransport({
@@ -432,5 +433,105 @@ exports.createUser = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.json({ error: "Error in createUser function" });
+  }
+};
+
+exports.currentUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).populate("image");
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+  }
+};
+
+exports.updateUserByAdmin = async (req, res) => {
+  try {
+    const { id, name, email, password, website, role, image } = req.body;
+
+    const userFromDb = await User.findById(id);
+
+    if (!emailValidator.validate(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    const exist = await User.findOne({ email });
+    if (exist && exist._id.toString() !== userFromDb._id.toString()) {
+      return res.status(400).json({ error: "Email is taken" });
+    }
+
+    const passwordPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (password && !password.match(passwordPattern)) {
+      return res.status(400).json({
+        error: "Password should contain at least one number, one lowercase letter, one uppercase letter, and one special character. It should be at least 8 characters long.",
+      });
+    }
+
+    const hashedPassword = password ? await hashPassword(password) : undefined;
+    const updated = await User.findByIdAndUpdate(
+      id,
+      {
+        name: name || userFromDb.name,
+        email: email || userFromDb.email,
+        password: hashedPassword || userFromDb.password,
+        website: website || userFromDb.website,
+        role: role || userFromDb.role,
+        image: image || userFromDb.image,
+      },
+      { new: true }
+    ).populate("image");
+
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Bad Request" });
+  }
+};
+
+exports.updateUserByUser = async (req, res) => {
+  try {
+    const { id, name, email, password, website, role, image } = req.body;
+
+    const userFromDb = await User.findById(id);
+
+    if(userFromDb._id.toString() !== req.user._id.toString()) {
+      return res.status(403).send("You are not allowed to update this user");
+    }
+
+    if (!emailValidator.validate(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    const exist = await User.findOne({ email });
+    if (exist && exist._id.toString() !== userFromDb._id.toString()) {
+      return res.status(400).json({ error: "Email is taken" });
+    }
+
+    const passwordPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (password && !password.match(passwordPattern)) {
+      return res.status(400).json({
+        error: "Password should contain at least one number, one lowercase letter, one uppercase letter, and one special character. It should be at least 8 characters long.",
+      });
+    }
+
+    const hashedPassword = password ? await hashPassword(password) : undefined;
+    const updated = await User.findByIdAndUpdate(
+      id,
+      {
+        name: name || userFromDb.name,
+        email: email || userFromDb.email,
+        password: hashedPassword || userFromDb.password,
+        website: website || userFromDb.website,
+        role: role || userFromDb.role,
+        image: image || userFromDb.image,
+      },
+      { new: true }
+    ).populate("image");
+
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Bad Request" });
   }
 };

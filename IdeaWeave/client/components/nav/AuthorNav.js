@@ -4,11 +4,14 @@ import Link from "next/link";
 import {
   PushpinOutlined,
   CameraOutlined,
+  UserSwitchOutlined,
   SettingOutlined,
+  BgColorsOutlined,
   UserOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
 
+import { AuthContext } from "../../context/auth";
 import { ThemeContext } from "../../context/theme";
 
 const { SubMenu } = Menu;
@@ -17,11 +20,12 @@ const { Sider } = Layout;
 const AuthorNav = () => {
   const [current, setCurrent] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
+  const [auth, setAuth] = useContext(AuthContext);
   const [theme] = useContext(ThemeContext);
-  const [collapsed, setCollapsed] = useState(false);
 
+  const [collapsed, setCollapsed] = useState(false);
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 100000);
+    setCollapsed(window.innerWidth < 1000000);
   };
 
   useEffect(() => {
@@ -44,45 +48,6 @@ const AuthorNav = () => {
     handleResize();
   }, []);
 
-  const menuConfig = [
-    {
-      key: "/author",
-      icon: <SettingOutlined />,
-      text: "Dashboard",
-      children: [],
-    },
-    {
-      key: "2",
-      icon: <PushpinOutlined />,
-      text: "Posts",
-      children: [
-        { key: "/author/posts", text: "All Books" },
-        { key: "/author/posts/new", text: "Write New Book" },
-      ],
-    },
-    {
-      key: "6",
-      icon: <CameraOutlined />,
-      text: "Media",
-      children: [
-        { key: "/author/media/library", text: "Media Library" },
-        { key: "/author/media/new", text: "Add New Media" },
-      ],
-    },
-    {
-      key: "/author/comments",
-      icon: <CommentOutlined />,
-      text: "Comments",
-      children: [],
-    },
-    {
-      key: "/author/userid",
-      icon: <UserOutlined />,
-      text: "Profile",
-      children: [],
-    },
-  ];
-
   const customStyles = {
     sider: {
       width: collapsed ? 50 : 100,
@@ -90,10 +55,6 @@ const AuthorNav = () => {
       transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
       overflow: "hidden",
       paddingTop: "64px",
-      position: "fixed",  
-      left: 0,            
-      top: 0,             
-      zIndex: 1000,
     },
     fixedSider: {
       position: "fixed",
@@ -121,7 +82,7 @@ const AuthorNav = () => {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
     },
-    
+
     activeSubMenu: {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
@@ -134,13 +95,13 @@ const AuthorNav = () => {
       width: "100%",
     },
   };
-  
+
   return (
     <Sider
       collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
-      style={{ ...customStyles.sider, overflow: "hidden" }}
+      style={{ ...customStyles.sider, ...customStyles.fixedSider }}
     >
       <Menu
         defaultOpenKeys={["2", "6", "10"]}
@@ -150,44 +111,147 @@ const AuthorNav = () => {
         style={customStyles.menu}
         theme={theme}
       >
-        {menuConfig.map((item) => (
-          <React.Fragment key={item.key}>
-            {item.children.length > 0 ? (
-              <SubMenu
-                key={item.key}
-                icon={item.icon}
-                title={item.text}
-                className={activeSubMenu === item.key ? "active" : ""}
-                style={activeSubMenu === item.key ? customStyles.activeSubMenu : {}}
-              >
-                {item.children.map((child) => (
-                  <Menu.Item
-                    key={child.key}
-                    className={current === child.key ? "active" : ""}
-                    style={
-                      current === child.key
-                        ? customStyles.activeItem
-                        : customStyles.item
-                    }
-                  >
-                    <Link href={child.key}>{child.text}</Link>
-                  </Menu.Item>
-                ))}
-              </SubMenu>
-            ) : (
-              <Menu.Item
-                key={item.key}
-                icon={item.icon}
-                className={current === item.key ? "active" : ""}
-                style={
-                  current === item.key ? customStyles.activeItem : customStyles.item
-                }
-              >
-                <Link href={item.key}>{item.text}</Link>
-              </Menu.Item>
-            )}
-          </React.Fragment>
-        ))}
+        <Menu.Item
+          key="/author"
+          icon={<SettingOutlined />}
+          className={current === "/author" ? "active" : ""}
+          style={
+            current === "/author" ? customStyles.activeItem : customStyles.item
+          }
+        >
+          <Link href="/author">Dashboard</Link>
+        </Menu.Item>
+
+        <SubMenu
+          key="2"
+          icon={<PushpinOutlined />}
+          title="Posts"
+          className={activeSubMenu === "/author" ? "active" : ""}
+          style={activeSubMenu === "/author" ? customStyles.activeSubMenu : {}}
+        >
+          <Menu.Item
+            key="/author/posts"
+            className={current === "/author/posts" ? "active" : ""}
+            style={
+              current === "/author/posts"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/posts">All Books</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/author/posts/new"
+            className={current === "/author/posts/new" ? "active" : ""}
+            style={
+              current === "/author/posts/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/posts/new">Add New Book</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/author/categories"
+            className={current === "/author/categories" ? "active" : ""}
+            style={
+              current === "/author/categories"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/categories">Categories</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <SubMenu key="6" icon={<CameraOutlined />} title="Media">
+          <Menu.Item
+            key="/author/media/library"
+            className={current === "/author/media/library" ? "active" : ""}
+            style={
+              current === "/author/media/library"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/media/library">Media Library</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/author/media/new"
+            className={current === "/author/media/new" ? "active" : ""}
+            style={
+              current === "/author/media/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/media/new">Add New Media</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <Menu.Item
+          key="/author/comments"
+          icon={<CommentOutlined />}
+          className={current === "/author/comments" ? "active" : ""}
+          style={
+            current === "/author/comments"
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href="/author/comments">Comments</Link>
+        </Menu.Item>
+
+        <SubMenu key="10" icon={<UserSwitchOutlined />} title="Users">
+          <Menu.Item
+            key="/author/users"
+            className={current === "/author/users" ? "active" : ""}
+            style={
+              current === "/author/users"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/users">All Users</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/author/users/new"
+            className={current === "/author/users/new" ? "active" : ""}
+            style={
+              current === "/author/users/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/users/new">Add New</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <Menu.Item
+          key={`/author/${auth?.user?._id}`}
+          icon={<UserOutlined />}
+          className={current === `/author/${auth?.user?._id}` ? "active" : ""}
+          style={
+            current === `/author/${auth?.user?._id}`
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href={`/author/${auth?.user?._id}`}>Profile</Link>
+        </Menu.Item>
+
+        <Menu.Item
+          key="/author/customize"
+          icon={<BgColorsOutlined />}
+          className={current === "/author/customize" ? "active" : ""}
+          style={
+            current === "/author/customize"
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href="/author/customize">Customize</Link>
+        </Menu.Item>
       </Menu>
     </Sider>
   );

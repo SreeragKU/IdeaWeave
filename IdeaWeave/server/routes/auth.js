@@ -12,6 +12,9 @@ const {
   verifyOtp,
   sendOtp, 
   createUser,
+  currentUserProfile,
+  updateUserByAdmin,
+  updateUserByUser,
 } = require("../controllers/auth"); 
 
 router.post("/signup", signup);
@@ -26,5 +29,8 @@ router.get("/current-reader", requireSignin, currentUser);
 router.get("/users", requireSignin, isAdmin, users);
 router.put("/users/:userId/toggle", requireSignin, isAdmin, toggleUserStatus);
 router.post("/create-user", requireSignin, isAdmin, createUser);
+router.get('/user/:userId', requireSignin, currentUserProfile);
+router.put('/update-user-by-admin', requireSignin, isAdmin, updateUserByAdmin);
+router.put('/update-user-by-user', requireSignin, updateUserByUser);
 
 module.exports = router;

@@ -1,4 +1,3 @@
-// Import necessary components and styles
 import { useState, useEffect, useContext } from "react";
 import {
   Row,
@@ -138,7 +137,7 @@ export default function AllUsers() {
   };
 
   const handleEditUser = (userId) => {
-    router.push(`/users/edit/${userId}`);
+    router.push(`/admin/users/${userId}`);
   };
 
   useEffect(() => {

@@ -2,7 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/admin/posts": "pages/admin/posts.js",
-  "/admin/posts/new": "pages/admin/posts/new.js",
-  "/admin/users": "pages/admin/users.js"
+  "/reader": "pages/reader.js",
+  "/reader/[id]": "pages/reader/[id].js",
+  "/": "pages/index.js"
 }

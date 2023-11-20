@@ -11,6 +11,7 @@ import {
   CommentOutlined,
 } from "@ant-design/icons";
 
+import { AuthContext } from "../../context/auth";
 import { ThemeContext } from "../../context/theme";
 
 const { SubMenu } = Menu;
@@ -19,6 +20,7 @@ const { Sider } = Layout;
 const AdminNav = () => {
   const [current, setCurrent] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
+  const [auth, setAuth] = useContext(AuthContext);
   const [theme] = useContext(ThemeContext);
 
   const [collapsed, setCollapsed] = useState(false);
@@ -80,7 +82,7 @@ const AdminNav = () => {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
     },
-    
+
     activeSubMenu: {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
@@ -93,7 +95,6 @@ const AdminNav = () => {
       width: "100%",
     },
   };
-  
 
   return (
     <Sider
@@ -227,16 +228,16 @@ const AdminNav = () => {
         </SubMenu>
 
         <Menu.Item
-          key="/admin/userid"
+          key={`/admin/${auth?.user?._id}`}
           icon={<UserOutlined />}
-          className={current === "/admin/userid" ? "active" : ""}
+          className={current === `/admin/${auth?.user?._id}` ? "active" : ""}
           style={
-            current === "/admin/userid"
+            current === `/admin/${auth?.user?._id}`
               ? customStyles.activeItem
               : customStyles.item
           }
         >
-          <Link href="/admin/userid">Profile</Link>
+          <Link href={`/admin/${auth?.user?._id}`}>Profile</Link>
         </Menu.Item>
 
         <Menu.Item

@@ -4,11 +4,14 @@ import Link from "next/link";
 import {
   PushpinOutlined,
   CameraOutlined,
+  UserSwitchOutlined,
   SettingOutlined,
+  BgColorsOutlined,
   UserOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
 
+import { AuthContext } from "../../context/auth";
 import { ThemeContext } from "../../context/theme";
 
 const { SubMenu } = Menu;
@@ -17,11 +20,12 @@ const { Sider } = Layout;
 const ReaderNav = () => {
   const [current, setCurrent] = useState("");
   const [activeSubMenu, setActiveSubMenu] = useState("");
+  const [auth, setAuth] = useContext(AuthContext);
   const [theme] = useContext(ThemeContext);
-  const [collapsed, setCollapsed] = useState(false);
 
+  const [collapsed, setCollapsed] = useState(false);
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 100000);
+    setCollapsed(window.innerWidth < 1000000);
   };
 
   useEffect(() => {
@@ -44,27 +48,6 @@ const ReaderNav = () => {
     handleResize();
   }, []);
 
-  const menuConfig = [
-    {
-      key: "/reader",
-      icon: <SettingOutlined />,
-      text: "Dashboard",
-      children: [],
-    },
-    {
-      key: "/reader/comments",
-      icon: <CommentOutlined />,
-      text: "Comments",
-      children: [],
-    },
-    {
-      key: "/reader/profile",
-      icon: <UserOutlined />,
-      text: "Profile",
-      children: [],
-    },
-  ];
-
   const customStyles = {
     sider: {
       width: collapsed ? 50 : 100,
@@ -72,10 +55,6 @@ const ReaderNav = () => {
       transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
       overflow: "hidden",
       paddingTop: "64px",
-      position: "fixed",  
-      left: 0,            
-      top: 0,             
-      zIndex: 1000,
     },
     fixedSider: {
       position: "fixed",
@@ -103,7 +82,7 @@ const ReaderNav = () => {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
     },
-    
+
     activeSubMenu: {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
@@ -116,13 +95,13 @@ const ReaderNav = () => {
       width: "100%",
     },
   };
-  
+
   return (
     <Sider
       collapsible
       collapsed={collapsed}
       onCollapse={() => setCollapsed(!collapsed)}
-      style={{ ...customStyles.sider, overflow: "hidden" }}
+      style={{ ...customStyles.sider, ...customStyles.fixedSider }}
     >
       <Menu
         defaultOpenKeys={["2", "6", "10"]}
@@ -132,44 +111,147 @@ const ReaderNav = () => {
         style={customStyles.menu}
         theme={theme}
       >
-        {menuConfig.map((item) => (
-          <React.Fragment key={item.key}>
-            {item.children.length > 0 ? (
-              <SubMenu
-                key={item.key}
-                icon={item.icon}
-                title={item.text}
-                className={activeSubMenu === item.key ? "active" : ""}
-                style={activeSubMenu === item.key ? customStyles.activeSubMenu : {}}
-              >
-                {item.children.map((child) => (
-                  <Menu.Item
-                    key={child.key}
-                    className={current === child.key ? "active" : ""}
-                    style={
-                      current === child.key
-                        ? customStyles.activeItem
-                        : customStyles.item
-                    }
-                  >
-                    <Link href={child.key}>{child.text}</Link>
-                  </Menu.Item>
-                ))}
-              </SubMenu>
-            ) : (
-              <Menu.Item
-                key={item.key}
-                icon={item.icon}
-                className={current === item.key ? "active" : ""}
-                style={
-                  current === item.key ? customStyles.activeItem : customStyles.item
-                }
-              >
-                <Link href={item.key}>{item.text}</Link>
-              </Menu.Item>
-            )}
-          </React.Fragment>
-        ))}
+        <Menu.Item
+          key="/reader"
+          icon={<SettingOutlined />}
+          className={current === "/reader" ? "active" : ""}
+          style={
+            current === "/reader" ? customStyles.activeItem : customStyles.item
+          }
+        >
+          <Link href="/reader">Dashboard</Link>
+        </Menu.Item>
+
+        <SubMenu
+          key="2"
+          icon={<PushpinOutlined />}
+          title="Posts"
+          className={activeSubMenu === "/reader" ? "active" : ""}
+          style={activeSubMenu === "/reader" ? customStyles.activeSubMenu : {}}
+        >
+          <Menu.Item
+            key="/reader/posts"
+            className={current === "/reader/posts" ? "active" : ""}
+            style={
+              current === "/reader/posts"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/posts">All Books</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/reader/posts/new"
+            className={current === "/reader/posts/new" ? "active" : ""}
+            style={
+              current === "/reader/posts/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/posts/new">Add New Book</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/reader/categories"
+            className={current === "/reader/categories" ? "active" : ""}
+            style={
+              current === "/reader/categories"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/categories">Categories</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <SubMenu key="6" icon={<CameraOutlined />} title="Media">
+          <Menu.Item
+            key="/reader/media/library"
+            className={current === "/reader/media/library" ? "active" : ""}
+            style={
+              current === "/reader/media/library"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/media/library">Media Library</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/reader/media/new"
+            className={current === "/reader/media/new" ? "active" : ""}
+            style={
+              current === "/reader/media/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/media/new">Add New Media</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <Menu.Item
+          key="/reader/comments"
+          icon={<CommentOutlined />}
+          className={current === "/reader/comments" ? "active" : ""}
+          style={
+            current === "/reader/comments"
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href="/reader/comments">Comments</Link>
+        </Menu.Item>
+
+        <SubMenu key="10" icon={<UserSwitchOutlined />} title="Users">
+          <Menu.Item
+            key="/reader/users"
+            className={current === "/reader/users" ? "active" : ""}
+            style={
+              current === "/reader/users"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/users">All Users</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/reader/users/new"
+            className={current === "/reader/users/new" ? "active" : ""}
+            style={
+              current === "/reader/users/new"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/reader/users/new">Add New</Link>
+          </Menu.Item>
+        </SubMenu>
+
+        <Menu.Item
+          key={`/reader/${auth?.user?._id}`}
+          icon={<UserOutlined />}
+          className={current === `/reader/${auth?.user?._id}` ? "active" : ""}
+          style={
+            current === `/reader/${auth?.user?._id}`
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href={`/reader/${auth?.user?._id}`}>Profile</Link>
+        </Menu.Item>
+
+        <Menu.Item
+          key="/reader/customize"
+          icon={<BgColorsOutlined />}
+          className={current === "/reader/customize" ? "active" : ""}
+          style={
+            current === "/reader/customize"
+              ? customStyles.activeItem
+              : customStyles.item
+          }
+        >
+          <Link href="/reader/customize">Customize</Link>
+        </Menu.Item>
       </Menu>
     </Sider>
   );

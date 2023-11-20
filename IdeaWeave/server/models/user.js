@@ -24,8 +24,8 @@ const userSchema = new Schema(
       default: "Subscriber",
     },
     image: {
-      public_id: "",
-      url: "",
+      type: ObjectId, 
+      ref: "Media"
     },
     website: {
       type: String,

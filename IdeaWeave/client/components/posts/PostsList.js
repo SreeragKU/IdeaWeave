@@ -1,3 +1,4 @@
+import React from "react";
 import htmlToMd from "html-to-md";
 import dayjs from "dayjs";
 import { Card, Col, Space, Popconfirm } from "antd";
@@ -7,6 +8,11 @@ import { Typography } from "antd";
 const { Text, Title } = Typography;
 
 const PostsList = ({ posts, handleDelete, handleEdit }) => {
+  const sanitizeHtml = (html) => {
+    return html.replace(/<\/?(u|b|i)>/g, "");
+  };
+  
+
   return (
     <>
       {posts.map((post) => (
@@ -39,7 +45,7 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
                 <Text strong>{volume.volume}</Text>
                 {volume.chapters.map((chapter) => (
                   <div key={chapter.name}>
-                    <Text ellipsis>{htmlToMd(chapter.content)}</Text>
+                    <Text ellipsis>{htmlToMd(sanitizeHtml(chapter.content))}</Text>
                   </div>
                 ))}
               </div>

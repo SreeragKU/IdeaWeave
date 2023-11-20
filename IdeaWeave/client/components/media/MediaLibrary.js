@@ -80,6 +80,7 @@ const MediaLibrary = ({ page = "admin" }) => {
         </p>
       </Dragger>
 
+      
       <div
         style={{
           textAlign: "center",
@@ -89,8 +90,16 @@ const MediaLibrary = ({ page = "admin" }) => {
           justifyContent: "center",
         }}
       >
-        {media?.images?.map((image) => (
-          <Badge key={image._id}>
+        {media?.images
+          ?.filter((image) => {
+            if (page === "admin") {
+              return true;
+            } else {
+              return image?.postedBy?._id === auth?.user?._id;
+            }
+          })
+          .map((image) => (
+            <Badge key={image._id}>
             <div
               style={{
                 margin: "10px",
