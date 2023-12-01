@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 const { ObjectId } = mongoose.Schema;
 
-// Define chapter schema
 const chapterSchema = new Schema(
   {
     chapter: {
@@ -21,7 +20,6 @@ const chapterSchema = new Schema(
   { _id: false }
 );
 
-// Define volume schema
 const volumeSchema = new Schema(
   {
     volume: {

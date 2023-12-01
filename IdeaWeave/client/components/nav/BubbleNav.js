@@ -113,11 +113,9 @@ const BubbleNav = ({ onZoomIn, onZoomOut, onThemeChange, postContent, post, curr
     if ("speechSynthesis" in window) {
       const synthesis = window.speechSynthesis;
       const utterance = new SpeechSynthesisUtterance(text);
-
-      // Add an event listener to the utterance object to handle the end of speech
       utterance.addEventListener("end", () => {
-        setT2SActive(false); // Update T2S state when speech ends
-        setActiveIcon(null); // Remove the active icon styling
+        setT2SActive(false); 
+        setActiveIcon(null); 
       });
 
       synthesis.speak(utterance);

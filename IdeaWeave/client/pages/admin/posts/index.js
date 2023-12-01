@@ -21,7 +21,7 @@ function Posts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if(auth.token) fetchPosts();
+    if (auth.token) fetchPosts();
   }, [auth?.token]);
 
   const fetchPosts = async () => {
@@ -67,7 +67,9 @@ function Posts() {
             {loading ? <Spin /> : `${posts?.length} Posts`}
           </Title>
         </Col>
-        <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit} />
+        <Col span={24}>
+          <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit} />
+        </Col>
       </Row>
     </AdminLayout>
   );

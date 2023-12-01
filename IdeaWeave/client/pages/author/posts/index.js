@@ -62,11 +62,9 @@ function Posts() {
             {posts?.length} Posts
           </Title>
         </Col>
-        <PostsList
-          posts={posts}
-          handleDelete={handleDelete}
-          handleEdit={handleEdit}
-        />
+        <Col span={24}>
+          <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit} />
+        </Col>
       </Row>
     </AuthorLayour>
   );

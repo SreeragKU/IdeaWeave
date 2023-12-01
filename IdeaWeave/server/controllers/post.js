@@ -4,6 +4,7 @@ import slugify from "slugify";
 import cloudinary from "cloudinary";
 import Media from "../models/media";
 import User from "../models/user";
+import Comment from "../models/comment";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -85,7 +86,11 @@ export const singlePost = async (req, res) => {
           select: "chapter name content",
         },
       });
-    res.json(post);
+      const comments = await Comment.find({ postId: post._id })
+      .populate("postedBy", "name")
+      .sort({ createdAt: -1 });
+
+    res.json({post, comments});
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -263,6 +268,22 @@ export const postsForAdmin = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.json(all);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const createComment = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const {  comment } = req.body;
+    let newComment = await new Comment({
+      content: comment,
+      postedBy: req.user._id,
+      postId,
+    }).save();
+    newComment = await newComment.populate('postedBy', 'name');
+    res.json(newComment);
   } catch (err) {
     console.log(err);
   }

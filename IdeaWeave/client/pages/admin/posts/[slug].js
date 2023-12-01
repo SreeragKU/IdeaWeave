@@ -1,5 +1,5 @@
 import AdminLayout from "../../../components/layout/AdminLayout"
-import EditPostComponent from "../../../components/layout/EditPostComponent";
+import EditPostComponent from "../../../components/posts/EditPostComponent";
 
 function EditPost() {
   const user = "/admin";

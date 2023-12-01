@@ -1,5 +1,5 @@
 import AuthorLayout from "../../../components/layout/AuthorLayout";
-import EditPostComponent from "../../../components/layout/EditPostComponent";
+import EditPostComponent from "../../../components/posts/EditPostComponent";
 
 function EditPost() {
   
