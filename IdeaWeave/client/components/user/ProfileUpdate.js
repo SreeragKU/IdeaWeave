@@ -9,7 +9,7 @@ import Media from "../media";
 
 const { TabPane } = Tabs;
 
-const ProfileUpdate = ({page = 'admin'}) => {
+const ProfileUpdate = ({ page = "admin" }) => {
   const [auth, setAuth] = useContext(AuthContext);
   const [media, setMedia] = useContext(MediaContext);
   const [id, setId] = useState("");
@@ -44,7 +44,6 @@ const ProfileUpdate = ({page = 'admin'}) => {
     };
     if (auth?.token) currentUser();
   }, [auth, router?.query?.id]);
-
 
   const validateName = (value) => {
     if (value.trim() === "") {
@@ -93,17 +92,22 @@ const ProfileUpdate = ({page = 'admin'}) => {
           ? image._id
           : undefined,
       });
-
+  
       if (data?.error) {
-        toast.error(data.error);
+        if (data.error.includes("E11000 duplicate key error") && data.error.includes("name")) {
+          toast.error("User name already taken. Please choose a different name.");
+        } else {
+          toast.error(data.error);
+        }
         setLoading(false);
       } else {
-        setAuth({ ...auth, user: data });
-
-        let fromLocalStorage = JSON.parse(localStorage.getItem("auth"));
-        fromLocalStorage.user = data;
-        localStorage.setItem("auth", JSON.stringify(fromLocalStorage));
-
+        if (auth?.user?._id === data._id) {
+          setAuth({ ...auth, user: data });
+          let fromLocalStorage = JSON.parse(localStorage.getItem("auth"));
+          fromLocalStorage.user = data;
+          localStorage.setItem("auth", JSON.stringify(fromLocalStorage));
+        }
+  
         toast.success("Profile updated successfully");
         setLoading(false);
       }
@@ -113,151 +117,154 @@ const ProfileUpdate = ({page = 'admin'}) => {
       setLoading(false);
     }
   };
+  
+  
 
   return (
-      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
-        <Col span={12} offset={6}>
-          <Tabs
-            tabBarStyle={{ marginBottom: 0 }}
-          >
-            <TabPane tab="User Info" key="1">
-              <div style={{ marginBottom: 20 }}></div>
-              <h4 style={{ marginBottom: "-10px" }}>Update User Profile</h4>
-              <div style={{ marginBottom: 30 }}></div>
-              <div style={{ marginBottom: 20, textAlign: "center" }}>
-                {media.selected ? (
-                  <>
-                    <div style={{ marginBottom: 15 }}></div>
-                    <Avatar src={media.selected.url} size={100} />
-                  </>
-                ) : image ? (
-                  <>
-                    <div style={{ marginBottom: 15 }}></div>
-                    <Avatar src={image.url} size={100} />
-                  </>
-                ) : (
-                  ""
-                )}
+    <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+      <Col span={12} offset={6}>
+        <Tabs tabBarStyle={{ marginBottom: 0 }}>
+          <TabPane tab="User Info" key="1">
+            <div style={{ marginBottom: 20 }}></div>
+            <h4 style={{ marginBottom: "-10px" }}>Update User Profile</h4>
+            <div style={{ marginBottom: 30 }}></div>
+            <div style={{ marginBottom: 20, textAlign: "center" }}>
+              {media.selected ? (
+                <>
+                  <div style={{ marginBottom: 15 }}></div>
+                  <Avatar src={media.selected.url} size={100} />
+                </>
+              ) : image ? (
+                <>
+                  <div style={{ marginBottom: 15 }}></div>
+                  <Avatar src={image.url} size={100} />
+                </>
+              ) : (
+                ""
+              )}
+            </div>
+            <Input
+              style={{ margin: "20px 0px 10px 0px" }}
+              size="large"
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                validateName(e.target.value);
+              }}
+            />
+            {nameError && <div style={{ color: "red" }}>{nameError}</div>}
+            <Input
+              style={{ margin: "10px 0px 10px 0px" }}
+              size="large"
+              value={email}
+              readOnly
+              disabled
+            />
+
+            {emailError && <div style={{ color: "red" }}>{emailError}</div>}
+            <Input
+              style={{ margin: "10px 0px 10px 0px" }}
+              size="large"
+              placeholder="Website (optional)"
+              value={website}
+              onChange={(e) => {
+                setWebsite(e.target.value);
+                validateWebsite(e.target.value);
+              }}
+            />
+            {websiteError && <div style={{ color: "red" }}>{websiteError}</div>}
+
+            <Input.Password
+              style={{ margin: "10px 0px 10px 0px" }}
+              size="large"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validatePassword(e.target.value);
+              }}
+            />
+            {passwordError && (
+              <div style={{ color: "red" }}>{passwordError}</div>
+            )}
+
+            {isTyping && (
+              <div className="password-strength">
+                <p>{password.length >= 8 ? "✔" : "✘"} At least 8 characters</p>
+                <p>
+                  {/[A-Z]/.test(password) ? "✔" : "✘"} At least one uppercase
+                  character
+                </p>
+                <p>
+                  {/[a-z]/.test(password) ? "✔" : "✘"} At least one lowercase
+                  character
+                </p>
+                <p>{/[0-9]/.test(password) ? "✔" : "✘"} At least one number</p>
+                <p>
+                  {/[!@#$%^&*]/.test(password) ? "✔" : "✘"} At least one special
+                  character
+                </p>
               </div>
-              <Input
-                style={{ margin: "20px 0px 10px 0px" }}
-                size="large"
-                placeholder="Full name"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  validateName(e.target.value);
-                }}
-              />
-              {nameError && <div style={{ color: "red" }}>{nameError}</div>}
-              <Input
-                style={{ margin: "10px 0px 10px 0px" }}
-                size="large"
-                value={email}
-                readOnly
-                disabled
-              />
+            )}
 
-              {emailError && <div style={{ color: "red" }}>{emailError}</div>}
-              <Input
-                style={{ margin: "10px 0px 10px 0px" }}
-                size="large"
-                placeholder="Website (optional)"
-                value={website}
-                onChange={(e) => {
-                  setWebsite(e.target.value);
-                  validateWebsite(e.target.value);
-                }}
-              />
-              {websiteError && (
-                <div style={{ color: "red" }}>{websiteError}</div>
-              )}
-
-              <Input.Password
-                style={{ margin: "10px 0px 10px 0px" }}
-                size="large"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  validatePassword(e.target.value);
-                }}
-              />
-              {passwordError && (
-                <div style={{ color: "red" }}>{passwordError}</div>
-              )}
-
-              {isTyping && (
-                <div className="password-strength">
-                  <p>
-                    {password.length >= 8 ? "✔" : "✘"} At least 8 characters
-                  </p>
-                  <p>
-                    {/[A-Z]/.test(password) ? "✔" : "✘"} At least one uppercase
-                    character
-                  </p>
-                  <p>
-                    {/[a-z]/.test(password) ? "✔" : "✘"} At least one lowercase
-                    character
-                  </p>
-                  <p>
-                    {/[0-9]/.test(password) ? "✔" : "✘"} At least one number
-                  </p>
-                  <p>
-                    {/[!@#$%^&*]/.test(password) ? "✔" : "✘"} At least one
-                    special character
-                  </p>
-                </div>
-              )}
-
+            {page === "admin" && (
               <Select
                 value={role}
                 style={{ margin: "10px 0px 10px 0px", width: "100%" }}
                 onChange={(e) => setRole(e)}
-                disabled={auth.user && auth.user.role === "Admin"} // Add a conditional check
               >
-                <Select.Option value="Subscriber">Subscriber</Select.Option>
-                <Select.Option value="Author">Author</Select.Option>
-                <Select.Option value="Admin">Admin</Select.Option>
-                <Select.Option value="Reviewer">Reviewer</Select.Option>
+                <>
+                  <Select.Option value="Subscriber" disabled={role === "Admin"}>
+                    Subscriber
+                  </Select.Option>
+                  <Select.Option value="Author" disabled={role === "Admin"}>
+                    Author
+                  </Select.Option>
+                  <Select.Option value="Admin">Admin</Select.Option>
+                  <Select.Option value="Reviewer" disabled={role === "Admin"}>
+                    Reviewer
+                  </Select.Option>
+                </>
               </Select>
+            )}
 
-              <Button
-                onClick={handleSubmit}
-                type="default"
-                style={{ margin: "10px 0px 10px 0px" }}
-                loading={loading}
-                block
-              >
-                Submit
-              </Button>
-            </TabPane>
-            <TabPane tab="User Profile" key="2">
-              <div style={{ marginBottom: 20 }}></div>
-              <h4 style={{ marginBottom: "-10px" }}>
-                Your Current Profile Image:
-              </h4>
-              <div style={{ marginBottom: 30 }}></div>
-              <div style={{ marginBottom: 20, textAlign: "center" }}>
-                {media.selected ? (
-                  <>
-                    <div style={{ marginBottom: 15 }}></div>
-                    <Avatar src={media.selected.url} size={100} />
-                  </>
-                ) : image ? (
-                  <>
-                    <div style={{ marginBottom: 15 }}></div>
-                    <Avatar src={image.url} size={100} />
-                  </>
-                ) : (
-                  ""
-                )}
-              </div>
-              <Media />
-            </TabPane>
-          </Tabs>
-        </Col>
-      </Row>
+            <Button
+              onClick={handleSubmit}
+              type="default"
+              style={{ margin: "10px 0px 10px 0px" }}
+              loading={loading}
+              block
+            >
+              Submit
+            </Button>
+          </TabPane>
+          <TabPane tab="Profile Image" key="2">
+            <div style={{ marginBottom: 20 }}></div>
+            <h4 style={{ marginBottom: "-10px" }}>
+              Your Current Profile Image:
+            </h4>
+            <div style={{ marginBottom: 30 }}></div>
+            <div style={{ marginBottom: 20, textAlign: "center" }}>
+              {media.selected ? (
+                <>
+                  <div style={{ marginBottom: 15 }}></div>
+                  <Avatar src={media.selected.url} size={100} />
+                </>
+              ) : image ? (
+                <>
+                  <div style={{ marginBottom: 15 }}></div>
+                  <Avatar src={image.url} size={100} />
+                </>
+              ) : (
+                ""
+              )}
+            </div>
+            <Media />
+          </TabPane>
+        </Tabs>
+      </Col>
+    </Row>
   );
 };
 

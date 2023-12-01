@@ -88,6 +88,8 @@ function NewPostComponent({ page = "admin" }) {
   const [imagePreviewVisible, setImagePreviewVisible] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
 
+  const [expandedPanels, setExpandedPanels] = useState([]);
+
   // Step 1: Book Title and Cover Image
   const [title, setTitle] = useState(
     typeof window !== "undefined"
@@ -576,20 +578,19 @@ function NewPostComponent({ page = "admin" }) {
                         icon={<PlusOutlined />}
                         onClick={() => {
                           const updatedVolumes = [...volumes];
-                          const lastVolumeIndex = updatedVolumes.length - 1;
                           const lastChapterIndex =
-                            updatedVolumes[lastVolumeIndex].chapters.length - 1;
+                            updatedVolumes[volumeIndex].chapters.length - 1;
                           const newChapterNumber =
                             lastChapterIndex >= 0
                               ? parseInt(
-                                  updatedVolumes[lastVolumeIndex].chapters[
+                                  updatedVolumes[volumeIndex].chapters[
                                     lastChapterIndex
                                   ].chapter,
                                   10
                                 ) + 1
                               : 1;
 
-                          updatedVolumes[lastVolumeIndex].chapters.push({
+                          updatedVolumes[volumeIndex].chapters.push({
                             name: `Chapter ${newChapterNumber}`,
                             chapter: newChapterNumber.toString(),
                             content: "",

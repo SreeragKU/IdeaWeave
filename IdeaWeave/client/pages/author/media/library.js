@@ -5,7 +5,7 @@ import MediaLibrary from "../../../components/media/MediaLibrary";
 function AuthorMediaLibrary() {
   return (
     <AuthorLayout>
-      <Row>
+      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
         <Col span={24}>
           <MediaLibrary page="author" />
         </Col>

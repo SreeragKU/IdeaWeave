@@ -523,7 +523,7 @@ exports.updateUserByUser = async (req, res) => {
         email: email || userFromDb.email,
         password: hashedPassword || userFromDb.password,
         website: website || userFromDb.website,
-        role: role || userFromDb.role,
+        // role: role || userFromDb.role,
         image: image || userFromDb.image,
       },
       { new: true }

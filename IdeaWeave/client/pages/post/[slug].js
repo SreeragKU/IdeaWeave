@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Row, Col, Card, Typography, Button, Select } from "antd";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import BookFront from "./BookFront";
 import BubbleNav from "../../components/nav/BubbleNav";
+import { Spin } from "antd";
 
 const { Title } = Typography;
 const { Option } = Select;
 
-const ReactQuill = dynamic(() => import("react-quill"), {
+const ReactQuillNoSSR = dynamic(() => import("react-quill"), {
   ssr: false,
 });
 
@@ -64,7 +65,7 @@ const ReadOnlyQuill = ({ content, theme, zoomLevel }) => {
 
   return (
     <div>
-      <ReactQuill
+      <ReactQuillNoSSR
         value={content}
         readOnly={true}
         theme="bubble"
@@ -81,6 +82,17 @@ const SinglePost = ({ post }) => {
   const [postContent, setPostContent] = useState(post.content);
   const [currentVolume, setCurrentVolume] = useState(0);
   const [currentChapter, setCurrentChapter] = useState(0);
+  const reloadFlagKey = "hasReloadedFlag";
+  const hasReloaded =
+    typeof window !== "undefined" &&
+    window.localStorage.getItem(reloadFlagKey) === "true";
+
+  const handleReload = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(reloadFlagKey, "true");
+      window.location.reload();
+    }
+  };
 
   const handleZoomIn = () => {
     if (zoomLevel < 2) {
@@ -103,11 +115,9 @@ const SinglePost = ({ post }) => {
   };
 
   const handleNextChapter = () => {
-    // Move to the next chapter within the current volume
     if (currentChapter < post.volumes[currentVolume].chapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
     } else {
-      // If at the end of the current volume, move to the next volume
       if (currentVolume < post.volumes.length - 1) {
         setCurrentVolume(currentVolume + 1);
         setCurrentChapter(0);
@@ -116,11 +126,9 @@ const SinglePost = ({ post }) => {
   };
 
   const handlePrevChapter = () => {
-    // Move to the previous chapter within the current volume
     if (currentChapter > 0) {
       setCurrentChapter(currentChapter - 1);
     } else {
-      // If at the beginning of the current volume, move to the previous volume
       if (currentVolume > 0) {
         setCurrentVolume(currentVolume - 1);
         setCurrentChapter(post.volumes[currentVolume - 1].chapters.length - 1);
@@ -128,8 +136,31 @@ const SinglePost = ({ post }) => {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const hasReloaded =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem(reloadFlagKey) === "true";
+
+    const shouldReload = !hasReloaded;
+
+    const handleReload = () => {
+      if (shouldReload) {
+        setIsLoading(true); 
+        window.localStorage.setItem(reloadFlagKey, "true");
+        window.location.reload();
+      }
+    };
+
+    handleReload();
+    if (hasReloaded) {
+      window.localStorage.removeItem(reloadFlagKey);
+      setIsLoading(false); 
+    }
+  }, []);
+
   const handleSelect = (value) => {
-    // Update the current volume and chapter based on the selected value
     const [selectedVolume, selectedChapter] = value.split(":").map(Number);
 
     setCurrentVolume(selectedVolume - 1);
@@ -143,6 +174,12 @@ const SinglePost = ({ post }) => {
 
   return (
     <>
+      {isLoading && (
+        <div style={{ textAlign: "center", marginTop: 80 }}>
+          <Spin size="large" />
+        </div>
+      )}
+
       <BubbleNav
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
@@ -150,8 +187,8 @@ const SinglePost = ({ post }) => {
         onTextToSpeech={handleTextToSpeech}
         postContent={postContent}
         post={post}
-        currentVolume={currentVolume} 
-        currentChapter={currentChapter} 
+        currentVolume={currentVolume}
+        currentChapter={currentChapter}
       />
 
       <BookFront post={post} />
@@ -214,7 +251,11 @@ const SinglePost = ({ post }) => {
               zoomLevel={zoomLevel}
             />
             <div
-              style={{ marginBottom: 16, textAlign: "center", marginTop: 16 }}
+              style={{
+                marginBottom: 16,
+                textAlign: "center",
+                marginTop: 16,
+              }}
             >
               <Button
                 type="primary"

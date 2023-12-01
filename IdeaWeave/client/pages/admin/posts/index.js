@@ -7,25 +7,27 @@ import { useRouter } from "next/router";
 import AdminLayout from "../../../components/layout/AdminLayout";
 import Link from "next/link";
 import PostsList from "../../../components/posts/PostsList";
+import { AuthContext } from "../../../context/auth";
 
 const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
 
 function Posts() {
   const [post, setPost] = useContext(PostContext);
+  const [auth, setAuth] = useContext(AuthContext);
   const { posts } = post;
   const router = useRouter();
   const screens = useBreakpoint();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if(auth.token) fetchPosts();
+  }, [auth?.token]);
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/posts");
+      const { data } = await axios.get("/posts-for-admin");
       setPost((prev) => ({ ...prev, posts: data }));
     } catch (err) {
       console.log(err);

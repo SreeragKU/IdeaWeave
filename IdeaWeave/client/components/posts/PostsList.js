@@ -11,7 +11,35 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
   const sanitizeHtml = (html) => {
     return html.replace(/<\/?(u|b|i)>/g, "");
   };
-  
+
+  const renderChapters = (chapters) => {
+    const maxContentLength = 100; 
+
+    if (chapters.length > 0) {
+      const firstChapter = chapters[0];
+      return (
+        <div key={firstChapter.name}>
+          <Text ellipsis>
+            {htmlToMd(sanitizeHtml(firstChapter.content)).substring(0, maxContentLength)}...
+          </Text>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const renderVolumes = (volumes) => {
+    return volumes.map((volume) => (
+      <div key={volume.volume}>
+        <Text strong>{volume.volume}</Text>
+        <Text type="secondary">
+          &nbsp;({volume.chapters.length} chapters)
+        </Text>
+        {renderChapters(volume.chapters)}
+      </div>
+    ));
+  };
 
   return (
     <>
@@ -39,22 +67,19 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
               style={{ width: "100%", height: "150px" }}
             />
             <Title level={5}>{post.title}</Title>
-            {/* Displaying volume and chapter information */}
-            {post.volumes.map((volume) => (
-              <div key={volume.volume}>
-                <Text strong>{volume.volume}</Text>
-                {volume.chapters.map((chapter) => (
-                  <div key={chapter.name}>
-                    <Text ellipsis>{htmlToMd(sanitizeHtml(chapter.content))}</Text>
-                  </div>
-                ))}
-              </div>
-            ))}
+            <div>
+              <Text strong>Total Volumes:</Text>
+              <Text>{post.volumes.length}</Text>
+              <br />
+              <Text strong>Total Chapters:</Text>
+              <Text>{post.volumes.reduce((sum, volume) => sum + volume.chapters.length, 0)}</Text>
+            </div>
+            {renderVolumes(post.volumes)}
             <div style={{ marginTop: "16px" }}>
-              <u>Posted On</u> :{" "}
+              <u>Posted On</u>:{" "}
               <i>{dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")}</i>
               <br />
-              <u>Posted By</u> : {post.postedBy.name}
+              <u>Posted By</u>: {post.postedBy.name}
             </div>
           </Card>
         </Col>

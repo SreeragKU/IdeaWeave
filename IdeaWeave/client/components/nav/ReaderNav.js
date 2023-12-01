@@ -122,47 +122,18 @@ const ReaderNav = () => {
           <Link href="/reader">Dashboard</Link>
         </Menu.Item>
 
-        <SubMenu
-          key="2"
-          icon={<PushpinOutlined />}
-          title="Posts"
-          className={activeSubMenu === "/reader" ? "active" : ""}
-          style={activeSubMenu === "/reader" ? customStyles.activeSubMenu : {}}
+        <Menu.Item
+          key="/reader/comments"
+          icon={<CommentOutlined />}
+          className={current === "/reader/comments" ? "active" : ""}
+          style={
+            current === "/reader/comments"
+              ? customStyles.activeItem
+              : customStyles.item
+          }
         >
-          <Menu.Item
-            key="/reader/posts"
-            className={current === "/reader/posts" ? "active" : ""}
-            style={
-              current === "/reader/posts"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/reader/posts">All Books</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="/reader/posts/new"
-            className={current === "/reader/posts/new" ? "active" : ""}
-            style={
-              current === "/reader/posts/new"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/reader/posts/new">Add New Book</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="/reader/categories"
-            className={current === "/reader/categories" ? "active" : ""}
-            style={
-              current === "/reader/categories"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/reader/categories">Categories</Link>
-          </Menu.Item>
-        </SubMenu>
+          <Link href="/reader/comments">Comments</Link>
+        </Menu.Item>
 
         <SubMenu key="6" icon={<CameraOutlined />} title="Media">
           <Menu.Item
@@ -190,44 +161,6 @@ const ReaderNav = () => {
         </SubMenu>
 
         <Menu.Item
-          key="/reader/comments"
-          icon={<CommentOutlined />}
-          className={current === "/reader/comments" ? "active" : ""}
-          style={
-            current === "/reader/comments"
-              ? customStyles.activeItem
-              : customStyles.item
-          }
-        >
-          <Link href="/reader/comments">Comments</Link>
-        </Menu.Item>
-
-        <SubMenu key="10" icon={<UserSwitchOutlined />} title="Users">
-          <Menu.Item
-            key="/reader/users"
-            className={current === "/reader/users" ? "active" : ""}
-            style={
-              current === "/reader/users"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/reader/users">All Users</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="/reader/users/new"
-            className={current === "/reader/users/new" ? "active" : ""}
-            style={
-              current === "/reader/users/new"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/reader/users/new">Add New</Link>
-          </Menu.Item>
-        </SubMenu>
-
-        <Menu.Item
           key={`/reader/${auth?.user?._id}`}
           icon={<UserOutlined />}
           className={current === `/reader/${auth?.user?._id}` ? "active" : ""}
@@ -238,19 +171,6 @@ const ReaderNav = () => {
           }
         >
           <Link href={`/reader/${auth?.user?._id}`}>Profile</Link>
-        </Menu.Item>
-
-        <Menu.Item
-          key="/reader/customize"
-          icon={<BgColorsOutlined />}
-          className={current === "/reader/customize" ? "active" : ""}
-          style={
-            current === "/reader/customize"
-              ? customStyles.activeItem
-              : customStyles.item
-          }
-        >
-          <Link href="/reader/customize">Customize</Link>
         </Menu.Item>
       </Menu>
     </Sider>

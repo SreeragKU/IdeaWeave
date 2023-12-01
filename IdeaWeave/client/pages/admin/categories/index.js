@@ -69,12 +69,17 @@ export default function Categories({ children }) {
     try {
       const { data } = await axios.delete(`/category/${item.slug}`);
       setPendingCategories(pendingCategories.filter((cat) => cat._id !== data._id));
+      setPost((prev) => ({
+        ...prev,
+        categories: prev.categories.filter((cat) => cat._id !== data._id),
+      }));
       toast.success("Category deleted successfully");
     } catch (error) {
       console.log(error);
       toast.error("Category delete failed");
     }
-  }
+  };
+  
 
   const handleEdit = async (item) => {
     setupdatingCategory(item);

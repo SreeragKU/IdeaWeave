@@ -151,17 +151,6 @@ const AuthorNav = () => {
           >
             <Link href="/author/posts/new">Add New Book</Link>
           </Menu.Item>
-          <Menu.Item
-            key="/author/categories"
-            className={current === "/author/categories" ? "active" : ""}
-            style={
-              current === "/author/categories"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/author/categories">Categories</Link>
-          </Menu.Item>
         </SubMenu>
 
         <SubMenu key="6" icon={<CameraOutlined />} title="Media">
@@ -202,31 +191,6 @@ const AuthorNav = () => {
           <Link href="/author/comments">Comments</Link>
         </Menu.Item>
 
-        <SubMenu key="10" icon={<UserSwitchOutlined />} title="Users">
-          <Menu.Item
-            key="/author/users"
-            className={current === "/author/users" ? "active" : ""}
-            style={
-              current === "/author/users"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/author/users">All Users</Link>
-          </Menu.Item>
-          <Menu.Item
-            key="/author/users/new"
-            className={current === "/author/users/new" ? "active" : ""}
-            style={
-              current === "/author/users/new"
-                ? customStyles.activeItem
-                : customStyles.item
-            }
-          >
-            <Link href="/author/users/new">Add New</Link>
-          </Menu.Item>
-        </SubMenu>
-
         <Menu.Item
           key={`/author/${auth?.user?._id}`}
           icon={<UserOutlined />}
@@ -238,19 +202,6 @@ const AuthorNav = () => {
           }
         >
           <Link href={`/author/${auth?.user?._id}`}>Profile</Link>
-        </Menu.Item>
-
-        <Menu.Item
-          key="/author/customize"
-          icon={<BgColorsOutlined />}
-          className={current === "/author/customize" ? "active" : ""}
-          style={
-            current === "/author/customize"
-              ? customStyles.activeItem
-              : customStyles.item
-          }
-        >
-          <Link href="/author/customize">Customize</Link>
         </Menu.Item>
       </Menu>
     </Sider>

@@ -85,11 +85,8 @@ export const singlePost = async (req, res) => {
           select: "chapter name content",
         },
       });
-
-    console.log("Fetched post data:", post);
     res.json(post);
   } catch (err) {
-    console.error("Error fetching post data:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -149,13 +146,16 @@ export const editPost = async (req, res) => {
 
 export const posts = async (req, res) => {
   try {
+    const perPage = 8;
+    const page = req.params.page || 1;
     const all = await Post.find()
+      .skip((page - 1) * perPage)
       .populate('coverImage')
       .populate("postedBy", "name")
       .populate("categories", "name slug")
       .populate("volumes.chapters", "name content") 
-      .sort({ createdAt: -1 });
-
+      .sort({ createdAt: -1 })
+      .limit(perPage);
     res.json(all);
   } catch (err) {
     console.log(err);
@@ -239,6 +239,30 @@ export const postByAuthor = async (req, res) => {
       .populate("coverImage", "url")
       .sort({ createdAt: -1 });
     res.json(posts);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const postCount = async (req, res) => {
+  try {
+    const count = await Post.countDocuments();
+    res.json(count);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const postsForAdmin = async (req, res) => {
+  try {
+    const all = await Post.find()
+      .populate('coverImage')
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .populate("volumes.chapters", "name content") 
+      .sort({ createdAt: -1 });
+
+    res.json(all);
   } catch (err) {
     console.log(err);
   }
