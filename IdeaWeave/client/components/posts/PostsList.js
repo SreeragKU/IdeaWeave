@@ -75,7 +75,7 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
 
   return (
     <>
-      <Row justify="space-between" style={{ marginBottom: 16 }}>
+      <Row justify="space-between" style={{ marginBottom: 16, paddingRight: 50 }}>
         <Col>
           <Space>
             <Search

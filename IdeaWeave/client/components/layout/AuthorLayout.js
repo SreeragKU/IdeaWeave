@@ -11,11 +11,16 @@ const { Content } = Layout;
 export default function AuthorLayout({ children }) {
   const [auth, setAuth] = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(true); 
   const router = useRouter();
 
   useEffect(() => {
     if(auth?.token) getCurrentAuthor();
   }, [auth?.token]);
+
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+  };
 
   const getCurrentAuthor = async () => {
     try {
@@ -44,8 +49,8 @@ export default function AuthorLayout({ children }) {
 
   return (
     <Layout>
-      <AuthorNav />
-      <Layout>
+      <AuthorNav isOpen={isNavOpen} toggleNav={toggleNav} />
+      <Layout style={{ marginLeft: isNavOpen ? 90 : 80, transition: "margin 0.5s" }}>
         <Content style={{ padding: "10px" }}>{children}</Content>
       </Layout>
     </Layout>

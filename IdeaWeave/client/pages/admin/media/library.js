@@ -5,7 +5,7 @@ import MediaLibrary from "../../../components/media/MediaLibrary";
 function AdminMediaLibrary() {
   return (
     <AdminLayout>
-      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+      <Row style={{ paddingTop: "50px" }}>
         <Col span={24}>
           <MediaLibrary />
         </Col>

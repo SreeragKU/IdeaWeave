@@ -56,7 +56,7 @@ function Posts() {
 
   return (
     <AdminLayout>
-      <Row gutter={[16, 16]} style={{ marginTop: 60, marginLeft: 90 }}>
+      <Row gutter={[16, 16]} style={{ paddingLeft: 120, marginTop: 60, paddingRight: 50 }}>
         <Col span={24}>
           <Button type="primary">
             <Link href="/admin/posts/new">

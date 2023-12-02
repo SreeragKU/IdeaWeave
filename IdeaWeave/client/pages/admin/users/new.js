@@ -125,7 +125,7 @@ const handleSubmit = async (e) => {
 
   return (
     <AdminLayout>
-      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+      <Row style={{ paddingLeft: 50, paddingTop: "50px" }}>
         <Col span={12} offset={6}>
           <h4 style={{ marginBottom: "-10px" }}>Add new user</h4>
           <Input

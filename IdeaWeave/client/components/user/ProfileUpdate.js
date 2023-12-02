@@ -121,7 +121,7 @@ const ProfileUpdate = ({ page = "admin" }) => {
   
 
   return (
-    <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+    <Row style={{ paddingTop: "50px" }}>
       <Col span={12} offset={6}>
         <Tabs tabBarStyle={{ marginBottom: 0 }}>
           <TabPane tab="User Info" key="1">

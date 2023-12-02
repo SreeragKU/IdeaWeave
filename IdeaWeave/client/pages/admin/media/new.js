@@ -5,7 +5,7 @@ import UploadFile from "../../../components/media/UploadFile";
 function NewMedia() {
   return (
     <AdminLayout>
-      <Row style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+      <Row style={{ paddingLeft: 50, paddingTop: "50px", paddingRight: 50 }}>
         <Col span={24}>
           <div
             style={{

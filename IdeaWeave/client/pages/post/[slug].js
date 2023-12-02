@@ -5,7 +5,6 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 import BookFront from "./BookFront";
 import BubbleNav from "../../components/nav/BubbleNav";
-import { Spin } from "antd";
 import dayjs from "dayjs";
 import CommentForm from "../../components/comments/CommentForm";
 
@@ -15,9 +14,10 @@ dayjs.extend(relativeTime);
 const { Title } = Typography;
 const { Option } = Select;
 
-const ReactQuillNoSSR = dynamic(() => import("react-quill"), {
-  ssr: false,
-});
+const ReactQuillNoSSR = dynamic(
+  () => import("react-quill").then((module) => module.default),
+  { ssr: false }
+);
 
 const themes = {
   Default: {
@@ -58,29 +58,6 @@ const themes = {
   },
 };
 
-const ReadOnlyQuill = ({ content, theme, zoomLevel }) => {
-  const quillStyle = {
-    height: "auto",
-    fontSize: `${themes[theme].fontSize * zoomLevel}rem`,
-    lineHeight: `${themes[theme].lineHeight * zoomLevel}`,
-    backgroundColor: themes[theme].backgroundColor,
-    color: themes[theme].color,
-    padding: "16px",
-  };
-
-  return (
-    <div>
-      <ReactQuillNoSSR
-        value={content}
-        readOnly={true}
-        theme="bubble"
-        modules={{ toolbar: false }}
-        style={quillStyle}
-      />
-    </div>
-  );
-};
-
 const SinglePost = ({ post, postComments }) => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedTheme, setSelectedTheme] = useState("Default");
@@ -90,7 +67,26 @@ const SinglePost = ({ post, postComments }) => {
   const [comments, setComments] = useState(postComments);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
-  const reloadFlagKey = "hasReloadedFlag";
+
+  useEffect(() => {
+    setZoomLevel(1);
+    setPostContent(
+      post.volumes[currentVolume].chapters[currentChapter].content
+    );
+  }, [currentVolume, currentChapter]);
+
+  useEffect(() => {
+    setPostContent(
+      post.volumes[currentVolume].chapters[currentChapter].content
+    );
+  }, [zoomLevel]);
+
+  useEffect(() => {
+    // This ensures that the styles are applied after the dynamic import
+    setPostContent(
+      post.volumes[currentVolume].chapters[currentChapter].content
+    );
+  }, [postContent]);
 
   const handleZoomIn = () => {
     if (zoomLevel < 2) {
@@ -134,48 +130,19 @@ const SinglePost = ({ post, postComments }) => {
     }
   };
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const hasReloaded =
-      typeof window !== "undefined" &&
-      window.localStorage.getItem(reloadFlagKey) === "true";
-
-    const shouldReload = !hasReloaded;
-
-    const handleReload = () => {
-      if (shouldReload) {
-        setIsLoading(true);
-        window.localStorage.setItem(reloadFlagKey, "true");
-        window.location.reload();
-      }
-    };
-
-    handleReload();
-    if (hasReloaded) {
-      window.localStorage.removeItem(reloadFlagKey);
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoading) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isLoading]);
-  
   const handleSelect = (value) => {
     const [selectedVolume, selectedChapter] = value.split(":").map(Number);
 
     setCurrentVolume(selectedVolume - 1);
     setCurrentChapter(selectedChapter - 1);
   };
+
+  const [isQuillLoaded, setIsQuillLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsQuillLoaded(true);
+    handleQuillLoad(); 
+  }, []);
 
   const isAtFirstChapter = currentVolume === 0 && currentChapter === 0;
   const isAtLastChapter =
@@ -196,30 +163,39 @@ const SinglePost = ({ post, postComments }) => {
     }
   };
 
+  const handleQuillLoad = () => {
+    setIsQuillLoaded(true);
+    if (isQuillLoaded) {
+      const quill = document.querySelector(".ql-editor");
+      if (quill) {
+        quill.style.fontSize = `${themes[selectedTheme].fontSize * zoomLevel}rem`;
+        quill.style.lineHeight = `${themes[selectedTheme].lineHeight * zoomLevel}`;
+        quill.style.backgroundColor = themes[selectedTheme].backgroundColor;
+        quill.style.color = themes[selectedTheme].color;
+        quill.style.padding = "16px";
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isQuillLoaded) {
+      const quill = document.querySelector(".ql-editor");
+      if (quill) {
+        quill.style.fontSize = `${
+          themes[selectedTheme].fontSize * zoomLevel
+        }rem`;
+        quill.style.lineHeight = `${
+          themes[selectedTheme].lineHeight * zoomLevel
+        }`;
+        quill.style.backgroundColor = themes[selectedTheme].backgroundColor;
+        quill.style.color = themes[selectedTheme].color;
+        quill.style.padding = "16px";
+      }
+    }
+  }, [zoomLevel, selectedTheme, isQuillLoaded]);
+
   return (
     <>
-      {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            overflow: "hidden", // Lock scroll when loading
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <Spin size="large" />
-          </div>
-        </div>
-      )}
-
       <BubbleNav
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
@@ -283,13 +259,18 @@ const SinglePost = ({ post, postComments }) => {
                 Next Chapter
               </Button>{" "}
             </div>
-            <ReadOnlyQuill
-              content={
-                post.volumes[currentVolume].chapters[currentChapter].content
-              }
-              theme={selectedTheme}
-              zoomLevel={zoomLevel}
-            />
+            <div>
+              <ReactQuillNoSSR
+                value={postContent}
+                readOnly={true}
+                theme="bubble"
+                modules={{ toolbar: false }}
+                style={{
+                  visibility: isQuillLoaded ? "visible" : "hidden",
+                }}
+                onLoad={handleQuillLoad}
+              />
+            </div>
             <div
               style={{
                 marginBottom: 16,
@@ -352,7 +333,7 @@ const SinglePost = ({ post, postComments }) => {
               itemLayout="horizontal"
               dataSource={comments}
               renderItem={(item) => (
-                <List.Item key={item._id}>
+                <List.Item key={item._id} id={item._id}>
                   <List.Item.Meta
                     avatar={<Avatar>{item?.postedBy?.name?.charAt(0)}</Avatar>}
                     title={item?.postedBy?.name}

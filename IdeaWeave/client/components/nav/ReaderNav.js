@@ -25,7 +25,7 @@ const ReaderNav = () => {
 
   const [collapsed, setCollapsed] = useState(false);
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 1000000);
+    setCollapsed(window.innerWidth < 1000);
   };
 
   useEffect(() => {
@@ -67,6 +67,11 @@ const ReaderNav = () => {
     },
     menu: {
       background: theme === "dark" ? "#001529" : "#fff",
+      height: "calc(100% - 64px)",
+      overflowY: "auto",
+      overflowX: "hidden", 
+      scrollbarWidth: "thin",
+      WebkitOverflowScrolling: "touch", 
     },
     item: {
       background: "transparent",

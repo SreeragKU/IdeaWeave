@@ -11,13 +11,18 @@ const { Content } = Layout;
 export default function ReaderLayout({ children }) {
   const [auth, setAuth] = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
+  const [isNavOpen, setIsNavOpen] = useState(true); 
   const router = useRouter();
 
   useEffect(() => {
-    if(auth?.token) getCurrentAuthor();
+    if(auth?.token) getCurrentReader();
   }, [auth?.token]);
 
-  const getCurrentAuthor = async () => {
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+  };
+
+  const getCurrentReader = async () => {
     try {
       const {data} = await axios.get("/current-reader");
       setLoading(false);
@@ -44,8 +49,8 @@ export default function ReaderLayout({ children }) {
 
   return (
     <Layout>
-      <ReaderNav />
-      <Layout>
+      <ReaderNav isOpen={isNavOpen} toggleNav={toggleNav}/>
+      <Layout style={{ marginLeft: isNavOpen ? 90 : 80, transition: "margin 0.5s" }}>
         <Content style={{ padding: "10px" }}>{children}</Content>
       </Layout>
     </Layout>

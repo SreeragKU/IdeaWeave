@@ -273,7 +273,7 @@ export default function AllUsers() {
       <Row
         style={{
           padding: 20,
-          marginLeft: 80,
+          marginLeft: 90,
           marginRight: 10,
           marginTop: 60,
           backgroundColor: theme === "dark" ? "#222" : "transparent",

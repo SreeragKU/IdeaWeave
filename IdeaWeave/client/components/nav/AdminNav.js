@@ -22,10 +22,10 @@ const AdminNav = () => {
   const [activeSubMenu, setActiveSubMenu] = useState("");
   const [auth, setAuth] = useContext(AuthContext);
   const [theme] = useContext(ThemeContext);
-
   const [collapsed, setCollapsed] = useState(false);
+
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 1000000);
+    setCollapsed(window.innerWidth < 1000);
   };
 
   useEffect(() => {
@@ -51,22 +51,27 @@ const AdminNav = () => {
   const customStyles = {
     sider: {
       width: collapsed ? 50 : 100,
-      height: "100vh",
       transition: "width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)",
       overflow: "hidden",
       paddingTop: "64px",
+      height: "100vh",
     },
     fixedSider: {
       position: "fixed",
       top: 0,
       left: 0,
-      height: "100vh",
+      bottom: 0,
       zIndex: 1000,
       background: theme === "dark" ? "#001529" : "#fff",
       boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
     },
     menu: {
       background: theme === "dark" ? "#001529" : "#fff",
+      height: "calc(100% - 64px)",
+      overflowY: "auto",
+      overflowX: "hidden", 
+      scrollbarWidth: "thin",
+      WebkitOverflowScrolling: "touch", 
     },
     item: {
       background: "transparent",
@@ -82,7 +87,6 @@ const AdminNav = () => {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",
     },
-
     activeSubMenu: {
       background: theme === "dark" ? "#007F7F" : "#00BFFF",
       color: "#fff",

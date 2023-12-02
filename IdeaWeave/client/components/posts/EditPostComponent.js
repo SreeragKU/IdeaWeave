@@ -364,7 +364,7 @@ function EditPostComponent({ page = "admin" }) {
 
   return (
     <>
-      <Row justify="center" style={{ paddingLeft: "30px", paddingTop: "50px" }}>
+      <Row justify="center" style={{ paddingLeft: 50, paddingTop: "50px", paddingRight: 50 }}>
         <Col span={18}>
           <Card style={{ padding: "20px", marginBottom: "20px" }}>
             <Steps current={step} style={{ marginBottom: "20px" }}>
