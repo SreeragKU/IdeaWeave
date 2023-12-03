@@ -189,7 +189,7 @@ export default function AllUsers() {
                     src={user?.image?.url}
                     style={{ backgroundColor: "#87d068" }}
                   >
-                    {user?.name[0]}
+                    {user?.name ? user.name[0] : ''}
                   </Avatar>
                 }
                 title={
@@ -273,8 +273,8 @@ export default function AllUsers() {
       <Row
         style={{
           padding: 20,
-          marginLeft: 90,
-          marginRight: 10,
+          marginLeft: 150,
+          marginRight: 50,
           marginTop: 60,
           backgroundColor: theme === "dark" ? "#222" : "transparent",
         }}

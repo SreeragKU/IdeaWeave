@@ -128,7 +128,7 @@ export default function Categories({ children }) {
 
   return (
     <AdminLayout>
-      <Row style={{ paddingLeft: 50, paddingTop: "50px", paddingRight: 50 }}>
+      <Row style={{ paddingLeft: 80, paddingTop: "50px", paddingRight: 50 }}>
         <Col xs={22} sm={22} lg={10} offset={1}>
           <Content>
             <h1>Categories</h1>

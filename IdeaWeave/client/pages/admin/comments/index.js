@@ -1,13 +1,15 @@
 import { useEffect, useState, useContext } from "react";
-import { Row, Col, Button, Input, List, Modal } from "antd";
+import { Row, Col, Button, Input, List, Modal, Spin } from "antd";
 import AdminLayout from "../../../components/layout/AdminLayout";
 import Link from "next/link";
-import { PlusOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { AuthContext } from "../../../context/auth";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
+import CommentForm from "../../../components/comments/CommentForm";
+import {toast} from "react-hot-toast";
 
 dayjs.extend(localizedFormat);
 
@@ -18,7 +20,10 @@ function Comments() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedComment, setSelectedComment] = useState({});
+  const [content, setContent] = useState("");
+  const [visible, setVisible] = useState(false);
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
 
@@ -38,8 +43,10 @@ function Comments() {
     try {
       const { data } = await axios.get(`/comments/${page}`);
       setComments([...comments, ...data]);
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
   };
 
@@ -73,15 +80,45 @@ function Comments() {
         return;
       },
     });
-  };  
+  };
 
-  const filteredComments = comments?.filter((comment) =>
-    comment.content.toLowerCase().includes(keyword)
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.put(`/comment/${selectedComment._id}`, {
+        content,
+      });
+
+      let arr = comments;
+      const index = arr.findIndex((c) => c._id === selectedComment._id);
+      arr[index].content = data.content;
+      setComments(arr);
+
+      setVisible(false);
+      setLoading(false);
+      setSelectedComment({});
+
+      toast.success("Comment updated");
+    } catch (err) {
+      console.log(err);
+      setVisible(false);
+    }
+  };
+
+  const filteredComments = comments?.filter(
+    (comment) =>
+      comment.content.toLowerCase().includes(keyword) ||
+      comment?.postedBy?.name.toLowerCase().includes(keyword) ||
+      (comment?.postedBy?.role &&
+        comment.postedBy.role.toLowerCase().includes(keyword))
   );
 
   return (
     <AdminLayout>
-      <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50}}>
+      {loading ? (
+        <Spin size="large" style={{ marginLeft: 120, marginTop: 80 }} />
+      ) : (
+      <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
         <Col xs={24} sm={24} lg={16} offset={1}>
           <h1 style={{ marginTop: 15 }}>{total} Comments</h1>
 
@@ -92,29 +129,38 @@ function Comments() {
             onChange={(e) => setKeyword(e.target.value.toLowerCase())}
           />
 
-          <List
-            itemLayout="horizontal"
-            dataSource={filteredComments}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Link href={`/post/${item?.postId?.slug}#${item._id}`}>
-                    view
-                  </Link>,
-                  <a onClick={() => handleDelete(item)}>delete</a>,
-                ]}
-              >
-                <List.Item.Meta
-                  description={`On ${item?.postId?.title} | ${
-                    item?.postedBy?.name
-                  } | ${dayjs(item.createdAt).format("L LT")}`}
-                  title={item.content}
-                />
-              </List.Item>
-            )}
-          />
+          {filteredComments.map((item) => (
+            <List.Item
+              key={item._id}
+              actions={[
+                <Link href={`/post/${item?.postId?.slug}#${item._id}`}>
+                  view
+                </Link>,
+                auth.user && item.postedBy.name === auth.user.name && (
+                  <a
+                    onClick={() => {
+                      setSelectedComment(item);
+                      setVisible(true);
+                      setContent(item.content);
+                    }}
+                  >
+                    edit
+                  </a>
+                ),
+                auth.user && <a onClick={() => handleDelete(item)}>delete</a>,
+              ]}
+            >
+              <List.Item.Meta
+                description={`On ${item?.postId?.title} | ${
+                  item?.postedBy?.name
+                } | ${dayjs(item.createdAt).format("L LT")}`}
+                title={item.content}
+              />
+            </List.Item>
+          ))}
         </Col>
       </Row>
+      )}
 
       {page * 6 < total && (
         <Row>
@@ -130,6 +176,24 @@ function Comments() {
           </Col>
         </Row>
       )}
+      <Row>
+        <Col span={24}>
+          <Modal
+            visible={visible}
+            title="Update comment"
+            onOk={() => setVisible(false)}
+            onCancel={() => setVisible(false)}
+            footer={null}
+          >
+            <CommentForm
+              handleSubmit={handleSubmit}
+              comment={content}
+              setComment={setContent}
+              loading={loading}
+            />
+          </Modal>
+        </Col>
+      </Row>
     </AdminLayout>
   );
 }

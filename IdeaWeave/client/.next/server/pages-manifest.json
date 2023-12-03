@@ -2,8 +2,13 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/post/[slug]": "pages/post/[slug].js",
+  "/admin": "pages/admin.js",
   "/admin/posts": "pages/admin/posts.js",
-  "/posts": "pages/posts.js",
-  "/admin": "pages/admin.js"
+  "/signin": "pages/signin.js",
+  "/author": "pages/author.js",
+  "/": "pages/index.js",
+  "/author/comments": "pages/author/comments.js",
+  "/author/[id]": "pages/author/[id].js",
+  "/author/posts": "pages/author/posts.js",
+  "/author/posts/new": "pages/author/posts/new.js"
 }

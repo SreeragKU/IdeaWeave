@@ -13,7 +13,7 @@ const chapterSchema = new Schema(
       required: true,
     },
     content: {
-      type: String, 
+      type: String,
       required: true,
     },
   },
@@ -38,7 +38,7 @@ const postSchema = new Schema(
       required: true,
     },
     content: {
-      type: String, 
+      type: String,
       required: true,
     },
     volumes: [volumeSchema],
@@ -51,6 +51,7 @@ const postSchema = new Schema(
       unique: true,
       lowercase: true,
     },
+    commentCount: { type: Number, default: 0 }, 
   },
   { timestamps: true }
 );

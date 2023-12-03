@@ -7,6 +7,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BookOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 import ToggleTheme from "./ToggleTheme";
 import Link from "next/link";
@@ -57,7 +58,7 @@ const TopNav = () => {
         position: "fixed",
         top: 0,
         width: "100%",
-        zIndex: 1001, // Above the Sider
+        zIndex: 1001,
       }}
     >
       <Menu.Item key="ideaweave" icon={<AppstoreOutlined />}>
@@ -65,6 +66,9 @@ const TopNav = () => {
       </Menu.Item>
       <Menu.Item key="posts" icon={<BookOutlined />}>
         <Link href="/posts">Books</Link>
+      </Menu.Item>
+      <Menu.Item key="contact" icon={<MailOutlined />}>
+        <Link href="/contact">Contact</Link>
       </Menu.Item>
       {auth?.user === null && (
             <>

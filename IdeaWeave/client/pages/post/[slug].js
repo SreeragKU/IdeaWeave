@@ -8,6 +8,7 @@ import BubbleNav from "../../components/nav/BubbleNav";
 import dayjs from "dayjs";
 import CommentForm from "../../components/comments/CommentForm";
 
+
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
@@ -208,6 +209,7 @@ const SinglePost = ({ post, postComments }) => {
       />
 
       <BookFront post={post} />
+      
       <Head>
         <title>{post.title}</title>
         <meta name="description" content={post.content.substring(0, 160)} />
@@ -327,7 +329,7 @@ const SinglePost = ({ post, postComments }) => {
               handleSubmit={handleSubmit}
               loading={loading}
             />
-            <div style={{ marginBottom: 50 }}></div>
+            <div style={{ marginBottom: 50 }} id="commentSection"></div>
 
             <List
               itemLayout="horizontal"

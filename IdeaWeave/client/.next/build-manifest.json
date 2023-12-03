@@ -12,6 +12,11 @@
   ],
   "rootMainFiles": [],
   "pages": {
+    "/": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/index.js"
+    ],
     "/_app": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
@@ -27,15 +32,40 @@
       "static/chunks/main.js",
       "static/chunks/pages/admin.js"
     ],
-    "/post/[slug]": [
+    "/admin/posts": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/post/[slug].js"
+      "static/chunks/pages/admin/posts.js"
     ],
-    "/posts": [
+    "/author": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/posts.js"
+      "static/chunks/pages/author.js"
+    ],
+    "/author/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/author/[id].js"
+    ],
+    "/author/comments": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/author/comments.js"
+    ],
+    "/author/posts": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/author/posts.js"
+    ],
+    "/author/posts/new": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/author/posts/new.js"
+    ],
+    "/signin": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/signin.js"
     ]
   },
   "ampFirstPages": []

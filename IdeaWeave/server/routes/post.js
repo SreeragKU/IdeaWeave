@@ -31,6 +31,7 @@ import {
   updateComment,
   removeComment,
   userComments,
+  getNumbers,
 } from "../controllers/post";
 
 router.post("/upload-image", requireSignin, canCreateRead, uploadImage);
@@ -50,6 +51,7 @@ router.post("/comment/:postId", requireSignin, createComment);
 router.get("/comments/:page", requireSignin, isAdmin, comments);
 router.get("/user-comments", requireSignin, userComments);
 router.get("/comment-count", commentCount);
+router.get('/numbers', getNumbers)
 router.put(
   "/comment/:commentId",
   requireSignin,

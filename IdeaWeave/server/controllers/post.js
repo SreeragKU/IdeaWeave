@@ -151,19 +151,17 @@ export const editPost = async (req, res) => {
 
 export const posts = async (req, res) => {
   try {
-    const perPage = 8;
-    const page = req.params.page || 1;
     const all = await Post.find()
-      .skip((page - 1) * perPage)
       .populate('coverImage')
       .populate("postedBy", "name")
       .populate("categories", "name slug")
-      .populate("volumes.chapters", "name content") 
-      .sort({ createdAt: -1 })
-      .limit(perPage);
+      .populate("volumes.chapters", "name content")
+      .populate("commentCount")
+      .sort({ createdAt: -1 });
     res.json(all);
   } catch (err) {
     console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -310,11 +308,10 @@ export const comments = async (req, res) => {
 export const userComments = async (req, res) => {
   try {
     const comments = await Comment.find(
-      { postedBy: req.user._id }
+      { postedBy: req.user._id })
         .populate("postedBy", "name")
         .populate("postId", "title slug")
         .sort({ createdAt: -1 })
-    );
 
     return res.json(comments);
   } catch (err) {
@@ -334,11 +331,11 @@ export const commentCount = async (req, res) => {
 export const updateComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const { comment } = req.body;
+    const { content } = req.body;
 
     const updatedComment = await Comment.findByIdAndUpdate(
       commentId,
-      { content: comment },
+      { content },
       { new: true }
     );
     res.json(updatedComment);
@@ -350,7 +347,38 @@ export const updateComment = async (req, res) => {
 export const removeComment = async (req, res) => {
   try {
     const comment = await Comment.findByIdAndDelete(req.params.commentId);
-    res.json({ ok: true });
+
+    // If comment is successfully deleted, update the associated post's commentCount
+    if (comment) {
+      const post = await Post.findOneAndUpdate(
+        { _id: comment.postId },
+        { $inc: { commentCount: -1 } },
+        { new: true }
+      );
+
+      if (!post) {
+        console.error('Associated post not found');
+      }
+
+      res.json({ ok: true });
+    } else {
+      // Comment not found
+      res.json({ ok: false, error: 'Comment not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: 'Internal Server Error' });
+  }
+};
+
+export const getNumbers = async (req, res) => {
+  try {
+    const posts = await Post.countDocuments();
+    const users = await User.countDocuments();
+    const comments = await Comment.countDocuments();
+    const categories = await Category.countDocuments();
+
+    return res.json({ posts, users, comments, categories });
   } catch (err) {
     console.log(err);
   }

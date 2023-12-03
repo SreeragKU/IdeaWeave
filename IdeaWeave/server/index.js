@@ -7,6 +7,7 @@ require('dotenv').config();
 const { DATABASE } = require("./config");
 import categoryRoutes from "./routes/category";
 import uploadRoutes from "./routes/post";
+import websiteRoutes from "./routes/website";
 const authRoutes = require("./routes/auth");
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(morgan("dev"));
 app.use("/api", authRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", uploadRoutes);
+app.use("/api", websiteRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
