@@ -3,12 +3,7 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/admin": "pages/admin.js",
-  "/admin/posts": "pages/admin/posts.js",
-  "/signin": "pages/signin.js",
-  "/author": "pages/author.js",
+  "/admin/customize": "pages/admin/customize.js",
   "/": "pages/index.js",
-  "/author/comments": "pages/author/comments.js",
-  "/author/[id]": "pages/author/[id].js",
-  "/author/posts": "pages/author/posts.js",
-  "/author/posts/new": "pages/author/posts/new.js"
+  "/posts": "pages/posts.js"
 }

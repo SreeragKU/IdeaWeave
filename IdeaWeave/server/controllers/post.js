@@ -165,6 +165,24 @@ export const posts = async (req, res) => {
   }
 };
 
+export const postsPage= async (req, res) => {
+  try {
+    const perPage = 5;
+    const page = req.params.page || 1;
+
+    const all = await Post.find()
+      .skip((page - 1) * perPage)
+      .populate("coverImage")
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
+      .sort({ createdAt: -1 })
+      .limit(perPage);
+    res.json(all);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export const uploadImageFile = async (req, res) => {
   try {
     //console.log(req.files);

@@ -1,6 +1,6 @@
 import { Progress } from "antd";
 import Link from "next/link";
-import { CountUp } from 'use-count-up';
+import CountUp from 'react-countup';
 
 const RenderProgress = ({ number, name, link = "#" }) => (
   <Link href={link}>
@@ -12,7 +12,13 @@ const RenderProgress = ({ number, name, link = "#" }) => (
         "100%": "#111",
       }}
       percent={100}
-      format={() => <CountUp isCounting end={number} duration={3} />}
+      format={() => (
+        <CountUp
+          end={number}
+          duration={2}
+          separator=","
+        />
+      )}
     />
     <p style={{ marginTop: 18, color: "#666" }}>{name.toUpperCase()}</p>
   </Link>

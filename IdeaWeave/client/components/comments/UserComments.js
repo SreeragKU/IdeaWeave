@@ -96,7 +96,7 @@ function UserComments() {
   return (
     <>
       {loading ? (
-        <Spin size="large" style={{ marginLeft: 80, marginTop: 80 }} />
+        <Spin size="large" style={{ marginLeft: 120, marginTop: 80 }} />
       ) : (
         <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
           <Col xs={24} sm={24} lg={16} offset={1}>

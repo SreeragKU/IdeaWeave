@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Row, Col, Card, Avatar, Button, Carousel, Input } from "antd";
+import { Row, Col, Card, Avatar, Button, Carousel, Input, Divider } from "antd";
 import Head from "next/head";
 import Link from "next/link";
+import useCategory from "../hooks/useCategory";
 
 const { Meta } = Card;
 const { Search } = Input;
@@ -18,6 +19,7 @@ export const Posts = ({ posts }) => {
   const [visiblePosts, setVisiblePosts] = useState([]);
   const [carouselPosts, setCarouselPosts] = useState([]);
   const postsPerPage = 8;
+  const {categories} = useCategory();
 
   useEffect(() => {
     getTotal();
@@ -105,6 +107,10 @@ export const Posts = ({ posts }) => {
     }
   };
 
+  const handleCategoryClick = (slug) => {
+    router.push(`/category/${slug}`);
+  };
+
   return (
     <>
       <Head>
@@ -133,7 +139,7 @@ export const Posts = ({ posts }) => {
                   <Avatar
                     shape="square"
                     style={{ height: "300px" }}
-                    src={post.coverImage?.url || "images/default.jpeg"}
+                    src={post.coverImage?.url || "images/default.jpg"}
                     alt={post.title}
                   />
                 }
@@ -157,7 +163,29 @@ export const Posts = ({ posts }) => {
           ))}
         </Carousel>
       </div>
-
+      <Divider>Categories</Divider>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          margin: "20px 0",
+        }}
+      >
+        {categories.map((c) => (
+          <Link href={`/category/${c.slug}`} key={c._id}>
+            <Button
+              style={{
+                margin: "0 8px 8px 0",
+                background: "#468570", 
+                color: "white",
+              }}
+            >
+              {c.name}
+            </Button>
+          </Link>
+        ))}
+      </div>
       <div
         style={{
           textAlign: "center",

@@ -51,7 +51,7 @@ function Posts() {
 
   return (
     <AuthorLayour>
-      <Row gutter={[16, 16]} style={{  paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
+      <Row gutter={[16, 16]} style={{ paddingLeft: 120, marginTop: 60, paddingRight: 50 }}>
         <Col span={24}>
           <Button type="primary">
             <Link href="/author/posts/new">

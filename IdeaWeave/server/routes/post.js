@@ -32,12 +32,14 @@ import {
   removeComment,
   userComments,
   getNumbers,
+  postsPage,
 } from "../controllers/post";
 
 router.post("/upload-image", requireSignin, canCreateRead, uploadImage);
 router.post("/upload-image-file", formidable(), requireSignin, uploadImageFile);
 router.post("/create-post", requireSignin, canCreateRead, createPost);
 router.get("/posts/:page", posts);
+router.get("/posts-page/:page", postsPage);
 router.get("/post/:slug", singlePost);
 router.get("/media", requireSignin, canCreateRead, media);
 router.get("/post-by-author", requireSignin, postByAuthor);

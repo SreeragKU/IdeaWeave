@@ -3,8 +3,8 @@ import { Layout } from "antd";
 import ReaderNav from "../nav/ReaderNav";
 import { AuthContext } from "../../context/auth";
 import { useRouter } from "next/router";
-import { LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
+import LoadingtoRedirect from "../LoadingToRedirect"
 
 const { Content } = Layout;
 
@@ -33,18 +33,7 @@ export default function ReaderLayout({ children }) {
   }
 
   if (loading) {
-    return (
-      <LoadingOutlined
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          fontSize: "50px",
-          color: "red",
-        }}
-      />
-    );
+    return <LoadingtoRedirect />
   }
 
   return (

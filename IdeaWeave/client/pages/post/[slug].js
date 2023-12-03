@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Row, Col, Card, Typography, Button, Select, List, Avatar } from "antd";
+import { Row, Col, Card, Typography, Button, Select, List, Avatar, Divider } from "antd";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import BookFront from "./BookFront";
 import BubbleNav from "../../components/nav/BubbleNav";
 import dayjs from "dayjs";
 import CommentForm from "../../components/comments/CommentForm";
-
+import useLatestPosts from "../../hooks/useLatestPosts";
+import Link from "next/link";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -68,6 +69,7 @@ const SinglePost = ({ post, postComments }) => {
   const [comments, setComments] = useState(postComments);
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
+  const { latestPosts } = useLatestPosts();
 
   useEffect(() => {
     setZoomLevel(1);
@@ -83,7 +85,6 @@ const SinglePost = ({ post, postComments }) => {
   }, [zoomLevel]);
 
   useEffect(() => {
-    // This ensures that the styles are applied after the dynamic import
     setPostContent(
       post.volumes[currentVolume].chapters[currentChapter].content
     );
@@ -142,7 +143,7 @@ const SinglePost = ({ post, postComments }) => {
 
   useEffect(() => {
     setIsQuillLoaded(true);
-    handleQuillLoad(); 
+    handleQuillLoad();
   }, []);
 
   const isAtFirstChapter = currentVolume === 0 && currentChapter === 0;
@@ -169,8 +170,12 @@ const SinglePost = ({ post, postComments }) => {
     if (isQuillLoaded) {
       const quill = document.querySelector(".ql-editor");
       if (quill) {
-        quill.style.fontSize = `${themes[selectedTheme].fontSize * zoomLevel}rem`;
-        quill.style.lineHeight = `${themes[selectedTheme].lineHeight * zoomLevel}`;
+        quill.style.fontSize = `${
+          themes[selectedTheme].fontSize * zoomLevel
+        }rem`;
+        quill.style.lineHeight = `${
+          themes[selectedTheme].lineHeight * zoomLevel
+        }`;
         quill.style.backgroundColor = themes[selectedTheme].backgroundColor;
         quill.style.color = themes[selectedTheme].color;
         quill.style.padding = "16px";
@@ -209,7 +214,7 @@ const SinglePost = ({ post, postComments }) => {
       />
 
       <BookFront post={post} />
-      
+
       <Head>
         <title>{post.title}</title>
         <meta name="description" content={post.content.substring(0, 160)} />
@@ -323,6 +328,18 @@ const SinglePost = ({ post, postComments }) => {
                 Next Chapter
               </Button>{" "}
             </div>
+            {isAtLastChapter && (
+              <div>
+                <Divider level={2} style={{ marginTop: 20 }}>
+                  Latest Books
+                </Divider>
+                {latestPosts.map((p) => (
+                  <Link href={`/post/${p.slug}`} key={p._id}>
+                    <h4>{p.title}</h4>
+                  </Link>
+                ))}
+              </div>
+               )}
             <CommentForm
               comment={comment}
               setComment={setComment}
