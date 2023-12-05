@@ -292,18 +292,33 @@ export const postsForAdmin = async (req, res) => {
 export const createComment = async (req, res) => {
   try {
     const { postId } = req.params;
-    const {  comment } = req.body;
-    let newComment = await new Comment({
+    const { comment } = req.body;
+
+    if (!postId || !comment) {
+      return res.status(400).json({ error: "postId and comment are required" });
+    }
+
+    const newComment = await Comment.create({
       content: comment,
       postedBy: req.user._id,
       postId,
-    }).save();
-    newComment = await newComment.populate('postedBy', 'name');
-    res.json(newComment);
+    });
+
+    // Increment commentCount of the associated post
+    await Post.findByIdAndUpdate(postId, { $inc: { commentCount: 1 } });
+
+    // Populate the 'postedBy' field for response
+    const populatedComment = await Comment.findById(newComment._id)
+      .populate('postedBy', 'name')
+      .exec();
+
+    res.json(populatedComment);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 export const comments = async (req, res) => {
   try {

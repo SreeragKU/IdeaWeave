@@ -111,6 +111,7 @@ function Signin() {
             <Input
               prefix={<MailOutlined className="site-form-item-icon" />}
               placeholder="Email"
+              id="em"
             />
           </Form.Item>
           {/* password */}
@@ -130,6 +131,7 @@ function Signin() {
               prefix={<LockOutlined className="site-form-item-icon" />}
               type={showPassword ? "text" : "password"}
               placeholder="Password"
+              id="ps"
               iconRender={(visible) => (
                 visible ? (
                   <EyeOutlined
