@@ -43,6 +43,8 @@ import {
   createDraftPost,
   addToLibrary,
   getLibrary,
+  hideComment,
+  allComments
 } from "../controllers/post";
 
 router.post("/upload-image", requireSignin, canCreateRead, uploadImage);
@@ -67,9 +69,11 @@ router.put("/edit-draft/:postId", requireSignin, canUpdateDeletePost, editDraft)
 router.get("/post-count", postCount);
 router.get("/posts-for-admin", requireSignin, isAdmin, postsForAdmin);
 router.post("/comment/:postId", requireSignin, createComment);
+router.put('/hide-comment/:id', requireSignin, isAdmin, hideComment);
 router.post("/add-to-library/:postId", requireSignin, addToLibrary);
 router.get("/get-library/:userId", requireSignin, getLibrary);
 router.get("/comments/:page", requireSignin, isAdmin, comments);
+router.get("/all-comments/:page", requireSignin, isAdmin, allComments);
 router.get("/user-comments", requireSignin, userComments);
 router.get("/comment-count", commentCount);
 router.get('/numbers', getNumbers)

@@ -12,6 +12,10 @@ const commentSchema = new Schema(
     },
     postedBy: { type: ObjectId, ref: "User" },
     postId: { type: ObjectId, ref: "Post" },
+    hidden: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -9,7 +9,7 @@ import { AuthContext } from "../../../context/auth";
 import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import CommentForm from "../../../components/comments/CommentForm";
-import {toast} from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 dayjs.extend(localizedFormat);
 
@@ -41,7 +41,7 @@ function Comments() {
 
   const fetchComments = async () => {
     try {
-      const { data } = await axios.get(`/comments/${page}`);
+      const { data } = await axios.get(`/all-comments/${page}`);
       setComments([...comments, ...data]);
       setLoading(false);
     } catch (err) {
@@ -59,18 +59,18 @@ function Comments() {
     }
   };
 
-  const handleDelete = async (comment) => {
+  const handleHide = async (comment) => {
     confirm({
-      title: "Are you sure you want to delete this comment?",
+      title: "Are you sure you want to hide this comment?",
       icon: <ExclamationCircleOutlined />,
       content: "This action cannot be undone.",
       async onOk() {
         try {
-          const { data } = await axios.delete(`/comment/${comment._id}`);
-          if (data?.ok) {
+          const { data } = await axios.put(`/hide-comment/${comment._id}`);
+          if (data?.success) {
             setComments(comments.filter((c) => c._id !== comment._id));
             setTotal(total - 1);
-            toast.success("Comment deleted successfully");
+            toast.success("Comment hidden successfully");
           }
         } catch (error) {
           console.log(error);
@@ -107,7 +107,7 @@ function Comments() {
 
   const filteredComments = comments?.filter(
     (comment) =>
-      comment.content.toLowerCase().includes(keyword) ||
+      comment?.content.toLowerCase().includes(keyword) ||
       comment?.postedBy?.name.toLowerCase().includes(keyword) ||
       (comment?.postedBy?.role &&
         comment.postedBy.role.toLowerCase().includes(keyword))
@@ -118,48 +118,47 @@ function Comments() {
       {loading ? (
         <Spin size="large" style={{ marginLeft: 120, marginTop: 80 }} />
       ) : (
-      <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
-        <Col xs={24} sm={24} lg={16} offset={1}>
-          <h1 style={{ marginTop: 15 }}>{total} Comments</h1>
-
-          <Input
-            placeholder="Search"
-            type="search"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value.toLowerCase())}
-          />
-
-          {filteredComments.map((item) => (
-            <List.Item
-              key={item._id}
-              actions={[
-                <Link href={`/post/${item?.postId?.slug}#${item._id}`}>
-                  view
-                </Link>,
-                auth.user && item.postedBy.name === auth.user.name && (
-                  <a
-                    onClick={() => {
-                      setSelectedComment(item);
-                      setVisible(true);
-                      setContent(item.content);
-                    }}
-                  >
-                    edit
-                  </a>
-                ),
-                auth.user && <a onClick={() => handleDelete(item)}>delete</a>,
-              ]}
-            >
-              <List.Item.Meta
-                description={`On ${item?.postId?.title} | ${
-                  item?.postedBy?.name
-                } | ${dayjs(item.createdAt).format("L LT")}`}
-                title={item.content}
-              />
-            </List.Item>
-          ))}
-        </Col>
-      </Row>
+        <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
+          <Col xs={24} sm={24} lg={16} offset={1}>
+            <h1 style={{ marginTop: 15 }}>{total} Comments</h1>
+            <Input
+              placeholder="Search"
+              type="search"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value.toLowerCase())}
+            />
+            {filteredComments.map((item) => (
+              <List.Item
+                key={item._id}
+                style={{ opacity: item.isHidden ? 0.5 : 1 }} // Apply different opacity for hidden comments
+                actions={[
+                  <Link href={`/post/${item?.postId?.slug}#${item._id}`}>
+                    view
+                  </Link>,
+                  auth.user && item.postedBy.name === auth.user.name && (
+                    <a
+                      onClick={() => {
+                        setSelectedComment(item);
+                        setVisible(true);
+                        setContent(item.content);
+                      }}
+                    >
+                      edit
+                    </a>
+                  ),
+                  auth.user && <a onClick={() => handleHide(item)}>hide</a>,
+                ]}
+              >
+                <List.Item.Meta
+                  description={`On ${item?.postId?.title} | ${
+                    item?.postedBy?.name
+                  } | ${dayjs(item.createdAt).format("L LT")}`}
+                  title={item.content}
+                />
+              </List.Item>
+            ))}
+          </Col>
+        </Row>
       )}
 
       {page * 6 < total && (

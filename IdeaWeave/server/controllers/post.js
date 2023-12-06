@@ -32,7 +32,9 @@ export const createPost = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const alreadyExist = await Post.findOne({ slug: slugify(title.toLowerCase()) });
+    const alreadyExist = await Post.findOne({
+      slug: slugify(title.toLowerCase()),
+    });
     if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
 
     const categoryIds = await Promise.all(
@@ -47,7 +49,7 @@ export const createPost = async (req, res) => {
       chapters: volume.chapters.map((chapter) => ({
         chapter: chapter.chapter,
         name: chapter.name,
-        content: chapter.content, 
+        content: chapter.content,
       })),
     }));
 
@@ -77,8 +79,8 @@ export const singlePost = async (req, res) => {
     const { slug } = req.params;
 
     const post = await Post.findOne({ slug })
-      .populate("postedBy", "name") 
-      .populate("categories", "name slug") 
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
       .populate("coverImage", "url")
       .populate({
         path: "volumes",
@@ -87,11 +89,11 @@ export const singlePost = async (req, res) => {
           select: "chapter name content",
         },
       });
-      const comments = await Comment.find({ postId: post._id })
+    const comments = await Comment.find({ postId: post._id })
       .populate("postedBy", "name")
       .sort({ createdAt: -1 });
 
-    res.json({post, comments});
+    res.json({ post, comments });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -153,7 +155,7 @@ export const editPost = async (req, res) => {
 export const posts = async (req, res) => {
   try {
     const all = await Post.find()
-      .populate('coverImage')
+      .populate("coverImage")
       .populate("postedBy", "name")
       .populate("categories", "name slug")
       .populate("volumes.chapters", "name content")
@@ -166,7 +168,7 @@ export const posts = async (req, res) => {
   }
 };
 
-export const postsPage= async (req, res) => {
+export const postsPage = async (req, res) => {
   try {
     const perPage = 5;
     const page = req.params.page || 1;
@@ -278,10 +280,10 @@ export const postCount = async (req, res) => {
 export const postsForAdmin = async (req, res) => {
   try {
     const all = await Post.find()
-      .populate('coverImage')
+      .populate("coverImage")
       .populate("postedBy", "name")
       .populate("categories", "name slug")
-      .populate("volumes.chapters", "name content") 
+      .populate("volumes.chapters", "name content")
       .sort({ createdAt: -1 });
 
     res.json(all);
@@ -310,13 +312,13 @@ export const createComment = async (req, res) => {
 
     // Populate the 'postedBy' field for response
     const populatedComment = await Comment.findById(newComment._id)
-      .populate('postedBy', 'name')
+      .populate("postedBy", "name")
       .exec();
 
     res.json(populatedComment);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -340,11 +342,10 @@ export const comments = async (req, res) => {
 
 export const userComments = async (req, res) => {
   try {
-    const comments = await Comment.find(
-      { postedBy: req.user._id })
-        .populate("postedBy", "name")
-        .populate("postId", "title slug")
-        .sort({ createdAt: -1 })
+    const comments = await Comment.find({ postedBy: req.user._id })
+      .populate("postedBy", "name")
+      .populate("postId", "title slug")
+      .sort({ createdAt: -1 });
 
     return res.json(comments);
   } catch (err) {
@@ -390,17 +391,17 @@ export const removeComment = async (req, res) => {
       );
 
       if (!post) {
-        console.error('Associated post not found');
+        console.error("Associated post not found");
       }
 
       res.json({ ok: true });
     } else {
       // Comment not found
-      res.json({ ok: false, error: 'Comment not found' });
+      res.json({ ok: false, error: "Comment not found" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ ok: false, error: 'Internal Server Error' });
+    res.status(500).json({ ok: false, error: "Internal Server Error" });
   }
 };
 
@@ -425,7 +426,9 @@ export const createDraft = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const alreadyExist = await Draft.findOne({ slug: slugify(title.toLowerCase()) });
+    const alreadyExist = await Draft.findOne({
+      slug: slugify(title.toLowerCase()),
+    });
     if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
 
     const categoryIds = await Promise.all(
@@ -440,7 +443,7 @@ export const createDraft = async (req, res) => {
       chapters: volume.chapters.map((chapter) => ({
         chapter: chapter.chapter,
         name: chapter.name,
-        content: chapter.content, 
+        content: chapter.content,
       })),
     }));
 
@@ -517,7 +520,7 @@ export const editDraft = async (req, res) => {
 export const drafts = async (req, res) => {
   try {
     const all = await Draft.find()
-      .populate('coverImage')
+      .populate("coverImage")
       .populate("postedBy", "name")
       .populate("categories", "name slug")
       .populate("volumes.chapters", "name content")
@@ -530,7 +533,7 @@ export const drafts = async (req, res) => {
   }
 };
 
-export const draftPage= async (req, res) => {
+export const draftPage = async (req, res) => {
   try {
     const perPage = 5;
     const page = req.params.page || 1;
@@ -583,8 +586,8 @@ export const singleDraft = async (req, res) => {
     const { slug } = req.params;
 
     const post = await Draft.findOne({ slug })
-      .populate("postedBy", "name") 
-      .populate("categories", "name slug") 
+      .populate("postedBy", "name")
+      .populate("categories", "name slug")
       .populate("coverImage", "url")
       .populate({
         path: "volumes",
@@ -593,11 +596,11 @@ export const singleDraft = async (req, res) => {
           select: "chapter name content",
         },
       });
-      const comments = await Comment.find({ postId: post._id })
+    const comments = await Comment.find({ postId: post._id })
       .populate("postedBy", "name")
       .sort({ createdAt: -1 });
 
-    res.json({post, comments});
+    res.json({ post, comments });
   } catch (err) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -611,7 +614,9 @@ export const createDraftPost = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const alreadyExist = await Post.findOne({ slug: slugify(title.toLowerCase()) });
+    const alreadyExist = await Post.findOne({
+      slug: slugify(title.toLowerCase()),
+    });
     if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
 
     const categoryIds = await Promise.all(
@@ -626,7 +631,7 @@ export const createDraftPost = async (req, res) => {
       chapters: volume.chapters.map((chapter) => ({
         chapter: chapter.chapter,
         name: chapter.name,
-        content: chapter.content, 
+        content: chapter.content,
       })),
     }));
 
@@ -643,7 +648,7 @@ export const createDraftPost = async (req, res) => {
     await User.findByIdAndUpdate(req.user._id, {
       $addToSet: { posts: post._id },
     });
-    await Draft.findByIdAndDelete(req.params.postId); 
+    await Draft.findByIdAndDelete(req.params.postId);
 
     return res.json(post);
   } catch (err) {
@@ -655,7 +660,7 @@ export const createDraftPost = async (req, res) => {
 export const addToLibrary = async (req, res) => {
   try {
     const { postId } = req.params;
-    const userId = req.user._id; 
+    const userId = req.user._id;
     if (!postId || !userId) {
       return res.status(400).json({ error: "postId and userId are required" });
     }
@@ -663,10 +668,12 @@ export const addToLibrary = async (req, res) => {
     user.library.push(req.body.postId);
     await user.save();
 
-    res.json({ success: true, message: 'Post added to library successfully' });
+    res.json({ success: true, message: "Post added to library successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to add post to library' });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to add post to library" });
   }
 };
 
@@ -678,19 +685,21 @@ export const getLibrary = async (req, res) => {
     }
 
     const user = await User.findById(userId).populate({
-      path: 'library',
-      select: 'title slug', 
+      path: "library",
+      select: "title slug",
       populate: {
-        path: 'coverImage postedBy',
-        select: 'url name',
+        path: "coverImage postedBy",
+        select: "url name",
       },
     });
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    const libraryWithDetails = user.library.map(post => ({
+    const libraryWithDetails = user.library.map((post) => ({
       title: post.title,
       slug: post.slug,
       coverImage: post.coverImage.url,
@@ -701,6 +710,46 @@ export const getLibrary = async (req, res) => {
     res.json({ success: true, library: libraryWithDetails });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Failed to get library' });
+    res.status(500).json({ success: false, message: "Failed to get library" });
+  }
+};
+
+export const hideComment = async (req, res) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
+
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    // Set the 'hidden' field to true
+    comment.hidden = true;
+
+    // Save the updated comment
+    await comment.save();
+
+    return res.json({ success: true, message: "Comment hidden successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const allComments = async (req, res) => {
+  try {
+    const perPage = 6;
+    const page = req.params.page || 1;
+
+    const allComments = await Comment.find()
+      .skip((page - 1) * perPage)
+      .populate("postedBy", "name")
+      .populate("postId", "title slug")
+      .sort({ createdAt: -1 })
+      .limit(perPage);
+
+    return res.json(allComments);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
