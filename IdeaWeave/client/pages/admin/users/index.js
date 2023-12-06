@@ -240,6 +240,7 @@ export default function AllUsers() {
                     <Button
                       type={user.isActive ? "danger" : "success"}
                       onClick={() => handleToggleUserStatus(user)}
+                      id="disable"
                     >
                       {user.isActive ? "Disable" : "Enable"}
                     </Button>

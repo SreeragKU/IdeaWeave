@@ -6,7 +6,7 @@ import {
   CameraOutlined,
   UserSwitchOutlined,
   SettingOutlined,
-  BgColorsOutlined,
+  ContainerFilled,
   UserOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
@@ -126,7 +126,16 @@ const AuthorNav = () => {
         >
           <Link href="/author">Dashboard</Link>
         </Menu.Item>
-
+        <Menu.Item
+          key="/author/library"
+          icon={<ContainerFilled />}
+          className={current === "/author/library" ? "active" : ""}
+          style={
+            current === "/author/library" ? customStyles.activeItem : customStyles.item
+          }
+        >
+          <Link href="/author/library">Library</Link>
+        </Menu.Item>
         <SubMenu
           key="2"
           icon={<PushpinOutlined />}
@@ -144,6 +153,17 @@ const AuthorNav = () => {
             }
           >
             <Link href="/author/posts">All Books</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/author/drafts"
+            className={current === "/author/posts/drafts" ? "active" : ""}
+            style={
+              current === "/author/posts/drafts"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/author/posts/drafts">All Drafts</Link>
           </Menu.Item>
           <Menu.Item
             key="/author/posts/new"

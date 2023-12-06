@@ -99,6 +99,7 @@ const TopNav = () => {
           onClick={() => signOut()}
           key="signout"
           icon={<LogoutOutlined />}
+          id="signout"
         >
           Sign Out
         </Menu.Item>

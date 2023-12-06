@@ -22,7 +22,7 @@ export default function Categories({ children }) {
   const [form] = Form.useForm();
   const [post, setPost] = useContext(PostContext);
 
-  const {categories} = post;
+  const { categories } = post;
 
   useEffect(() => {
     getCategories();
@@ -31,26 +31,28 @@ export default function Categories({ children }) {
   const getCategories = async () => {
     try {
       const { data } = await axios.get("/category");
-      setPost((prev) => ({...prev, categories: data}));
+      setPost((prev) => ({ ...prev, categories: data }));
       setPendingCategories(data);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const onFinish = async (values) => {
     if (!values.name) {
       toast.error("Category name cannot be empty");
       return;
     }
-  
-    const existingCategory = categories.find((category) => category.name === values.name);
-  
+
+    const existingCategory = categories.find(
+      (category) => category.name === values.name
+    );
+
     if (existingCategory) {
-      toast.error("Category already exists"); 
-      return; 
+      toast.error("Category already exists");
+      return;
     }
-  
+
     try {
       setLoading(true);
       const { data } = await axios.post("/category", values);
@@ -63,12 +65,14 @@ export default function Categories({ children }) {
       toast.error("Category create failed");
       setLoading(false);
     }
-  }
-  
+  };
+
   const handleDelete = async (item) => {
     try {
       const { data } = await axios.delete(`/category/${item.slug}`);
-      setPendingCategories(pendingCategories.filter((cat) => cat._id !== data._id));
+      setPendingCategories(
+        pendingCategories.filter((cat) => cat._id !== data._id)
+      );
       setPost((prev) => ({
         ...prev,
         categories: prev.categories.filter((cat) => cat._id !== data._id),
@@ -79,12 +83,11 @@ export default function Categories({ children }) {
       toast.error("Category delete failed");
     }
   };
-  
 
   const handleEdit = async (item) => {
     setupdatingCategory(item);
     setVisible(true);
-  }
+  };
 
   const handleUpdate = async (values) => {
     if (!values.name) {
@@ -92,7 +95,9 @@ export default function Categories({ children }) {
       return;
     }
 
-    const existingCategory = categories.find((category) => category.name === values.name);
+    const existingCategory = categories.find(
+      (category) => category.name === values.name
+    );
 
     if (existingCategory && existingCategory.slug !== updatingCategory.slug) {
       toast.error("Category already exists");
@@ -102,7 +107,10 @@ export default function Categories({ children }) {
     }
 
     try {
-      const { data } = await axios.put(`/category/${updatingCategory.slug}`, values);
+      const { data } = await axios.put(
+        `/category/${updatingCategory.slug}`,
+        values
+      );
 
       if (data) {
         toast.success("Category update successfully");
@@ -116,11 +124,14 @@ export default function Categories({ children }) {
       console.error(error);
       toast.error("Category update failed");
     }
-  }
+  };
 
   const combinedCategories = [editedCategory, ...pendingCategories]
     .filter((item) => item.name !== "")
-    .filter((item) => item._id !== updatingCategory._id && item.slug !== editedCategory.slug);
+    .filter(
+      (item) =>
+        item._id !== updatingCategory._id && item.slug !== editedCategory.slug
+    );
 
   if (!visible && updatingCategory._id) {
     combinedCategories.push(updatingCategory);
@@ -147,9 +158,10 @@ export default function Categories({ children }) {
                 <Input
                   prefix={<EditOutlined className="site-form-item-icon" />}
                   placeholder="Provide a Category Name"
+                  id="input"
                 />
               </Form.Item>
-              <Button loading={loading} type="primary" htmlType="submit">
+              <Button loading={loading} type="primary" htmlType="submit" id="submit">
                 Submit
               </Button>
             </Form>
@@ -164,12 +176,14 @@ export default function Categories({ children }) {
                 <List.Item
                   actions={[
                     <a onClick={() => handleEdit(item)}>Edit</a>,
-                    <a onClick={() => handleDelete(item)}>Remove</a>,
+                    <a onClick={() => handleDelete(item)} id="remove">Remove</a>,
                   ]}
                 >
                   <List.Item.Meta
                     title={
-                      <span style={{ color: theme === "light" ? "black" : "white" }}>
+                      <span
+                        style={{ color: theme === "light" ? "black" : "white" }}
+                      >
                         {item.name}
                       </span>
                     }
@@ -181,12 +195,12 @@ export default function Categories({ children }) {
         </Col>
         {updatingCategory._id && (
           <CategoryUpdateModal
-          visible={visible}
-          setVisible={setVisible}
-          handleUpdate={handleUpdate}
-          updatingCategory={updatingCategory}
-          setPost={setPost} 
-        />
+            visible={visible}
+            setVisible={setVisible}
+            handleUpdate={handleUpdate}
+            updatingCategory={updatingCategory}
+            setPost={setPost}
+          />
         )}
       </Row>
     </AdminLayout>

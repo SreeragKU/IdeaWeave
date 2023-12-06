@@ -62,7 +62,7 @@ function ContactForm() {
               },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Your Name" />
+            <Input prefix={<UserOutlined />} placeholder="Your Name" id="name" />
           </Form.Item>
 
           <Form.Item
@@ -76,7 +76,7 @@ function ContactForm() {
               },
             ]}
           >
-            <Input prefix={<MailOutlined />} placeholder="Your Email" />
+            <Input prefix={<MailOutlined />} placeholder="Your Email" id="email" />
           </Form.Item>
 
           <Form.Item
@@ -89,11 +89,11 @@ function ContactForm() {
               },
             ]}
           >
-            <Input.TextArea placeholder="Write your message here..." />
+            <Input.TextArea placeholder="Write your message here..." id="message" />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" loading={loading}>
+            <Button type="primary" htmlType="submit" loading={loading} id="submit">
               Submit
             </Button>
           </Form.Item>

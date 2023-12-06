@@ -1,11 +1,12 @@
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ThemeContext } from "../../context/theme";
 
-const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management System", fullWidthImage = "/images/image3.jpg"}) => {
+const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Management System", fullWidthImage = "/images/image3.jpg" }) => {
   const [theme] = useContext(ThemeContext);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const textStrokeColor = theme === "light" ? "#ffffff" : "#000";
 
@@ -16,9 +17,13 @@ const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management
       return "/author";
     } else if (auth?.role === "Reader") {
       return "/reader";
-    }else {
-      return "/signin"; 
+    } else {
+      return "/signin";
     }
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
   };
 
   return (
@@ -36,6 +41,19 @@ const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management
           overflow: "hidden",
         }}
       >
+        {imageLoading && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <Spin size="large" style={{marginTop: 80, marginLeft: 70}}/>
+          </div>
+        )}
+
         <img
           src={fullWidthImage}
           alt="CMS"
@@ -43,7 +61,9 @@ const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management
             width: "100%",
             height: "100%",
             objectFit: "cover",
+            display: imageLoading ? "none" : "block",
           }}
+          onLoad={handleImageLoad}
         />
 
         <div
@@ -57,6 +77,7 @@ const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management
             textShadow: "2px 2px 4px #000000",
             padding: "50px",
             borderRadius: "500px",
+            display: imageLoading ? "none" : "block",
           }}
         >
           <h1
@@ -80,7 +101,7 @@ const FullWidthImage = ({auth, title = "IdeaWeave", subtitle="Content Management
             {subtitle}
           </p>
           <Link href={getRedirectLink()}>
-            <Button type="primary" size="large" icon={<SendOutlined />}>
+            <Button type="primary" size="large" icon={<SendOutlined />} id="explore">
               Explore
             </Button>
           </Link>

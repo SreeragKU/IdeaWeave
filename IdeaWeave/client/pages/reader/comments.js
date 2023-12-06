@@ -1,13 +1,14 @@
 import { Layout } from "antd";
 import ReaderLayout from "../../components/layout/ReaderLayout";
+import UserComments from "../../components/comments/UserComments";
 
 const { Content, Sider } = Layout;
 
-export default function Comments({ children }) {
+export default function Author({ children }) {
   return (
     <ReaderLayout>
       <Content>
-        <h1>Comments Page</h1>
+        <UserComments />
       </Content>
     </ReaderLayout>
   );

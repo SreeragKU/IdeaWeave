@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { LoadingOutlined } from "@ant-design/icons";
 
 const LoadingToRedirect = ({ path = "/" }) => {
   const [count, setCount] = useState(3);
@@ -19,6 +20,7 @@ const LoadingToRedirect = ({ path = "/" }) => {
   }, [count]);
 
   return (
+    
     <div
       style={{
         display: "flex",
@@ -27,7 +29,16 @@ const LoadingToRedirect = ({ path = "/" }) => {
         height: "100vh",
       }}
     >
-      <p>Redirecting in {count} seconds</p>
+      <LoadingOutlined
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontSize: "50px",
+          color: "red",
+        }}
+      />
     </div>
   );
 };

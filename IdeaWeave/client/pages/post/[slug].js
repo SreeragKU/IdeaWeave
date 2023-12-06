@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import CommentForm from "../../components/comments/CommentForm";
 import useLatestPosts from "../../hooks/useLatestPosts";
 import Link from "next/link";
+import { AuthContext } from "../../context/auth";
+import { toast } from 'react-hot-toast';
 
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -70,6 +72,7 @@ const SinglePost = ({ post, postComments }) => {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const { latestPosts } = useLatestPosts();
+  const [auth, setAuth] = useContext(AuthContext);
 
   useEffect(() => {
     setZoomLevel(1);
@@ -165,6 +168,25 @@ const SinglePost = ({ post, postComments }) => {
     }
   };
 
+  const addToLibrary = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.post(`/add-to-library/${post._id}`, { postId: post._id });
+      if (data.success) {
+        toast.success("Added to library successfully");
+      } else {
+        toast.error("Failed to add to library");
+      }
+  
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("An error occurred while adding to the library");
+      setLoading(false);
+    }
+  };
+  
+
   const handleQuillLoad = () => {
     setIsQuillLoaded(true);
     if (isQuillLoaded) {
@@ -221,6 +243,12 @@ const SinglePost = ({ post, postComments }) => {
       </Head>
       <Row justify="center">
         <Col xs={24} xl={16}>
+        {/* Add to Library Button */}
+        {auth.token && (
+              <Button type="primary" onClick={addToLibrary}>
+                Add to Library
+              </Button>
+            )}
           <Card>
             <div style={{ marginBottom: 16, textAlign: "center" }}>
               <Button

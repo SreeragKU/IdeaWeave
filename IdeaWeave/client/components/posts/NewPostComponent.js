@@ -370,6 +370,89 @@ function NewPostComponent({ page = "admin" }) {
     }
   };
 
+  const handleSaveToDraft = async () => {
+    try {
+      setLoading(true);
+
+      const formattedVolumesChapters = volumes
+        .filter((v) => v.volume && v.chapters.length >= 1)
+        .map((v, volumeIndex) => {
+          const formattedChapters = v.chapters
+            .map((c, chapterIndex) => {
+              return {
+                chapterNumber: c.chapter,
+                chapterName: c.name,
+                chapterContent:
+                  quillContent[`${volumeIndex}-${chapterIndex}`]?.content ||
+                  getChapterContentFromLocalStorage(
+                    volumeIndex,
+                    chapterIndex
+                  ) ||
+                  "",
+              };
+            })
+            .filter((chapter) => chapter.chapterContent.trim() !== "");
+
+          return {
+            volumeName: v.volume,
+            chapters: formattedChapters,
+          };
+        });
+
+      const formattedContent = `<div style="font-size: 1.2rem; line-height: 1.6">${formattedVolumesChapters}</div>`;
+
+      // Prepare data to send to the server
+      const postData = {
+        title,
+        content: formattedContent,
+        categories: selectedCategories,
+        coverImage: media?.selected?._id,
+        volumes: volumes.map((volume, volumeIndex) => ({
+          volume: volume.volume,
+          chapters: volume.chapters.map((chapter, chapterIndex) => {
+            if (!chapter.chapter) {
+              toast.error("Chapter number cannot be empty");
+            }
+            return {
+              chapter: chapter.chapter,
+              name: chapter.name,
+              content:
+                quillContent[`${volumeIndex}-${chapterIndex}`]?.content ||
+                getChapterContentFromLocalStorage(volumeIndex, chapterIndex) ||
+                "",
+            };
+          }),
+        })),
+      };
+
+      const { data } = await axios.post("/create-draft", postData);
+
+      if (data?.error) {
+        toast.error(data?.error);
+        setLoading(false);
+      } else {
+        // Clear local storage
+        localStorage.removeItem("post-title");
+        localStorage.removeItem("post-volumes");
+        Object.keys(quillContent).forEach((key) => {
+          const chapterLocalStorageKey = `post-chapter-${key}`;
+          localStorage.removeItem(chapterLocalStorageKey);
+        });
+        localStorage.removeItem("post-image");
+
+        setMedia({ ...media, selected: null });
+
+        router.push(`/${page}/posts`);
+        toast.success("Post created successfully");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Post create failed. Try again.");
+      setLoading(false);
+    }
+  };
+  
+
   return (
     <>
       <Row justify="center" style={{ paddingLeft: 50, paddingTop: "50px", paddingRight: 50 }}>
@@ -749,6 +832,14 @@ function NewPostComponent({ page = "admin" }) {
                   ))}
                 </Select>
                 <div style={{ marginBottom: "10px" }}></div>
+
+                <Button
+                  style={{ margin: "10px 0px 20px", width: "100%" }}
+                  type="primary"
+                  onClick={handleSaveToDraft}
+                >
+                  Save to Draft
+                </Button>
 
                 <Button
                   style={{ width: "100%", marginBottom: "10px" }}

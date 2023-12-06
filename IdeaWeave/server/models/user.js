@@ -24,8 +24,8 @@ const userSchema = new Schema(
       default: "Subscriber",
     },
     image: {
-      type: ObjectId, 
-      ref: "Media"
+      type: ObjectId,
+      ref: "Media",
     },
     website: {
       type: String,
@@ -39,10 +39,18 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
-    posts: [{ 
-      type: ObjectId, 
-      ref: "Post" 
-    }],
+    posts: [
+      {
+        type: ObjectId,
+        ref: "Post",
+      },
+    ],
+    library: [
+      {
+        type: ObjectId,
+        ref: "Post",
+      },
+    ],
   },
   { timestamps: true }
 );

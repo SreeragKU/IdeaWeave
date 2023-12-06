@@ -4,9 +4,9 @@ import Link from "next/link";
 import {
   PushpinOutlined,
   CameraOutlined,
-  UserSwitchOutlined,
+  ContainerFilled,
   SettingOutlined,
-  BgColorsOutlined,
+  RetweetOutlined,
   UserOutlined,
   CommentOutlined,
 } from "@ant-design/icons";
@@ -126,7 +126,16 @@ const ReaderNav = () => {
         >
           <Link href="/reader">Dashboard</Link>
         </Menu.Item>
-
+        <Menu.Item
+          key="/reader/library"
+          icon={<ContainerFilled />}
+          className={current === "/reader/library" ? "active" : ""}
+          style={
+            current === "/reader/library" ? customStyles.activeItem : customStyles.item
+          }
+        >
+          <Link href="/reader/library">Library</Link>
+        </Menu.Item>
         <Menu.Item
           key="/reader/comments"
           icon={<CommentOutlined />}

@@ -148,6 +148,7 @@ const ProfileUpdate = ({ page = "admin" }) => {
               size="large"
               placeholder="Full name"
               value={name}
+              id="username"
               onChange={(e) => {
                 setName(e.target.value);
                 validateName(e.target.value);
@@ -179,6 +180,7 @@ const ProfileUpdate = ({ page = "admin" }) => {
               style={{ margin: "10px 0px 10px 0px" }}
               size="large"
               placeholder="Password"
+              id="password"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -235,6 +237,7 @@ const ProfileUpdate = ({ page = "admin" }) => {
               style={{ margin: "10px 0px 10px 0px" }}
               loading={loading}
               block
+              id="submit-btn"
             >
               Submit
             </Button>

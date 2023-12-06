@@ -9,6 +9,7 @@ import {
   BgColorsOutlined,
   UserOutlined,
   CommentOutlined,
+  ContainerFilled,
 } from "@ant-design/icons";
 
 import { AuthContext } from "../../context/auth";
@@ -125,6 +126,16 @@ const AdminNav = () => {
         >
           <Link href="/admin">Dashboard</Link>
         </Menu.Item>
+        <Menu.Item
+          key="/admin/library"
+          icon={<ContainerFilled />}
+          className={current === "/admin/library" ? "active" : ""}
+          style={
+            current === "/admin/library" ? customStyles.activeItem : customStyles.item
+          }
+        >
+          <Link href="/admin/library">Library</Link>
+        </Menu.Item>
 
         <SubMenu
           key="2"
@@ -143,6 +154,17 @@ const AdminNav = () => {
             }
           >
             <Link href="/admin/posts">All Books</Link>
+          </Menu.Item>
+          <Menu.Item
+            key="/admin/drafts"
+            className={current === "/admin/posts/drafts" ? "active" : ""}
+            style={
+              current === "/admin/posts/drafts"
+                ? customStyles.activeItem
+                : customStyles.item
+            }
+          >
+            <Link href="/admin/posts/drafts">All Drafts</Link>
           </Menu.Item>
           <Menu.Item
             key="/admin/posts/new"
@@ -241,7 +263,7 @@ const AdminNav = () => {
               : customStyles.item
           }
         >
-          <Link href={`/admin/${auth?.user?._id}`}>Profile</Link>
+          <Link href={`/admin/${auth?.user?._id}`} id="profile">Profile</Link>
         </Menu.Item>
 
         <Menu.Item

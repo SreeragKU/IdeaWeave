@@ -219,6 +219,7 @@ export const Posts = ({ posts }) => {
                     style={{ height: "200px" }}
                     src={post.coverImage?.url || "images/default.jpeg"}
                     alt={post.title}
+                    id="book"
                   />
                 }
               >

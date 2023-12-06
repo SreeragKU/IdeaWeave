@@ -115,7 +115,7 @@ function Home() {
               }}
             >
               {latestPosts.map((post) => (
-                <Link href={`/post/${post.slug}`} key={post.slug}>
+                <Link href={`/post/${post.slug}`} key={post.slug} id="book">
                   <h3
                     style={{
                       color: "#fff",
