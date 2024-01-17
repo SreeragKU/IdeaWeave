@@ -4,7 +4,7 @@ import UserComments from "../../components/comments/UserComments";
 
 const { Content, Sider } = Layout;
 
-export default function Author({ children }) {
+export default function Reader({ children }) {
   return (
     <ReaderLayout>
       <Content>

@@ -37,7 +37,7 @@ const BookFront = ({ post }) => {
         >
           <img
             src={post?.coverImage?.url || "/images/default.jpeg"}
-            alt={post.title}
+            alt={post?.title || "No Title"}
             style={{
               width: "100%",
               height: "100%",
@@ -48,17 +48,17 @@ const BookFront = ({ post }) => {
 
         <div style={{ marginTop: "20px", textAlign: "center" }}>
           <Title style={{ fontSize: "2rem", marginBottom: "10px" }}>
-            {post.title}
+            {post?.title || "No Title"}
           </Title>
           <p style={{ fontSize: "0.9rem", color: "#888" }}>
-            Author: {post.postedBy.name}{" "}
+            Author: {post?.postedBy?.name || "Unknown"}{" "}
           </p>
           <p style={{ fontSize: "0.9rem", color: "#888" }}>
-            {dayjs(post.createdAt).format("D MMMM, YYYY h:mm A")} / 0 Comments /
+            {dayjs(post?.createdAt).format("D MMMM, YYYY h:mm A")} / 0 Comments /
             in{" "}
-            {post?.categories.map((c) => (
-              <span key={c._id} style={{ marginRight: "10px" }}>
-                <Link href={`/category/${c.slug}`}>@{c.name}</Link>
+            {post?.categories?.map((c) => (
+              <span key={c?._id} style={{ marginRight: "10px" }}>
+                <Link href={`/category/${c?.slug}`}>@{c?.name}</Link>
               </span>
             ))}
           </p>

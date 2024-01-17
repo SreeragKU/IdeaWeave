@@ -26,7 +26,7 @@ const AdminNav = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const handleResize = () => {
-    setCollapsed(window.innerWidth < 1000);
+    setCollapsed(window.innerWidth < 10000);
   };
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Row, Col, Button, Input, List, Modal, Spin } from "antd";
+import { Row, Col, Button, Input, List, Modal, Spin, Card } from "antd";
 import AdminLayout from "../../../components/layout/AdminLayout";
 import Link from "next/link";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
@@ -25,7 +25,9 @@ function Comments() {
   const [content, setContent] = useState("");
   const [visible, setVisible] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [selectedPost, setSelectedPost] = useState(null);
   const router = useRouter();
+  const [commentFormVisible, setCommentFormVisible] = useState(false);
 
   useEffect(() => {
     if (auth?.token) {
@@ -34,20 +36,21 @@ function Comments() {
     }
   }, [auth?.token]);
 
-  useEffect(() => {
-    if (page === 1) return;
-    if (auth?.token) fetchComments();
-  }, [page]);
-
   const fetchComments = async () => {
     try {
-      const { data } = await axios.get(`/all-comments/${page}`);
+      const { data } = await axios.get(`/all-comments`);
       setComments([...comments, ...data]);
       setLoading(false);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setLoading(false);
     }
+  };
+
+  const handleEdit = (comment) => {
+    setSelectedComment(comment);
+    setContent(comment.content);
+    setCommentFormVisible(true);
   };
 
   const getTotal = async () => {
@@ -55,7 +58,7 @@ function Comments() {
       const { data } = await axios.get("/comment-count");
       setTotal(data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -73,7 +76,7 @@ function Comments() {
             toast.success("Comment hidden successfully");
           }
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       },
       onCancel() {
@@ -89,29 +92,50 @@ function Comments() {
         content,
       });
 
-      let arr = comments;
-      const index = arr.findIndex((c) => c._id === selectedComment._id);
-      arr[index].content = data.content;
-      setComments(arr);
+      setComments((prevComments) =>
+        prevComments.map((c) =>
+          c._id === selectedComment._id ? { ...c, content: data.content } : c
+        )
+      );
 
       setVisible(false);
       setLoading(false);
       setSelectedComment({});
+      setContent(""); 
 
       toast.success("Comment updated");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setVisible(false);
     }
   };
 
-  const filteredComments = comments?.filter(
-    (comment) =>
-      comment?.content.toLowerCase().includes(keyword) ||
-      comment?.postedBy?.name.toLowerCase().includes(keyword) ||
-      (comment?.postedBy?.role &&
-        comment.postedBy.role.toLowerCase().includes(keyword))
-  );
+  const filteredComments = comments?.filter((comment) => {
+    const keywordsArray = keyword.toLowerCase().split(" ");
+
+    return keywordsArray.every((kw) =>
+      [
+        comment?.content,
+        comment?.postedBy?.name,
+        comment?.postedBy?.role,
+        comment?.postId?.title,
+      ].some((field) => field && field.toLowerCase().includes(kw))
+    );
+  });
+
+  const [modalKeyword, setModalKeyword] = useState("");
+
+  const handlePostClick = (postTitle) => {
+    const postComments = comments.filter(
+      (comment) => comment?.postId?.title === postTitle
+    );
+    setSelectedPost({ title: postTitle, comments: postComments });
+    setVisible(true);
+  };
+
+  const uniquePostTitles = [
+    ...new Set(filteredComments.map((item) => item?.postId?.title)),
+  ];
 
   return (
     <AdminLayout>
@@ -121,57 +145,14 @@ function Comments() {
         <Row style={{ paddingLeft: 80, marginTop: 40, paddingRight: 50 }}>
           <Col xs={24} sm={24} lg={16} offset={1}>
             <h1 style={{ marginTop: 15 }}>{total} Comments</h1>
-            <Input
-              placeholder="Search"
-              type="search"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value.toLowerCase())}
-            />
-            {filteredComments.map((item) => (
-              <List.Item
-                key={item._id}
-                style={{ opacity: item.isHidden ? 0.5 : 1 }} // Apply different opacity for hidden comments
-                actions={[
-                  <Link href={`/post/${item?.postId?.slug}#${item._id}`}>
-                    view
-                  </Link>,
-                  auth.user && item.postedBy.name === auth.user.name && (
-                    <a
-                      onClick={() => {
-                        setSelectedComment(item);
-                        setVisible(true);
-                        setContent(item.content);
-                      }}
-                    >
-                      edit
-                    </a>
-                  ),
-                  auth.user && <a onClick={() => handleHide(item)}>hide</a>,
-                ]}
-              >
-                <List.Item.Meta
-                  description={`On ${item?.postId?.title} | ${
-                    item?.postedBy?.name
-                  } | ${dayjs(item.createdAt).format("L LT")}`}
-                  title={item.content}
-                />
-              </List.Item>
+            {uniquePostTitles.map((postTitle) => (
+              <Card
+                key={postTitle}
+                title={postTitle}
+                onClick={() => handlePostClick(postTitle)}
+                style={{ marginBottom: 16, cursor: "pointer" }}
+              />
             ))}
-          </Col>
-        </Row>
-      )}
-
-      {page * 6 < total && (
-        <Row>
-          <Col span={24} style={{ marginLeft: "430px", marginTop: "24px" }}>
-            <Button
-              size="large"
-              type="primary"
-              loading={loading}
-              onClick={() => setPage(page + 1)}
-            >
-              Load More
-            </Button>
           </Col>
         </Row>
       )}
@@ -179,9 +160,63 @@ function Comments() {
         <Col span={24}>
           <Modal
             visible={visible}
-            title="Update comment"
+            title={`Comments for ${selectedPost?.title}`}
             onOk={() => setVisible(false)}
             onCancel={() => setVisible(false)}
+            footer={null}
+          >
+            <Input
+              placeholder="Search comments"
+              type="search"
+              value={modalKeyword}
+              onChange={(e) => setModalKeyword(e.target.value.toLowerCase())}
+              style={{ marginBottom: 16 }}
+            />
+            {selectedPost?.comments
+              .filter((comment) =>
+                comment.content.toLowerCase().includes(modalKeyword)
+              )
+              .map((comment) => (
+                <div key={comment._id}>
+                  <p>{comment.content}</p>
+                  <p>{`${comment?.postedBy?.name} | ${dayjs(
+                    comment.createdAt
+                  ).format("L LT")}`}</p>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Link
+                      href={`/post/${comment?.postId?.slug}#${comment._id}`}
+                    >
+                      View
+                    </Link>
+                    {auth.user && comment.postedBy.name === auth.user.name && (
+                      <>
+                        <a
+                          onClick={() => {
+                            handleEdit(comment);
+                            setCommentFormVisible(true);
+                          }}
+                        >
+                          Edit
+                        </a>
+                      </>
+                    )}
+                    <a onClick={() => handleHide(comment)}>Hide</a>
+                  </div>
+                  <hr />
+                </div>
+              ))}
+          </Modal>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Modal
+            visible={commentFormVisible}
+            title="Update comment"
+            onOk={() => setCommentFormVisible(false)}
+            onCancel={() => setCommentFormVisible(false)}
             footer={null}
           >
             <CommentForm

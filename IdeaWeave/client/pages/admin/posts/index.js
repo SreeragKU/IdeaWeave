@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from "react";
-import { Row, Col, Button, Grid, Typography, Spin } from "antd";
+import { Row, Col, Button, Typography, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { PostContext } from "../../../context/post";
@@ -9,7 +9,6 @@ import Link from "next/link";
 import PostsList from "../../../components/posts/PostsList";
 import { AuthContext } from "../../../context/auth";
 
-const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
 
 function Posts() {
@@ -17,7 +16,6 @@ function Posts() {
   const [auth, setAuth] = useContext(AuthContext);
   const { posts } = post;
   const router = useRouter();
-  const screens = useBreakpoint();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,14 +54,16 @@ function Posts() {
 
   return (
     <AdminLayout>
-      <Row gutter={[16, 16]} style={{ paddingLeft: 120, marginTop: 60, paddingRight: 50 }}>
-        <Col span={24}>
+      <Row gutter={[16, 16]} style={{ padding: "16px" }}>
+        <Col span={24} style={{ marginTop: "30px", marginBottom: "16px" }}>
           <Button type="primary">
             <Link href="/admin/posts/new">
               <PlusOutlined /> Add New
             </Link>
           </Button>
-          <Title style={{ marginTop: 15 }} level={3}>
+        </Col>
+        <Col span={24}>
+          <Title level={3} style={{ marginTop: loading ? "15px" : "0" }}>
             {loading ? <Spin /> : `${posts?.length} Posts`}
           </Title>
         </Col>

@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Row, Col, Card, Typography, Button, Select, List, Avatar, Divider } from "antd";
+import { useRouter } from "next/router";
+import {
+  Row,
+  Col,
+  Card,
+  Typography,
+  Button,
+  Select,
+  List,
+  Avatar,
+  Divider,
+} from "antd";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import BookFront from "./BookFront";
@@ -10,7 +21,7 @@ import CommentForm from "../../components/comments/CommentForm";
 import useLatestPosts from "../../hooks/useLatestPosts";
 import Link from "next/link";
 import { AuthContext } from "../../context/auth";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -63,9 +74,10 @@ const themes = {
 };
 
 const SinglePost = ({ post, postComments }) => {
+  const router = useRouter();
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedTheme, setSelectedTheme] = useState("Default");
-  const [postContent, setPostContent] = useState(post.content);
+  const [postContent, setPostContent] = useState(post ? post.content : "");
   const [currentVolume, setCurrentVolume] = useState(0);
   const [currentChapter, setCurrentChapter] = useState(0);
   const [comments, setComments] = useState(postComments);
@@ -75,17 +87,27 @@ const SinglePost = ({ post, postComments }) => {
   const [auth, setAuth] = useContext(AuthContext);
 
   useEffect(() => {
-    setZoomLevel(1);
-    setPostContent(
-      post.volumes[currentVolume].chapters[currentChapter].content
-    );
-  }, [currentVolume, currentChapter]);
+    if (post && post.volumes && post.volumes.length > 0) {
+      setZoomLevel(1);
+      setPostContent(
+        post.volumes[currentVolume].chapters[currentChapter].content
+      );
+    }
+  }, [post, currentVolume, currentChapter]);
 
   useEffect(() => {
-    setPostContent(
-      post.volumes[currentVolume].chapters[currentChapter].content
-    );
-  }, [zoomLevel]);
+    if (!post) {
+      router.push("/_error");
+    }
+  }, [post, router]);
+
+  useEffect(() => {
+    if (post && post.volumes && post.volumes.length > 0) {
+      setPostContent(
+        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ""
+      );
+    }
+  }, [zoomLevel, post, currentVolume, currentChapter]);
 
   useEffect(() => {
     setPostContent(
@@ -151,8 +173,9 @@ const SinglePost = ({ post, postComments }) => {
 
   const isAtFirstChapter = currentVolume === 0 && currentChapter === 0;
   const isAtLastChapter =
+    post?.volumes &&
     currentVolume === post.volumes.length - 1 &&
-    currentChapter === post.volumes[currentVolume].chapters.length - 1;
+    currentChapter === post.volumes[currentVolume]?.chapters?.length - 1;
 
   const handleSubmit = async () => {
     try {
@@ -171,13 +194,15 @@ const SinglePost = ({ post, postComments }) => {
   const addToLibrary = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.post(`/add-to-library/${post._id}`, { postId: post._id });
+      const { data } = await axios.post(`/add-to-library/${post._id}`, {
+        postId: post._id,
+      });
       if (data.success) {
         toast.success("Added to library successfully");
       } else {
         toast.error("Failed to add to library");
       }
-  
+
       setLoading(false);
     } catch (err) {
       console.error(err);
@@ -185,7 +210,6 @@ const SinglePost = ({ post, postComments }) => {
       setLoading(false);
     }
   };
-  
 
   const handleQuillLoad = () => {
     setIsQuillLoaded(true);
@@ -238,17 +262,23 @@ const SinglePost = ({ post, postComments }) => {
       <BookFront post={post} />
 
       <Head>
-        <title>{post.title}</title>
-        <meta name="description" content={post.content.substring(0, 160)} />
+        <title>{post?.title || "Untitled Post"}</title>
+        <meta
+          name="description"
+          content={
+            post?.content?.substring(0, 160) || "No description available"
+          }
+        />
       </Head>
+
       <Row justify="center">
         <Col xs={24} xl={16}>
-        {/* Add to Library Button */}
-        {auth.token && (
-              <Button type="primary" onClick={addToLibrary}>
-                Add to Library
-              </Button>
-            )}
+          {/* Add to Library Button */}
+          {auth.token && (
+            <Button type="primary" onClick={addToLibrary}>
+              Add to Library
+            </Button>
+          )}
           <Card>
             <div style={{ marginBottom: 16, textAlign: "center" }}>
               <Button
@@ -269,7 +299,7 @@ const SinglePost = ({ post, postComments }) => {
                 dropdownStyle={{ borderRadius: 8 }}
                 onChange={handleSelect}
               >
-                {post.volumes.map((volume, volumeIndex) => (
+                {post?.volumes?.map((volume, volumeIndex) => (
                   <Select.OptGroup
                     label={`Volume ${volumeIndex + 1}: ${volume.volume}`}
                     key={`volume-${volumeIndex}`}
@@ -294,7 +324,12 @@ const SinglePost = ({ post, postComments }) => {
                 Next Chapter
               </Button>{" "}
             </div>
-            <div>
+            <div
+              style={{
+                height: "650px",
+                overflow: "auto",
+              }}
+            >
               <ReactQuillNoSSR
                 value={postContent}
                 readOnly={true}
@@ -331,7 +366,7 @@ const SinglePost = ({ post, postComments }) => {
                 dropdownStyle={{ borderRadius: 8 }}
                 onChange={handleSelect}
               >
-                {post.volumes.map((volume, volumeIndex) => (
+                {post?.volumes?.map((volume, volumeIndex) => (
                   <Select.OptGroup
                     label={`Volume ${volumeIndex + 1}: ${volume.volume}`}
                     key={`volume-${volumeIndex}`}
@@ -367,7 +402,7 @@ const SinglePost = ({ post, postComments }) => {
                   </Link>
                 ))}
               </div>
-               )}
+            )}
             <CommentForm
               comment={comment}
               setComment={setComment}
@@ -399,13 +434,23 @@ const SinglePost = ({ post, postComments }) => {
 };
 
 export async function getServerSideProps({ params }) {
-  const { data } = await axios.get(`${process.env.API}/post/${params.slug}`);
-  return {
-    props: {
-      post: data.post,
-      postComments: data.comments,
-    },
-  };
+  try {
+    const { data } = await axios.get(`${process.env.API}/post/${params.slug}`);
+    return {
+      props: {
+        post: data.post,
+        postComments: data.comments,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      props: {
+        post: null,
+        postComments: [],
+      },
+    };
+  }
 }
 
 export default SinglePost;

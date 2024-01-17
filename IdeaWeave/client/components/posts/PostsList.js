@@ -73,27 +73,27 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
     ));
   };
 
-  return (
+   return (
     <>
-      <Row justify="space-between" style={{ marginBottom: 16, paddingRight: 50 }}>
-        <Col>
-          <Space>
-            <Search
-              placeholder="Search by title"
-              onSearch={handleSearch}
-              onChange={(e) => handleSearch(e.target.value)}
-              value={searchTerm}
-              style={{ width: 200 }}
-            />
-            <Select
-              defaultValue="asc"
-              onChange={handleSortChange}
-              style={{ width: 120 }}
-            >
-              <Option value="asc">Ascending</Option>
-              <Option value="desc">Descending</Option>
-            </Select>
-          </Space>
+      <Row justify="space-between" style={{ marginBottom: 16, paddingRight: 16 }}>
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <Search
+            placeholder="Search by title"
+            onSearch={handleSearch}
+            onChange={(e) => handleSearch(e.target.value)}
+            value={searchTerm}
+            style={{ width: "100%" }}
+          />
+        </Col>
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <Select
+            defaultValue="asc"
+            onChange={handleSortChange}
+            style={{ width: "100%" }}
+          >
+            <Option value="asc">Ascending</Option>
+            <Option value="desc">Descending</Option>
+          </Select>
         </Col>
       </Row>
 
@@ -117,6 +117,7 @@ const PostsList = ({ posts, handleDelete, handleEdit }) => {
                 </Space>,
               ]}
             >
+
               <img
                 alt={post.title}
                 src={post.coverImage?.url}

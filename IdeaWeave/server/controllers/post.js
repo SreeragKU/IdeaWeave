@@ -95,6 +95,7 @@ export const singlePost = async (req, res) => {
 
     res.json({ post, comments });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -737,19 +738,37 @@ export const hideComment = async (req, res) => {
 
 export const allComments = async (req, res) => {
   try {
-    const perPage = 6;
-    const page = req.params.page || 1;
-
     const allComments = await Comment.find()
-      .skip((page - 1) * perPage)
       .populate("postedBy", "name")
       .populate("postId", "title slug")
       .sort({ createdAt: -1 })
-      .limit(perPage);
 
     return res.json(allComments);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const removeFromLibrary = async (req, res) => {
+  try {
+    const { bookId } = req.params;
+    const userId = req.user._id;
+
+    if (!bookId || !userId) {
+      return res.status(400).json({ error: "bookId and userId are required" });
+    }
+
+    const user = await User.findById(userId);
+
+    // Remove the bookId from the user's library
+    user.library = user.library.filter((postId) => postId.toString() !== bookId);
+
+    await user.save();
+
+    res.json({ success: true, message: "Book removed from library successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to remove book from library" });
   }
 };

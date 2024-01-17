@@ -22,10 +22,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/comments": [
+    "/admin": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/comments.js"
+      "static/chunks/pages/admin.js"
+    ],
+    "/admin/library": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/admin/library.js"
     ],
     "/post/[slug]": [
       "static/chunks/webpack.js",

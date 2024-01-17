@@ -1,38 +1,41 @@
-import { useEffect, useContext } from "react";
-import { Row, Col, Button, Grid, Typography } from "antd";
+import { useEffect, useContext, useState } from "react";
+import { Row, Col, Button, Typography, Spin } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { PostContext } from "../../../context/post";
 import { useRouter } from "next/router";
-import AuthorLayour from "../../../components/layout/AuthorLayout";
+import AuthorLayout from "../../../components/layout/AuthorLayout";
 import Link from "next/link";
 import PostsList from "../../../components/posts/PostsList";
+import { AuthContext } from "../../../context/auth";
 
-const { useBreakpoint } = Grid;
 const { Title, Text } = Typography;
 
 function Posts() {
   const [post, setPost] = useContext(PostContext);
+  const [auth, setAuth] = useContext(AuthContext);
   const { posts } = post;
   const router = useRouter();
-  const screens = useBreakpoint();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (auth.token) fetchPosts();
+  }, [auth?.token]);
 
   const fetchPosts = async () => {
     try {
-      const { data } = await axios.get("/post-by-author");
+      setLoading(true);
+      const { data } = await axios.get("/posts-for-admin");
       setPost((prev) => ({ ...prev, posts: data }));
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEdit = async (post) => {
-    console.log("Post", post);
-    return router.push(`/author/posts/${post.slug}`);
+    return router.push(`/admin/posts/${post.slug}`);
   };
 
   const handleDelete = async (post) => {
@@ -50,23 +53,25 @@ function Posts() {
   };
 
   return (
-    <AuthorLayour>
-      <Row gutter={[16, 16]} style={{ paddingLeft: 120, marginTop: 60, paddingRight: 50 }}>
-        <Col span={24}>
+    <AuthorLayout>
+      <Row gutter={[16, 16]} style={{ padding: "16px" }}>
+        <Col span={24} style={{ marginTop: "30px", marginBottom: "16px" }}>
           <Button type="primary">
-            <Link href="/author/posts/new">
+            <Link href="/admin/posts/new">
               <PlusOutlined /> Add New
             </Link>
           </Button>
-          <Title style={{ marginTop: 15 }} level={3}>
-            {posts?.length} Posts
+        </Col>
+        <Col span={24}>
+          <Title level={3} style={{ marginTop: loading ? "15px" : "0" }}>
+            {loading ? <Spin /> : `${posts?.length} Posts`}
           </Title>
         </Col>
         <Col span={24}>
           <PostsList posts={posts} handleDelete={handleDelete} handleEdit={handleEdit} />
         </Col>
       </Row>
-    </AuthorLayour>
+    </AuthorLayout>
   );
 }
 

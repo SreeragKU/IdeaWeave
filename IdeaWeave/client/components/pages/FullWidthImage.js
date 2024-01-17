@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../../context/theme";
 
-const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Management System", fullWidthImage = "/images/image3.jpg" }) => {
+const FullWidthImage = ({
+  auth,
+  title = "IdeaWeave",
+  subtitle = "Content Management System",
+  fullWidthImage = "/images/image3.jpg",
+}) => {
   const [theme] = useContext(ThemeContext);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -37,8 +42,12 @@ const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Managem
         style={{
           position: "relative",
           width: "100%",
-          height: "500px",
+          height: "auto",
           overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         {imageLoading && (
@@ -50,7 +59,7 @@ const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Managem
               transform: "translate(-50%, -50%)",
             }}
           >
-            <Spin size="large" style={{marginTop: 80, marginLeft: 70}}/>
+            <Spin size="large" style={{ marginTop: "20%" }} />
           </div>
         )}
 
@@ -59,7 +68,7 @@ const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Managem
           alt="CMS"
           style={{
             width: "100%",
-            height: "100%",
+            height: "auto",
             objectFit: "cover",
             display: imageLoading ? "none" : "block",
           }}
@@ -73,35 +82,57 @@ const FullWidthImage = ({ auth, title = "IdeaWeave", subtitle = "Content Managem
             left: "50%",
             transform: "translate(-50%, -50%)",
             textAlign: "center",
-            fontSize: "85px",
-            textShadow: "2px 2px 4px #000000",
-            padding: "50px",
-            borderRadius: "500px",
-            display: imageLoading ? "none" : "block",
+            padding: "2rem",
+            borderRadius: "2rem",
+            display: imageLoading ? "none" : "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <h1
             style={{
-              WebkitTextStroke: `3px ${textStrokeColor}`,
-              textStroke: `3px ${textStrokeColor}`,
+              WebkitTextStroke: `0.02rem ${textStrokeColor}`, 
+              textStroke: `0.02rem ${textStrokeColor}`, 
               fontFamily: "'Just Me Again Down Here', sans-serif",
               margin: 0,
+              fontSize: "10vw",
+              "@media (min-width: 768px)": {
+                fontSize: "6vw",
+              },
+              "@media (min-width: 480px)": {
+                fontSize: "4.5vw",
+              },
+              fontWeight: "bold",
+              color: theme === "light" ? "#000" : "#fff",
             }}
           >
             {title}
           </h1>
           <p
             style={{
-              WebkitTextStroke: `0.5px ${textStrokeColor}`,
-              textStroke: `0.5px ${textStrokeColor}`,
-              fontSize: "25px",
-              marginTop: "-60px",
+              WebkitTextStroke: `0.01rem ${textStrokeColor}`, 
+              textStroke: `0.01rem ${textStrokeColor}`, 
+              fontSize: "3vw",
+              "@media (min-width: 768px)": {
+                fontSize: "2vw",
+              },
+              "@media (min-width: 480px)": {
+                fontSize: "1.5vw",
+              },
+              marginTop: "-1rem",
+              color: theme === "light" ? "#333" : "#ccc",
             }}
           >
             {subtitle}
           </p>
           <Link href={getRedirectLink()}>
-            <Button type="primary" size="large" icon={<SendOutlined />} id="explore">
+            <Button
+              type="primary"
+              size="large"
+              icon={<SendOutlined />}
+              id="explore"
+            >
               Explore
             </Button>
           </Link>

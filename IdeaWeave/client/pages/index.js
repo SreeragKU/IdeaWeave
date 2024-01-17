@@ -42,12 +42,9 @@ function Home() {
         fullWidthImage={fullWidthImage?.url}
       />
 
-      <Row>
+      <Row gutter={[16, 16]}>
         {/* posts */}
-        <Col
-          span={6}
-          style={{ marginTop: 50, textAlign: "center", fontSize: 20 }}
-        >
+        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
           <RenderProgress
             number={numbers.posts}
             name="Books"
@@ -55,10 +52,7 @@ function Home() {
           />
         </Col>
         {/* comments */}
-        <Col
-          span={6}
-          style={{ marginTop: 50, textAlign: "center", fontSize: 20 }}
-        >
+        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
           <RenderProgress
             number={numbers.comments}
             name="Comments"
@@ -66,10 +60,7 @@ function Home() {
           />
         </Col>
         {/* catgories */}
-        <Col
-          span={6}
-          style={{ marginTop: 50, textAlign: "center", fontSize: 20 }}
-        >
+        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
           <RenderProgress
             number={numbers.categories}
             name="Categories"
@@ -77,10 +68,7 @@ function Home() {
           />
         </Col>
         {/* users */}
-        <Col
-          span={6}
-          style={{ marginTop: 50, textAlign: "center", fontSize: 20 }}
-        >
+        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
           <RenderProgress
             number={numbers.users}
             name="Users"
@@ -88,6 +76,7 @@ function Home() {
           />
         </Col>
       </Row>
+
       <Row>
         <Col span={24}>
           <ParallaxImage>
@@ -133,11 +122,9 @@ function Home() {
           </ParallaxImage>
         </Col>
       </Row>
-      <Row>
-        <Col
-          span={24}
-          style={{ textAlign: "center", marginTop: 80, marginBottom: 80 }}
-        >
+
+      <Row gutter={[16, 16]} justify="center">
+        <Col span={24} style={{ textAlign: "center", marginTop: 80, marginBottom: 80 }}>
           <Divider>CATEGORIES</Divider>
           <div style={{ textAlign: "center" }}>
             {categories.map((c) => (
@@ -148,6 +135,7 @@ function Home() {
           </div>
         </Col>
       </Row>
+
       <Footer />
     </>
   );
