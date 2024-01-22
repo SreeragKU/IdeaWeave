@@ -442,7 +442,7 @@ function NewPostComponent({ page = "admin" }) {
 
         setMedia({ ...media, selected: null });
 
-        router.push(`/${page}/posts`);
+        router.push(`/${page}/posts/drafts`);
         toast.success("Post created successfully");
       }
     } catch (err) {
@@ -836,6 +836,7 @@ function NewPostComponent({ page = "admin" }) {
                 <Button
                   style={{ margin: "10px 0px 20px", width: "100%" }}
                   type="primary"
+                  loading={loading}
                   onClick={handleSaveToDraft}
                 >
                   Save to Draft

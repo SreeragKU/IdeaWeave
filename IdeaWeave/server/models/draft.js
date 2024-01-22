@@ -52,6 +52,8 @@ const draftSchema = new Schema(
       lowercase: true,
     },
     commentCount: { type: Number, default: 0 },
+    publishDate: { type: Date }, 
+    status: { type: String, default: "draft" }, 
   },
   { timestamps: true },
 );

@@ -40,23 +40,18 @@ import {
   editDraft,
   draftsByAuthor,
   singleDraft,
-  createDraftPost,
+  publishDraftPosts,
   addToLibrary,
   getLibrary,
   hideComment,
   allComments,
-  removeFromLibrary,
+  bulkRemoveFromLibrary,
 } from "../controllers/post";
 
 router.post("/upload-image", requireSignin, canCreateRead, uploadImage);
 router.post("/upload-image-file", formidable(), requireSignin, uploadImageFile);
 router.post("/create-post", requireSignin, canCreateRead, createPost);
-router.post(
-  "/create-draft-post/:postId",
-  requireSignin,
-  canCreateRead,
-  createDraftPost
-);
+router.post("/publish-draft-posts", requireSignin, canCreateRead, publishDraftPosts)
 router.post("/create-draft", requireSignin, canCreateRead, createDraft);
 router.get("/drafts/:page", drafts);
 router.get("/drafts-page/:page", draftPage);
@@ -99,7 +94,7 @@ router.put(
   canUpdateDeleteComment,
   updateComment
 );
-router.delete("/delete-from-library/:bookId", requireSignin, removeFromLibrary);
+router.delete("/bulkdelete-from-library", requireSignin, bulkRemoveFromLibrary)
 router.delete(
   "/comment/:commentId",
   requireSignin,

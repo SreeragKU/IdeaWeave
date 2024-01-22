@@ -555,8 +555,6 @@ export const draftPage = async (req, res) => {
 export const removeDraft = async (req, res) => {
   try {
     const postId = req.params.postId;
-
-    // Find the post and remove it
     const post = await Draft.findByIdAndDelete(postId);
     if (post) {
       res.json({ ok: true });
@@ -607,51 +605,41 @@ export const singleDraft = async (req, res) => {
   }
 };
 
-export const createDraftPost = async (req, res) => {
+export const publishDraftPosts = async (req, res) => {
   try {
-    const { title, content, volumes, categories, coverImage } = req.body;
-
-    if (!title || !content || !volumes || !categories || !coverImage) {
-      return res.status(400).json({ error: "All fields are required" });
+    const { postIds } = req.body;
+    if (!Array.isArray(postIds) || postIds.length === 0) {
+      return res.status(400).json({ error: "Invalid postIds" });
     }
 
-    const alreadyExist = await Post.findOne({
-      slug: slugify(title.toLowerCase()),
-    });
-    if (alreadyExist) return res.status(400).json({ error: "Title is taken" });
+    const publishedPosts = [];
+    for (const postId of postIds) {
+      const draft = await Draft.findById(postId);
 
-    const categoryIds = await Promise.all(
-      categories.map(async (category) => {
-        const existingCategory = await Category.findOne({ name: category });
-        return existingCategory ? existingCategory._id : null;
-      })
-    );
+      if (draft) {
+        const { title, content, volumes, categories, coverImage } = draft;
 
-    const formattedVolumes = volumes.map((volume) => ({
-      volume: volume.volume,
-      chapters: volume.chapters.map((chapter) => ({
-        chapter: chapter.chapter,
-        name: chapter.name,
-        content: chapter.content,
-      })),
-    }));
+        const post = await new Post({
+          title,
+          content,
+          volumes,
+          categories,
+          coverImage,
+          postedBy: req.user._id,
+          slug: slugify(title), 
+        }).save();
 
-    const post = await new Post({
-      title,
-      content,
-      volumes: formattedVolumes,
-      categories: categoryIds.filter((categoryId) => categoryId),
-      coverImage,
-      postedBy: req.user._id,
-      slug: slugify(title),
-    }).save();
+        await User.findByIdAndUpdate(req.user._id, {
+          $addToSet: { posts: post._id },
+        });
 
-    await User.findByIdAndUpdate(req.user._id, {
-      $addToSet: { posts: post._id },
-    });
-    await Draft.findByIdAndDelete(req.params.postId);
+        await Draft.findByIdAndDelete(postId);
 
-    return res.json(post);
+        publishedPosts.push(post);
+      }
+    }
+
+    return res.json({ ok: true, publishedPosts });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -687,7 +675,7 @@ export const getLibrary = async (req, res) => {
 
     const user = await User.findById(userId).populate({
       path: "library",
-      select: "title slug",
+      select: "title slug coverImage postedBy createdAt",
       populate: {
         path: "coverImage postedBy",
         select: "url name",
@@ -701,12 +689,13 @@ export const getLibrary = async (req, res) => {
     }
 
     const libraryWithDetails = user.library.map((post) => ({
+      _id: post._id,
       title: post.title,
       slug: post.slug,
-      coverImage: post.coverImage.url,
-      postedBy: post.postedBy.name,
+      coverImage: post.coverImage ? post.coverImage.url : null,
+      postedBy: post.postedBy ? post.postedBy.name : null,
       createdAt: post.createdAt,
-    }));
+    }));    
 
     res.json({ success: true, library: libraryWithDetails });
   } catch (error) {
@@ -750,25 +739,26 @@ export const allComments = async (req, res) => {
   }
 };
 
-export const removeFromLibrary = async (req, res) => {
+export const bulkRemoveFromLibrary = async (req, res) => {
   try {
-    const { bookId } = req.params;
-    const userId = req.user._id;
+    const { bookIds } = req.body;
 
-    if (!bookId || !userId) {
-      return res.status(400).json({ error: "bookId and userId are required" });
+    // Check if bookIds array exists and is not empty
+    if (!bookIds || bookIds.length === 0) {
+      return res.status(400).json({ error: "No bookIds provided for bulk delete" });
     }
 
-    const user = await User.findById(userId);
+    // Perform bulk delete operation based on bookIds
+    await User.updateOne(
+      { _id: req.user._id },
+      { $pull: { library: { $in: bookIds } } }
+    );
 
-    // Remove the bookId from the user's library
-    user.library = user.library.filter((postId) => postId.toString() !== bookId);
-
-    await user.save();
-
-    res.json({ success: true, message: "Book removed from library successfully" });
+    res.json({ success: true, message: "Books removed from library successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Failed to remove book from library" });
+    res.status(500).json({ success: false, message: "Failed to remove books from library" });
   }
 };
+
+

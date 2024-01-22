@@ -86,6 +86,7 @@ const SinglePost = ({ post, postComments }) => {
   const { latestPosts } = useLatestPosts();
   const [auth, setAuth] = useContext(AuthContext);
 
+
   useEffect(() => {
     if (post && post.volumes && post.volumes.length > 0) {
       setZoomLevel(1);

@@ -1,7 +1,7 @@
 // server.js
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const morgan = require("morgan");
 require('dotenv').config();
 const { DATABASE } = require("./config");
