@@ -91,16 +91,16 @@ const SinglePost = ({ post, postComments }) => {
     if (post && post.volumes && post.volumes.length > 0) {
       setZoomLevel(1);
       setPostContent(
-        post.volumes[currentVolume].chapters[currentChapter].content
+        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ""
       );
     }
-  }, [post, currentVolume, currentChapter]);
+  }, [post, currentVolume, currentChapter]);  
 
   useEffect(() => {
     if (!post) {
       router.push("/_error");
     }
-  }, [post, router]);
+  }, [post, router]);  
 
   useEffect(() => {
     if (post && post.volumes && post.volumes.length > 0) {
@@ -111,10 +111,19 @@ const SinglePost = ({ post, postComments }) => {
   }, [zoomLevel, post, currentVolume, currentChapter]);
 
   useEffect(() => {
-    setPostContent(
-      post.volumes[currentVolume].chapters[currentChapter].content
-    );
-  }, [postContent]);
+    if (
+      post &&
+      post.volumes &&
+      post.volumes[currentVolume] &&
+      post.volumes[currentVolume].chapters &&
+      post.volumes[currentVolume].chapters[currentChapter]
+    ) {
+      setPostContent(
+        post.volumes[currentVolume].chapters[currentChapter].content
+      );
+    }
+  }, [post, currentVolume, currentChapter]);
+  
 
   const handleZoomIn = () => {
     if (zoomLevel < 2) {

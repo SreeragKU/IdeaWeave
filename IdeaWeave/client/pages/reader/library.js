@@ -289,7 +289,7 @@ const LibraryPage = () => {
         }
 
         .selected {
-          background-color: #e6f7ff; /* Highlight selected cards */
+          background-color: #606361;
         }
 
         @media only screen and (max-width: 767px) {

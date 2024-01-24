@@ -32,15 +32,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/admin.js"
     ],
-    "/admin/posts": [
+    "/admin/library": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/posts.js"
-    ],
-    "/admin/posts/drafts": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/admin/posts/drafts.js"
+      "static/chunks/pages/admin/library.js"
     ]
   },
   "ampFirstPages": []
