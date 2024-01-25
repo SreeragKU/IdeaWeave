@@ -319,7 +319,7 @@ function Signup() {
             type="primary"
             htmlType="submit"
             className="login-form-button"
-            loading={loading} // Use the loading attribute here
+            loading={loading} 
             disabled={loading}
           >
             {stage === 1 ? "Get OTP" : stage === 2 ? "Verify OTP" : "Register"}

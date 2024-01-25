@@ -36,7 +36,19 @@ export const isAuthor = async (req, res, next) => {
       console.log(err);
     }
   };
-
+  
+  export const isSubscriber = async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user._id);
+      if (user.role !== "Subscriber") {
+        return res.status(403).send("Unauthorized");
+      } else {
+        next();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 export const canCreateRead = async (req, res, next) => {
     try {
       const user = await User.findById(req.user._id);

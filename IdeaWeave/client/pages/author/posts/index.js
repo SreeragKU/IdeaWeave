@@ -25,7 +25,7 @@ function Posts() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/posts-for-admin");
+      const { data } = await axios.get("/post-by-author");
       setPost((prev) => ({ ...prev, posts: data }));
     } catch (err) {
       console.log(err);
@@ -35,7 +35,7 @@ function Posts() {
   };
 
   const handleEdit = async (post) => {
-    return router.push(`/admin/posts/${post.slug}`);
+    return router.push(`/author/posts/${post.slug}`);
   };
 
   const handleDelete = async (post) => {
@@ -57,7 +57,7 @@ function Posts() {
       <Row gutter={[16, 16]} style={{ marginLeft: 85, padding: "16px" }}>
         <Col span={24} style={{ marginTop: "30px", marginBottom: "16px" }}>
           <Button type="primary">
-            <Link href="/admin/posts/new">
+            <Link href="/author/posts/new">
               <PlusOutlined /> Add New
             </Link>
           </Button>

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { requireSignin, isAdmin, isAuthor } = require("../middlewares");
+const { requireSignin, isAdmin, isAuthor, isSubscriber } = require("../middlewares");
 const {
   signup,
   signin,
@@ -25,6 +25,7 @@ router.post("/verify-otp", verifyOtp);
 router.post("/send-otp", sendOtp);
 router.get("/current-admin", requireSignin, isAdmin, currentUser);
 router.get("/current-author", requireSignin, isAuthor, currentUser);
+router.get("/current-subscriber", requireSignin, isSubscriber, currentUser);
 router.get("/current-reader", requireSignin, currentUser);
 router.get("/users", requireSignin, isAdmin, users);
 router.put("/users/:userId/toggle", requireSignin, isAdmin, toggleUserStatus);

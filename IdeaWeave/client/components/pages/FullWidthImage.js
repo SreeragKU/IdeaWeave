@@ -20,6 +20,8 @@ const FullWidthImage = ({
       return "/admin";
     } else if (auth?.role === "Author") {
       return "/author";
+    } else if (auth?.role === "Subscriber") {
+      return "/subscriber";
     } else if (auth?.role === "Reader") {
       return "/reader";
     } else {

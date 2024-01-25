@@ -21,7 +21,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      default: "Subscriber",
+      default: "Reader",
     },
     image: {
       type: ObjectId,

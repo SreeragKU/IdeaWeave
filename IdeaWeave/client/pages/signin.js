@@ -81,8 +81,10 @@ function Signin() {
           router.push("/admin");
         } else if (data?.user?.role === "Author") {
           router.push("/author");
+        } else if (data?.user?.role === "Subscriber") {
+          router.push("/subscriber");
         } else {
-          router.push("/reader");
+          router.push("/unsubscriber");
         }
       }
     } catch (err) {
