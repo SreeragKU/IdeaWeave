@@ -27,12 +27,12 @@ function ForgotPassword() {
     number: false,
     special: false,
   });
-  const [password, setPassword] = useState(""); // Define password state
+  const [password, setPassword] = useState(""); 
 
   const [showRequirements, setShowRequirements] = useState(false);
 
   const checkPasswordStrength = (value) => {
-    setPassword(value); // Set the password state
+    setPassword(value); 
     const requirements = {
       length: value.length >= 8,
       uppercase: /[A-Z]/.test(value),

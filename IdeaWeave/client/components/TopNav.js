@@ -27,14 +27,11 @@ const TopNav = () => {
   };
 
   const signOut = () => {
-    //remove from local storage
     localStorage.removeItem("auth");
-    //remove from context
     setAuth({
       user: null,
       token: "",
     });
-    //redirect
     router.push("/signin");
   };
 
@@ -94,6 +91,9 @@ const TopNav = () => {
           >
             <Menu.Item key="setting:1">
               <Link href={roleBasedLink()}>Dashboard</Link>
+            </Menu.Item>
+            <Menu.Item key="setting:2">
+              <Link href="/plans">Billing</Link>
             </Menu.Item>
           </Menu.ItemGroup>
         </SubMenu>

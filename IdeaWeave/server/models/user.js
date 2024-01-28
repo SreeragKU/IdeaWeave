@@ -51,8 +51,16 @@ const userSchema = new Schema(
         ref: "Post",
       },
     ],
+    stripeCustomerId: {
+      type: String,
+      default: null,
+    },
+    subscriptionPlan: {
+      type: String, 
+      default: null,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);

@@ -54,7 +54,7 @@ function Signup() {
   const handleGetOtp = async () => {
     if (data.email && data.email.trim() !== "") {
       try {
-        setLoading(true); // Set loading to true before making the request
+        setLoading(true);
 
         const response = await axios.post("/send-otp", { email: data.email });
         if (response.data?.success) {
@@ -66,7 +66,7 @@ function Signup() {
       } catch (error) {
         toast.error("Failed to send OTP. Try again.");
       } finally {
-        setLoading(false); // Set loading back to false in the finally block
+        setLoading(false); 
       }
     }
   };

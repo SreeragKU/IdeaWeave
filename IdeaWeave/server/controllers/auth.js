@@ -5,6 +5,7 @@ const nanoid = require("nanoid");
 const nodemailer = require("nodemailer");
 const emailValidator = require("email-validator");
 const { JWT_SECRET, EMAIL_FROM, EMAIL_APP_PASSWORD } = require("../config");
+import { stripe } from "../helpers/stripe";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -135,12 +136,11 @@ exports.signup = async (req, res) => {
     }
 
     if (!existingUser.isActive) {
-      // Check if the user is disabled
       return res.json({
         error: "Account is disabled",
       });
     }
-
+    
     existingUser.name = name;
     existingUser.password = await hashPassword(password);
     await existingUser.save();
@@ -408,7 +408,6 @@ exports.createUser = async (req, res) => {
 
       try {
         const data = await transporter.sendMail(emailData);
-        //console.log("email sent => ", data);
       } catch (err) {
         console.log(err);
         return res.json({ error: "Failed to send email using Gmail" });

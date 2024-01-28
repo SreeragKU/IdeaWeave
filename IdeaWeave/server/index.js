@@ -9,6 +9,7 @@ import categoryRoutes from "./routes/category";
 import uploadRoutes from "./routes/post";
 import websiteRoutes from "./routes/website";
 const authRoutes = require("./routes/auth");
+const subRoutes = require("./routes/sub");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(morgan("dev"));
 
 // Route Middlewares
 app.use("/api", authRoutes);
+app.use("/api", subRoutes);
 app.use("/api", categoryRoutes);
 app.use("/api", uploadRoutes);
 app.use("/api", websiteRoutes);
