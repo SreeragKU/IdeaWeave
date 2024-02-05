@@ -27,15 +27,20 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/author": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/author.js"
-    ],
     "/plans": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/plans.js"
+    ],
+    "/post/[slug]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/post/[slug].js"
+    ],
+    "/posts": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/posts.js"
     ],
     "/signin": [
       "static/chunks/webpack.js",
@@ -46,6 +51,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/subscriber.js"
+    ],
+    "/subscriber/library": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/subscriber/library.js"
     ]
   },
   "ampFirstPages": []

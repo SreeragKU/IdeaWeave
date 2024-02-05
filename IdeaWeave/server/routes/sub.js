@@ -6,6 +6,7 @@ const User = require("../models/user");
 const nodemailer = require("nodemailer");
 
 const SUBSCRIBER_ROLE = "Subscriber";
+const READER_ROLE = "Reader";
 
 const updateUserRole = async (userId, newRole) => {
   try {
@@ -88,6 +89,18 @@ router.post("/session", requireSignin, async (req, res) => {
   }
 });
 
+router.post('/updateUserRole/:userId', requireSignin, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { newRole } = req.body;
+
+    await User.findByIdAndUpdate(userId, { role: newRole });
+    return res.json({ success: true, message: 'User role updated successfully' });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 router.get('/prices', requireSignin, async (req, res) => {
   try {
@@ -139,13 +152,15 @@ router.get('/subscription/:userId', requireSignin, async (req, res) => {
     const remainingTimeInSeconds = currentPeriodEnd - currentTime;
     const remainingTimeInDays = Math.ceil(remainingTimeInSeconds / (24 * 60 * 60));
 
-    return res.json({ remainingTimeInDays, receiptDetails });
+    // Check if the subscription has expired
+    const isSubscriptionActive = remainingTimeInDays > 0;
+
+    return res.json({ remainingTimeInDays, isSubscriptionActive, receiptDetails });
   } catch (error) {
     console.error("Error retrieving subscription details:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 module.exports = router;
 
