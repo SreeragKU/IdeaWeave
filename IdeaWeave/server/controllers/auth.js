@@ -210,7 +210,6 @@ exports.signin = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-  console.log("USER ===> ", user);
   if (!user) {
     return res.json({ error: "User not found" });
   }
@@ -248,6 +247,7 @@ exports.forgotPassword = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   try {
     const { email, password, resetCode } = req.body;
+    console.log(email, password, resetCode);
     // find user based on email and resetCode
     const user = await User.findOne({ email, resetCode });
     // if user not found

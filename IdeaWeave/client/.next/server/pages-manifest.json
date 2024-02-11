@@ -2,11 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/signin": "pages/signin.js",
-  "/subscriber": "pages/subscriber.js",
-  "/plans": "pages/plans.js",
-  "/subscriber/library": "pages/subscriber/library.js",
-  "/posts": "pages/posts.js",
-  "/post/[slug]": "pages/post/[slug].js"
+  "/": "pages/index.js"
 }

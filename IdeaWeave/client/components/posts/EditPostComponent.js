@@ -239,6 +239,7 @@ function EditPostComponent({ page = "admin" }) {
   const handleNextStep = () => {
     if (step === 0) {
       localStorage.setItem("post-edit-title", JSON.stringify(title));
+      
     } else if (step === 1) {
       // Load previous volumes and image from local storage
       const loadedVolumesFromLocalStorage =
@@ -968,8 +969,8 @@ function EditPostComponent({ page = "admin" }) {
       <Modal
         visible={media.showMediaModal}
         title="Media"
-        onOk={() => setVisible(false)}
-        onCancel={() => setVisible(false)}
+        onOk={() => setMedia({ ...media, showMediaModal: false })}
+        onCancel={() => setMedia({ ...media, showMediaModal: false })}
         width={720}
         footer={null}
       >

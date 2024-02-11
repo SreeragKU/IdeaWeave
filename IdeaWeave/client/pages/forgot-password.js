@@ -1,189 +1,148 @@
-import React, { useContext, useState } from "react";
-import { Form, Input, Button, Col, Row } from "antd";
-import {
-  LockOutlined,
-  MailOutlined,
-  EyeInvisibleOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
-import { ThemeContext } from "../context/theme";
-import axios from "axios";
-import { AuthContext } from "../context/auth";
+import { useState, useEffect, useContext } from "react";
+import { Form, Input, Button, Checkbox } from "antd";
+import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Row, Col, Typography } from "antd";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import axios from "axios";
 
-function ForgotPassword() {
-  const [theme] = useContext(ThemeContext);
-  const [auth, setAuth] = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
+const { Title } = Typography;
+
+const ForgotPassword = () => {
+  // hooks
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState({
-    length: false,
-    uppercase: false,
-    lowercase: false,
-    number: false,
-    special: false,
-  });
-  const [password, setPassword] = useState(""); 
+  // state
+  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  const [showRequirements, setShowRequirements] = useState(false);
+  const forgotPasswordRequest = async (values) => {
+    try {
+      setLoading(true);
 
-  const checkPasswordStrength = (value) => {
-    setPassword(value); 
-    const requirements = {
-      length: value.length >= 8,
-      uppercase: /[A-Z]/.test(value),
-      lowercase: /[a-z]/.test(value),
-      number: /[0-9]/.test(value),
-      special: /[!@#$%^&*]/.test(value),
-    };
-    setPasswordStrength(requirements);
-    const allConditionsMet = Object.values(requirements).every(
-      (condition) => condition
-    );
-    setShowRequirements(!allConditionsMet);
-  }
-  const renderRequirementStatus = (condition, requirement) => {
-    return (
-      <p
-        style={{
-          color: condition ? "green" : "red",
-          textDecoration: condition ? "line-through" : "none",
-        }}
-      >
-        {condition ? "✔" : "✘"} {requirement}
-      </p>
-    );
+      const { data } = await axios.post("/forgot-password", values);
+      console.log(data);
+      if (data.error) {
+        toast.error(data.error);
+        setLoading(false);
+      } else {
+        toast.success("Check your email. The request code is sent.");
+        setVisible(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      toast.error("ForgotPassword failed. Try again.");
+      console.log(err);
+      setLoading(false);
+    }
   };
-  const forgotPasswordRequest = async (values) =>{
-    try {
-        setLoading(true);
-        const {data} = await axios.post("/forgot-password", values);
-        if(data?.error) {
-            toast.error(data.error);
-            setLoading(false);
-        } else {
-            toast.success("Check your email (even spam). Password reset code is sent.");
-            setLoading(false);
-            setVisible(true);
-        }
-    } catch (err) {
-        console.log(err);
-        toast.error("Forgot password failed. Please try again");
-        setLoading(false);
-    }
-  }
 
-  const resetPasswordRequest = async (values) =>{
+  const resetPasswordRequest = async (values) => {
     try {
-        setLoading(true);
-        const {data} = await axios.post("/reset-password", values);
-        if(data?.error) {
-            toast.error(data.error);
-            setLoading(false);
-        } else {
-            toast.success("Password changed successfully. Please login with your new password");
-            form.resetFields();
-            setLoading(false);
-            setVisible(false);
-        }
-    } catch (err) {
-        console.log(err);
-        toast.error("Reset password failed. Please try again");
-        setLoading(false);
-    }
-  }
+      setLoading(true);
 
+      const { data } = await axios.post("/reset-password", values);
+      console.log(data);
+      if (data.error) {
+        toast.error(data.error);
+        setLoading(false);
+      } else {
+        toast.success(
+          "Password successfully changed. Please login with new password"
+        );
+        // clear form fields using ant form hook
+        form.resetFields(["email"]);
+        setVisible(false);
+        setLoading(false);
+        // redirect
+        setTimeout(() => {
+          router.push("/signin");
+        }, 3000);
+      }
+    } catch (err) {
+      toast.error("ForgotPassword failed. Try again.");
+      console.log(err);
+      setLoading(false);
+    }
+  };
 
   return (
     <Row>
-      <Col span={8} offset={8}>
-        <h1 style={{ paddingTop: "100px" }}>Forgot Password</h1>
+      <Col span={12} offset={6} style={{ paddingTop: "10%" }}>
+        <Title>Forgot Password</Title>
+
         <Form
-          form = {form}
-          name="normal_login"
-          className="login-form"
+          form={form}
           onFinish={visible ? resetPasswordRequest : forgotPasswordRequest}
         >
-          {/* email */}
           <Form.Item
             name="email"
-            rules={[{ type: "email", message: "Please enter a valid email!" }]}
-            style={{ marginBottom: "16px" }}
-          >
-            <Input
-              prefix={<MailOutlined className="site-form-item-icon" />}
-              placeholder="Email"
-            />
-          </Form.Item>
-          {/* password */}
-          {visible && ( <> 
-            <Form.Item
-            name="resetCode"
-            style={{ marginBottom: "16px" }}
-          >
-            <Input
-              prefix={<MailOutlined className="site-form-item-icon" />}
-              placeholder="Enter Reset Code"
-            />
-          </Form.Item>
-          <Form.Item
-            name="password"
             rules={[
-              { required: true, message: "Please input your Password!" }
+              {
+                type: "email",
+                message: "The input is not valid E-mail!",
+              },
+              {
+                required: true,
+                message: "Please input your E-mail!",
+              },
             ]}
-            style={{ marginBottom: "20px" }}
+            hasFeedback
           >
-            <Input.Password
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password"
-              placeholder="Password"
-              iconRender={(visible) =>
-                visible ? (
-                  <EyeOutlined
-                    style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                  />
-                ) : (
-                  <EyeInvisibleOutlined
-                    style={{ color: theme === "dark" ? "#fff" : "#333" }}
-                  />
-                )
-              }
-              onChange={(e) => {
-                checkPasswordStrength(e.target.value);
-              }}
-            />
-            {showRequirements && (
-              <div className="password-strength">
-                {renderRequirementStatus(passwordStrength.length, "At least 8 characters")}
-                {renderRequirementStatus(passwordStrength.uppercase, "At least one uppercase character")}
-                {renderRequirementStatus(passwordStrength.lowercase, "At least one lowercase character")}
-                {renderRequirementStatus(passwordStrength.number, "At least one number")}
-                {renderRequirementStatus(passwordStrength.special, "At least one special character")}
-              </div>
-            )}
+            <Input prefix={<MailOutlined />} placeholder="Email" />
           </Form.Item>
-          </>
+
+          {/* if visible true, show password and resetCode input fields */}
+          {visible && (
+            <>
+              <Form.Item
+                name="password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
+                    min: 6,
+                    max: 24,
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  type="password"
+                  placeholder="Password"
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="resetCode"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter reset code!",
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input prefix={<LockOutlined />} placeholder="Reset code" />
+              </Form.Item>
+            </>
           )}
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-              loading={loading}
-            >
+            <Button type="primary" htmlType="submit" loading={loading}>
               Submit
             </Button>
-            <br />
+            <br /> Or{" "}
+            <Link href="/signin">
+              Login
+            </Link>
           </Form.Item>
         </Form>
       </Col>
     </Row>
   );
-}
+};
 
 export default ForgotPassword;
