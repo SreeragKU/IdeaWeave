@@ -1,5 +1,5 @@
-import { useState, useContext } from "react";
-import { Menu } from "antd";
+import { useState, useContext } from 'react'
+import { Menu } from 'antd'
 import {
   SettingOutlined,
   AppstoreOutlined,
@@ -8,44 +8,44 @@ import {
   LogoutOutlined,
   BookOutlined,
   MailOutlined,
-} from "@ant-design/icons";
-import ToggleTheme from "./ToggleTheme";
-import Link from "next/link";
-import { AuthContext } from "../context/auth";
-import { useRouter } from "next/router";
+} from '@ant-design/icons'
+import ToggleTheme from './ToggleTheme'
+import Link from 'next/link'
+import { AuthContext } from '../context/auth'
+import { useRouter } from 'next/router'
 
-const { SubMenu } = Menu;
+const { SubMenu } = Menu
 
 const TopNav = () => {
-  const [current, setCurrent] = useState("ideaweave");
-  const [auth, setAuth] = useContext(AuthContext);
-  const router = useRouter();
+  const [current, setCurrent] = useState('ideaweave')
+  const [auth, setAuth] = useContext(AuthContext)
+  const router = useRouter()
 
   const handleClick = (e) => {
-    console.log("click ", e);
-    setCurrent(e.key);
-  };
+    console.log('click ', e)
+    setCurrent(e.key)
+  }
 
   const signOut = () => {
-    localStorage.removeItem("auth");
+    localStorage.removeItem('auth')
     setAuth({
       user: null,
-      token: "",
-    });
-    router.push("/signin");
-  };
+      token: '',
+    })
+    router.push('/signin')
+  }
 
   const roleBasedLink = () => {
-    if (auth?.user?.role === "Admin") {
-      return "/admin";
-    } else if (auth?.user?.role === "Author") {
-      return "/author";
-    } else if (auth?.user?.role === "Subscriber") {
-      return "/subscriber";
+    if (auth?.user?.role === 'Admin') {
+      return '/admin'
+    } else if (auth?.user?.role === 'Author') {
+      return '/author'
+    } else if (auth?.user?.role === 'Subscriber') {
+      return '/subscriber'
     } else {
-      return "/reader";
+      return '/reader'
     }
-  };
+  }
 
   return (
     <Menu
@@ -54,9 +54,9 @@ const TopNav = () => {
       mode="horizontal"
       theme="dark"
       style={{
-        position: "fixed",
+        position: 'fixed',
         top: 0,
-        width: "100%",
+        width: '100%',
         zIndex: 1001,
       }}
     >
@@ -70,47 +70,55 @@ const TopNav = () => {
         <Link href="/contact">Contact</Link>
       </Menu.Item>
       {auth?.user === null && (
-            <>
-              <Menu.Item style={{marginLeft: "auto"}} key="signup" icon={<UserAddOutlined />}>
-                <Link href="/signup">Sign Up</Link>
-              </Menu.Item>
-              <Menu.Item key="signin" icon={<UserOutlined />}>
-                <Link href="/signin">Sign In</Link>
-              </Menu.Item>
-            </>
-          )}
-      {auth?.user !== null && (<>
-        <SubMenu
-          key="SubMenu"
-          icon={<SettingOutlined />}
-          title={auth?.user?.name || "Dashboard"}
-          style={{ marginLeft: "auto" }}
-        >
-          <Menu.ItemGroup
-            title={<span style={{ color: "gray" }}>Management</span>}
+        <>
+          <Menu.Item
+            style={{ marginLeft: 'auto' }}
+            key="signup"
+            icon={<UserAddOutlined />}
           >
-            <Menu.Item key="setting:1">
-              <Link href={roleBasedLink()}>Dashboard</Link>
-            </Menu.Item>
-            <Menu.Item key="setting:2">
-              <Link href="/plans">Billing</Link>
-            </Menu.Item>
-          </Menu.ItemGroup>
-        </SubMenu>
-        <Menu.Item
-          onClick={() => signOut()}
-          key="signout"
-          icon={<LogoutOutlined />}
-          id="signout"
-        >
-          Sign Out
-        </Menu.Item>
-      </>)}
+            <Link href="/signup">Sign Up</Link>
+          </Menu.Item>
+          <Menu.Item key="signin" icon={<UserOutlined />}>
+            <Link href="/signin">Sign In</Link>
+          </Menu.Item>
+        </>
+      )}
+      {auth?.user !== null && (
+        <>
+          <SubMenu
+            key="SubMenu"
+            icon={<SettingOutlined />}
+            title={auth?.user?.name || 'Dashboard'}
+            style={{ marginLeft: 'auto' }}
+          >
+            <Menu.ItemGroup
+              title={<span style={{ color: 'gray' }}>Management</span>}
+            >
+              <Menu.Item key="setting:1">
+                <Link href={roleBasedLink()}>Dashboard</Link>
+              </Menu.Item>
+              {auth?.user?.role !== 'Admin' && (
+                <Menu.Item key="setting:2">
+                  <Link href="/plans">Billing</Link>
+                </Menu.Item>
+              )}
+            </Menu.ItemGroup>
+          </SubMenu>
+          <Menu.Item
+            onClick={() => signOut()}
+            key="signout"
+            icon={<LogoutOutlined />}
+            id="signout"
+          >
+            Sign Out
+          </Menu.Item>
+        </>
+      )}
       <Menu.Item key="toggleTheme">
         <ToggleTheme />
       </Menu.Item>
     </Menu>
-  );
-};
+  )
+}
 
-export default TopNav;
+export default TopNav

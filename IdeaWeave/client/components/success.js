@@ -1,22 +1,30 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { AuthContext } from '../context/auth';
-import { Card, Typography, Result, Skeleton, Descriptions, Tag, Button } from 'antd';
-import axios from 'axios';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import React, { useEffect, useState, useContext } from 'react'
+import { AuthContext } from '../context/auth'
+import {
+  Card,
+  Typography,
+  Result,
+  Skeleton,
+  Descriptions,
+  Tag,
+  Button,
+} from 'antd'
+import axios from 'axios'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph, Text } = Typography
 
 const SuccessPage = () => {
-  const [auth, setAuth] = useContext(AuthContext);
-  const [subscriptionDetails, setSubscriptionDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [auth, setAuth] = useContext(AuthContext)
+  const [subscriptionDetails, setSubscriptionDetails] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (auth.user && auth.user._id) {
-      fetchSubscriptionDetails(auth.user._id);
+      fetchSubscriptionDetails(auth.user._id)
     }
-  }, [auth.user]);
+  }, [auth.user])
 
   const fetchSubscriptionDetails = async (userId) => {
     try {
@@ -25,50 +33,84 @@ const SuccessPage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${auth.token}`,
         },
-      });
+      })
 
       if (response.status === 200) {
-        const data = response.data;
-        setSubscriptionDetails(data);
+        const data = response.data
+        setSubscriptionDetails(data)
       } else {
-        console.error('Failed to fetch subscription details:', response.status);
+        console.error('Failed to fetch subscription details:', response.status)
       }
     } catch (error) {
-      console.error('Error fetching subscription details:', error);
+      console.error('Error fetching subscription details:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const downloadReceipt = () => {
-    const receiptDetails = subscriptionDetails?.receiptDetails;
+    const receiptDetails = subscriptionDetails?.receiptDetails
     if (receiptDetails) {
-      const pdf = new jsPDF();
-      pdf.setFont('helvetica');
-      pdf.setFontSize(14);
+      const pdf = new jsPDF()
+      pdf.setFont('helvetica')
+      pdf.setFontSize(14)
 
-      pdf.text('IdeaWeave', 105, 20, 'center');
+      // Header
+      pdf.text('IdeaWeave', 105, 20, 'center')
+      pdf.setFontSize(12)
+      pdf.text('Subscription Receipt', 105, 30, 'center')
+      pdf.line(20, 35, 190, 35)
 
-      pdf.setFontSize(12);
-      pdf.text('Subscription Receipt', 105, 30, 'center');
-      pdf.line(20, 35, 190, 35); 
+      // Company Information
+      pdf.text('Company Information:', 20, 45)
+      pdf.text('IdeaWeave Project.', 20, 55)
+      pdf.text('Sreerag, Regular MCA', 20, 65)
+      pdf.text(
+        'Amal Jyothi College of Engineering, Kottayam, Kerala, India',
+        20,
+        75
+      )
+      pdf.text('Kottayam, Kerala, India', 20, 75)
+      pdf.text('Email: ideaweavep@gmail.com', 20, 85)
 
+      // Receipt Details
+      pdf.text('Receipt Details:', 20, 105)
       const tableData = [
         ['Receipt Number', receiptDetails.receiptNumber],
         ['Amount Paid', `INR ${(receiptDetails.amountPaid / 100).toFixed(2)}`],
         ['Payment Status', receiptDetails.paymentStatus],
-        ['Payment Date', new Date(receiptDetails.paymentDate).toLocaleDateString()],
-      ];
+        [
+          'Payment Date',
+          new Date(receiptDetails.paymentDate).toLocaleDateString(),
+        ],
+      ]
 
       pdf.autoTable({
-        startY: 40,
+        startY: 115,
         head: [['Description', 'Value']],
         body: tableData,
-        theme: 'striped',
-      });
-      pdf.save('subscription_receipt.pdf');
+        theme: 'grid',
+        margin: { top: 110 },
+      })
+
+      // Signature Line
+      pdf.line(
+        20,
+        pdf.internal.pageSize.height - 20,
+        190,
+        pdf.internal.pageSize.height - 20
+      )
+      pdf.text(
+        'Authorized Signature',
+        105,
+        pdf.internal.pageSize.height - 10,
+        'center'
+      )
+
+      // Save PDF
+      pdf.save('subscription_receipt.pdf')
     }
-  };
+  }
 
   const cardStyle = {
     maxWidth: '800px',
@@ -77,30 +119,35 @@ const SuccessPage = () => {
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
     borderRadius: '8px',
     padding: '30px',
-  };
+  }
 
   const pageStyle = {
     textAlign: 'center',
     padding: '20px',
     fontFamily: 'Arial, sans-serif',
     color: '#333',
-  };
+  }
 
   const titleStyle = {
     color: '#1890ff',
     marginTop: '50px',
-  };
+  }
 
   return (
     <div style={pageStyle}>
-      <Title level={2} style={titleStyle}>🌟 Hooray! 🎉</Title>
+      <Title level={2} style={titleStyle}>
+        🌟 Hooray! 🎉
+      </Title>
       <Paragraph>
         <Text type="warning" strong>
           Congratulations!
         </Text>{' '}
-        Your subscription is now active for 
-        <Text strong style={{ color: '#1890ff' }}> {subscriptionDetails?.remainingTimeInDays} days</Text>. 
-        We're excited to embark on this journey with you!.
+        Your subscription is now active for
+        <Text strong style={{ color: '#1890ff' }}>
+          {' '}
+          {subscriptionDetails?.remainingTimeInDays} days
+        </Text>
+        . We're excited to embark on this journey with you!.
       </Paragraph>
       {loading ? (
         <Skeleton active />
@@ -110,14 +157,28 @@ const SuccessPage = () => {
             <>
               <Title level={3}>Receipt Details</Title>
               <Descriptions bordered column={2}>
-                <Descriptions.Item label="Receipt Number">{subscriptionDetails.receiptDetails.receiptNumber}</Descriptions.Item>
-                <Descriptions.Item label="Amount Paid">
-                  <Tag color="green" style={{ padding: '8px' }}>₹{subscriptionDetails.receiptDetails.amountPaid / 100}</Tag>
+                <Descriptions.Item label="Receipt Number">
+                  {subscriptionDetails.receiptDetails.receiptNumber}
                 </Descriptions.Item>
-                <Descriptions.Item label="Payment Status">{subscriptionDetails.receiptDetails.paymentStatus}</Descriptions.Item>
-                <Descriptions.Item label="Payment Date">{new Date(subscriptionDetails.receiptDetails.paymentDate).toLocaleDateString()}</Descriptions.Item>
-                </Descriptions>
-              <Button type="primary" style={{marginTop: "20px"}} onClick={downloadReceipt}>
+                <Descriptions.Item label="Amount Paid">
+                  <Tag color="green" style={{ padding: '8px' }}>
+                    ₹{subscriptionDetails.receiptDetails.amountPaid / 100}
+                  </Tag>
+                </Descriptions.Item>
+                <Descriptions.Item label="Payment Status">
+                  {subscriptionDetails.receiptDetails.paymentStatus}
+                </Descriptions.Item>
+                <Descriptions.Item label="Payment Date">
+                  {new Date(
+                    subscriptionDetails.receiptDetails.paymentDate
+                  ).toLocaleDateString()}
+                </Descriptions.Item>
+              </Descriptions>
+              <Button
+                type="primary"
+                style={{ marginTop: '20px' }}
+                onClick={downloadReceipt}
+              >
                 Download Receipt
               </Button>
             </>
@@ -137,7 +198,7 @@ const SuccessPage = () => {
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SuccessPage;
+export default SuccessPage

@@ -1,29 +1,36 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../context/auth";
-import Head from "next/head";
-import FullWidthImage from "../components/pages/FullWidthImage";
-import useNumbers from "../hooks/useNumbers";
-import RenderProgress from "../components/posts/RenderProgress";
-import { Row, Col, Divider, Button } from "antd";
-import useLatestPosts from "../hooks/useLatestPosts";
-import useCategory from "../hooks/useCategory";
-import Link from "next/link";
-import ParallaxImage from "../components/pages/ParallaxImage";
-import { ThemeContext } from "../context/theme";
-import { ThunderboltOutlined } from "@ant-design/icons";
-import Footer from "../components/pages/Footer";
-import axios from "axios";
-import useHome from "../hooks/useHome";
+import { useContext, useEffect, useState } from 'react'
+import { AuthContext } from '../context/auth'
+import Head from 'next/head'
+import FullWidthImage from '../components/pages/FullWidthImage'
+import useNumbers from '../hooks/useNumbers'
+import RenderProgress from '../components/posts/RenderProgress'
+import { Row, Col, Divider, Button } from 'antd'
+import useLatestPosts from '../hooks/useLatestPosts'
+import useCategory from '../hooks/useCategory'
+import Link from 'next/link'
+import ParallaxImage from '../components/pages/ParallaxImage'
+import { ThemeContext } from '../context/theme'
+import { ThunderboltOutlined } from '@ant-design/icons'
+import Footer from '../components/pages/Footer'
+import axios from 'axios'
+import useHome from '../hooks/useHome'
 
 function Home() {
-  const [auth, setAuth] = useContext(AuthContext);
-  const { numbers } = useNumbers();
-  const { latestPosts } = useLatestPosts();
-  const { categories } = useCategory();
-  const [theme] = useContext(ThemeContext);
-  const { title, subtitle, fullWidthImage, setTitle, setSubtitle, setFullWidthImage } = useHome();
+  const [auth, setAuth] = useContext(AuthContext)
+  const { numbers } = useNumbers()
+  const { latestPosts } = useLatestPosts()
+  const { categories } = useCategory()
+  const [theme] = useContext(ThemeContext)
+  const {
+    title,
+    subtitle,
+    fullWidthImage,
+    setTitle,
+    setSubtitle,
+    setFullWidthImage,
+  } = useHome()
 
-  const textStrokeColor = theme === "light" ? "#ffffff" : "#000";
+  const textStrokeColor = theme === 'light' ? '#ffffff' : '#000'
 
   return (
     <>
@@ -44,7 +51,14 @@ function Home() {
 
       <Row gutter={[16, 16]}>
         {/* posts */}
-        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
+        <Col
+          xs={24}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          style={{ textAlign: 'center', fontSize: 20 }}
+        >
           <RenderProgress
             number={numbers.posts}
             name="Books"
@@ -52,7 +66,14 @@ function Home() {
           />
         </Col>
         {/* comments */}
-        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
+        <Col
+          xs={24}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          style={{ textAlign: 'center', fontSize: 20 }}
+        >
           <RenderProgress
             number={numbers.comments}
             name="Comments"
@@ -60,7 +81,14 @@ function Home() {
           />
         </Col>
         {/* catgories */}
-        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
+        <Col
+          xs={24}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          style={{ textAlign: 'center', fontSize: 20 }}
+        >
           <RenderProgress
             number={numbers.categories}
             name="Categories"
@@ -68,7 +96,14 @@ function Home() {
           />
         </Col>
         {/* users */}
-        <Col xs={24} sm={12} md={6} lg={6} xl={6} style={{ textAlign: "center", fontSize: 20 }}>
+        <Col
+          xs={24}
+          sm={12}
+          md={6}
+          lg={6}
+          xl={6}
+          style={{ textAlign: 'center', fontSize: 20 }}
+        >
           <RenderProgress
             number={numbers.users}
             name="Users"
@@ -82,10 +117,10 @@ function Home() {
           <ParallaxImage>
             <h2
               style={{
-                textAlign: "center",
-                fontSize: "74px",
-                textShadow: "8px 8px 12px #000000",
-                color: "#fff",
+                textAlign: 'center',
+                fontSize: '74px',
+                textShadow: '8px 8px 12px #000000',
+                color: '#fff',
                 WebkitTextStroke: `0.5px ${textStrokeColor}`,
                 textStroke: `0.5px ${textStrokeColor}`,
               }}
@@ -97,9 +132,9 @@ function Home() {
             </Divider>
             <div
               style={{
-                textAlign: "center",
-                fontSize: "15px",
-                position: "relative",
+                textAlign: 'center',
+                fontSize: '15px',
+                position: 'relative',
                 zIndex: 1,
               }}
             >
@@ -107,11 +142,11 @@ function Home() {
                 <Link href={`/post/${post.slug}`} key={post.slug} id="book">
                   <h3
                     style={{
-                      color: "#fff",
-                      background: "rgba(0, 0, 0, 0.3)",
-                      padding: "10px",
-                      borderRadius: "100px",
-                      margin: "10px 0",
+                      color: '#fff',
+                      background: 'rgba(0, 0, 0, 0.3)',
+                      padding: '10px',
+                      borderRadius: '100px',
+                      margin: '10px 0',
                     }}
                   >
                     {post.title}
@@ -124,9 +159,12 @@ function Home() {
       </Row>
 
       <Row gutter={[16, 16]} justify="center">
-        <Col span={24} style={{ textAlign: "center", marginTop: 80, marginBottom: 80 }}>
+        <Col
+          span={24}
+          style={{ textAlign: 'center', marginTop: 80, marginBottom: 80 }}
+        >
           <Divider>CATEGORIES</Divider>
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: 'center' }}>
             {categories.map((c) => (
               <Link href={`/category/${c.slug}`} key={c._id}>
                 <Button style={{ margin: 2 }}>{c.name}</Button>
@@ -138,7 +176,7 @@ function Home() {
 
       <Footer />
     </>
-  );
+  )
 }
 
-export default Home;
+export default Home
