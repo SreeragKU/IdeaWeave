@@ -27,15 +27,25 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/admin/categories": [
+    "/admin/library": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/categories.js"
+      "static/chunks/pages/admin/library.js"
     ],
-    "/admin/comments": [
+    "/plans": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/admin/comments.js"
+      "static/chunks/pages/plans.js"
+    ],
+    "/signin": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/signin.js"
+    ],
+    "/subscriber": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/subscriber.js"
     ]
   },
   "ampFirstPages": []
