@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../context/auth'
 import Head from 'next/head'
 import FullWidthImage from '../components/pages/FullWidthImage'
@@ -16,19 +16,19 @@ import axios from 'axios'
 import useHome from '../hooks/useHome'
 
 function Home() {
-  const [auth = {}, setAuth] = useContext(AuthContext)
-  const { numbers = {} } = useNumbers()
-  const { latestPosts = [] } = useLatestPosts()
-  const { categories = [] } = useCategory()
-  const [theme] = useContext(ThemeContext) || 'light'
+  const [auth, setAuth] = useContext(AuthContext)
+  const { numbers } = useNumbers()
+  const { latestPosts } = useLatestPosts()
+  const { categories } = useCategory()
+  const [theme] = useContext(ThemeContext)
   const {
-    title = '',
-    subtitle = '',
-    fullWidthImage = { url: '' },
+    title,
+    subtitle,
+    fullWidthImage,
     setTitle,
     setSubtitle,
     setFullWidthImage,
-  } = useHome() || {}
+  } = useHome()
 
   const textStrokeColor = theme === 'light' ? '#ffffff' : '#000'
 
@@ -46,7 +46,7 @@ function Home() {
         auth={auth.user}
         title={title}
         subtitle={subtitle}
-        fullWidthImage={fullWidthImage.url}
+        fullWidthImage={fullWidthImage?.url}
       />
 
       <Row gutter={[16, 16]}>
@@ -139,7 +139,7 @@ function Home() {
               }}
             >
               {latestPosts.map((post) => (
-                <Link href={`/post/${post?.slug}`} key={post?.slug} id="book">
+                <Link href={`/post/${post.slug}`} key={post.slug} id="book">
                   <h3
                     style={{
                       color: '#fff',
@@ -166,8 +166,8 @@ function Home() {
           <Divider>CATEGORIES</Divider>
           <div style={{ textAlign: 'center' }}>
             {categories.map((c) => (
-              <Link href={`/category/${c?.slug}`} key={c?._id}>
-                <Button style={{ margin: 2 }}>{c?.name}</Button>
+              <Link href={`/category/${c.slug}`} key={c._id}>
+                <Button style={{ margin: 2 }}>{c.name}</Button>
               </Link>
             ))}
           </div>
