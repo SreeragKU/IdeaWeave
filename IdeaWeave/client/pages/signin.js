@@ -19,9 +19,7 @@ function Signin() {
   const [auth, setAuth] = useContext(AuthContext)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   //const [form] = Form.useForm();
   const [showPassword, setShowPassword] = useState(false)
   const [isDisabled, setIsDisabled] = useState(false)

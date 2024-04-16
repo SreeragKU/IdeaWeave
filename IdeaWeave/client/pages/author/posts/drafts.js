@@ -17,9 +17,7 @@ function Posts({ page = 'author' }) {
   const [auth, setAuth] = useContext(AuthContext)
   const { posts } = post
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const screens = useBreakpoint()
   const [loading, setLoading] = useState(true)
   const [selectedPosts, setSelectedPosts] = useState([])

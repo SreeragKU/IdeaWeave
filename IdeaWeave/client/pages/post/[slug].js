@@ -75,9 +75,7 @@ const themes = {
 
 const SinglePost = ({ post, postComments }) => {
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [zoomLevel, setZoomLevel] = useState(1)
   const [selectedTheme, setSelectedTheme] = useState('Default')
   const [postContent, setPostContent] = useState(post ? post.content : '')

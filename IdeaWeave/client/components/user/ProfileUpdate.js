@@ -27,10 +27,6 @@ const ProfileUpdate = ({ page = 'admin' }) => {
   const [websiteError, setWebsiteError] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
-
   useEffect(() => {
     const currentUser = async () => {
       try {

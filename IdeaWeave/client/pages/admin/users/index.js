@@ -27,9 +27,7 @@ const { Option } = Select
 export default function AllUsers() {
   const [auth, setAuth] = useContext(AuthContext)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [theme] = useContext(ThemeContext)

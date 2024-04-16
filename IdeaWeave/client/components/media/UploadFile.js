@@ -10,9 +10,6 @@ const UploadFile = ({ redirectToLibrary = false, page = 'admin' }) => {
   const [auth, setAuth] = useContext(AuthContext)
   const [media, setMedia] = useContext(MediaContext)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
 
   const props = {
     name: 'file',

@@ -2,5 +2,7 @@
   "dependencies": {
     "generate-password": "^1.7.1"
   },
-  "scripts": {}
+  "scripts": {
+    "start": "concurrently \"cd client && npm run dev\" \"cd server && npm start\""
+  }
 }

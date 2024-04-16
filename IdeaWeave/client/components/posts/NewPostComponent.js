@@ -81,9 +81,6 @@ function NewPostComponent({ page = 'admin' }) {
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
   const { Step } = Steps
 
   const [media, setMedia] = useContext(MediaContext)

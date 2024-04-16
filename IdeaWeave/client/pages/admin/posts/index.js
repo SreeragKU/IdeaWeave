@@ -16,9 +16,7 @@ function Posts() {
   const [auth, setAuth] = useContext(AuthContext)
   const { posts } = post
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {

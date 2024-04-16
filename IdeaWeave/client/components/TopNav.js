@@ -20,9 +20,6 @@ const TopNav = () => {
   const [current, setCurrent] = useState('ideaweave')
   const [auth, setAuth] = useContext(AuthContext)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
 
   const handleClick = (e) => {
     console.log('click ', e)

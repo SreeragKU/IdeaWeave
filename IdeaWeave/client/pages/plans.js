@@ -17,9 +17,6 @@ const Plans = () => {
   const [userSubscription, setUserSubscription] = useState(null)
   const [buttonLoading, setButtonLoading] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
 
   useEffect(() => {
     checkUserSubscription()

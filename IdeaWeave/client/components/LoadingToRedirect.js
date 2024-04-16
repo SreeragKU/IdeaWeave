@@ -5,9 +5,6 @@ import { LoadingOutlined } from '@ant-design/icons'
 const LoadingToRedirect = ({ path = '/' }) => {
   const [count, setCount] = useState(3)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
 
   useEffect(() => {
     const interval = setInterval(() => {

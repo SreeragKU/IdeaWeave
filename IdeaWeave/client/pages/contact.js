@@ -8,9 +8,7 @@ import { useRouter } from 'next/router'
 function ContactForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [form] = Form.useForm()
 
   const onFinish = async (values) => {

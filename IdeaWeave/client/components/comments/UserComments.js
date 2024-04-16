@@ -21,9 +21,7 @@ function UserComments() {
   const [content, setContent] = useState('')
   const [visible, setVisible] = useState(false)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   useEffect(() => {
     if (auth?.token) {
       fetchComments()

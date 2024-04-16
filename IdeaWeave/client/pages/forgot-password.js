@@ -12,9 +12,7 @@ const { Title } = Typography
 const ForgotPassword = () => {
   // hooks
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [form] = Form.useForm()
   // state
   const [loading, setLoading] = useState(false)

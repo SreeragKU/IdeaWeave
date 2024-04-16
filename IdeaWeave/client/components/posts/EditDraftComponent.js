@@ -84,9 +84,7 @@ function EditDraftComponent({ page = 'admin' }) {
   const [visible, setVisible] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [media, setMedia] = useContext(MediaContext)
   const [step, setStep] = useState(0)
   const { Step } = Steps

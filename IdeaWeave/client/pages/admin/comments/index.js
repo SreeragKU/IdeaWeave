@@ -27,9 +27,7 @@ function Comments() {
   const [keyword, setKeyword] = useState('')
   const [selectedPost, setSelectedPost] = useState(null)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [commentFormVisible, setCommentFormVisible] = useState(false)
 
   useEffect(() => {

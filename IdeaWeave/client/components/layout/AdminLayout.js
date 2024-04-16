@@ -14,9 +14,6 @@ export default function AdminLayout({ children }) {
   const [loading, setLoading] = useState(true)
   const [isNavOpen, setIsNavOpen] = useState(true)
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
 
   useEffect(() => {
     if (auth?.token) getCurrentAdmin()

@@ -33,9 +33,7 @@ function Signup() {
   })
 
   const router = useRouter()
-  if (!router.isFallback && !post) {
-    return <ErrorPage statusCode={404} />
-  }
+
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
