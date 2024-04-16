@@ -1,5 +1,0 @@
-"use strict";exports.id=3338,exports.ids=[3338],exports.modules={3338:(e,s,i)=>{i.a(e,async(e,a)=>{try{i.d(s,{Z:()=>y});var l=i(997),t=i(6689),n=i(9538),o=i.n(n),r=i(7369),d=i.n(r),c=i(3800),u=i.n(c),f=i(2074),p=i(2540),h=i.n(p),m=i(4212),x=i(1163),g=e([f]);f=(g.then?(await g)():g)[0];let y=({redirectToLibrary:e=!1,page:s="admin"})=>{let[i,a]=(0,t.useContext)(f.V),[n,r]=(0,t.useContext)(m.Y),c=(0,x.useRouter)(),p={name:"file",action:"https://ideaweave-backend.onrender.com/api/upload-image-file",headers:{Authorization:`Bearer ${i.token}`},onChange(i){"uploading"!==i.file.status&&console.log(i.file,i.fileList),"done"===i.file.status?(d().success(`${i.file.name} file uploaded successfully`),r({images:[...n.images,i.file.response],selected:i.file.response,showMediaModal:!1}),e&&c.push(`/${s}/media/library`)):"error"===i.file.status&&d().error(`${i.file.name} file upload failed.`)}};return(0,l.jsxs)("div",{children:[l.jsx("style",{children:`
-          .ant-upload-list-item-card-actions {
-            display: none;
-          }
-        `}),l.jsx(o(),{...p,maxCount:1,children:l.jsx(u(),{icon:l.jsx(h(),{}),children:"Click to Upload"})})]})};a()}catch(e){a(e)}})}};
