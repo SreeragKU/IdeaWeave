@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from 'react'
 import {
   Row,
   Col,
@@ -13,152 +13,155 @@ import {
   Badge,
   Input,
   Select,
-} from "antd";
-import { toast } from "react-hot-toast";
-import { useRouter } from "next/router";
-import { AuthContext } from "../../../context/auth";
-import axios from "axios";
-import AdminLayout from "../../../components/layout/AdminLayout";
-import { ThemeContext } from "../../../context/theme";
+} from 'antd'
+import { toast } from 'react-hot-toast'
+import { useRouter } from 'next/router'
+import { AuthContext } from '../../../context/auth'
+import axios from 'axios'
+import AdminLayout from '../../../components/layout/AdminLayout'
+import { ThemeContext } from '../../../context/theme'
 
-const { Search } = Input;
-const { Option } = Select;
+const { Search } = Input
+const { Option } = Select
 
 export default function AllUsers() {
-  const [auth, setAuth] = useContext(AuthContext);
-  const router = useRouter();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [theme] = useContext(ThemeContext);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
-  const [currentWindowWidth, setCurrentWindowWidth] = useState(0);
+  const [auth, setAuth] = useContext(AuthContext)
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [theme] = useContext(ThemeContext)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 5
+  const [currentWindowWidth, setCurrentWindowWidth] = useState(0)
   const [filter, setFilter] = useState({
-    searchTerm: "",
-    role: "",
+    searchTerm: '',
+    role: '',
     isActive: null,
-  });
+  })
   const [sort, setSort] = useState({
-    field: "name",
-    order: "asc",
-  });
+    field: 'name',
+    order: 'asc',
+  })
 
   useEffect(() => {
     if (auth?.token) {
-      loadUsers();
+      loadUsers()
     }
-  }, [auth?.token, filter, sort]);
+  }, [auth?.token, filter, sort])
 
   const loadUsers = async () => {
     try {
-      setLoading(true);
-      const { data } = await axios.get("/users");
-      setUsers(applyFiltersAndSort(data, filter, sort));
+      setLoading(true)
+      const { data } = await axios.get('/users')
+      setUsers(applyFiltersAndSort(data, filter, sort))
     } catch (err) {
-      console.error(err);
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const applyFiltersAndSort = (users, filter, sort) => {
-    let filteredUsers = users;
+    let filteredUsers = users
 
     if (filter.searchTerm) {
-      const searchTermLower = filter.searchTerm.toLowerCase();
+      const searchTermLower = filter.searchTerm.toLowerCase()
       filteredUsers = filteredUsers.filter(
         (user) =>
           user.email.toLowerCase().includes(searchTermLower) ||
           user.name.toLowerCase().includes(searchTermLower) ||
           user.role.toLowerCase().includes(searchTermLower)
-      );
+      )
     }
 
     if (filter.role) {
-      filteredUsers = filteredUsers.filter((user) => user.role === filter.role);
+      filteredUsers = filteredUsers.filter((user) => user.role === filter.role)
     }
 
     if (filter.isActive !== null) {
       filteredUsers = filteredUsers.filter(
         (user) => user.isActive === filter.isActive
-      );
+      )
     }
 
-    const field = sort.field;
-    const order = sort.order === "asc" ? 1 : -1;
+    const field = sort.field
+    const order = sort.order === 'asc' ? 1 : -1
     filteredUsers.sort((a, b) => {
-      if (a[field] < b[field]) return -1 * order;
-      if (a[field] > b[field]) return 1 * order;
-      return 0;
-    });
+      if (a[field] < b[field]) return -1 * order
+      if (a[field] > b[field]) return 1 * order
+      return 0
+    })
 
-    return filteredUsers;
-  };
+    return filteredUsers
+  }
 
   const handleToggleUserStatus = async (user) => {
     if (user.isUpdating) {
-      return;
+      return
     }
 
     try {
       if (user._id === auth.user._id) {
-        toast.error("You cannot toggle your own status");
-        return;
+        toast.error('You cannot toggle your own status')
+        return
       }
 
       setUsers((prev) =>
         prev.map((u) => (u._id === user._id ? { ...u, isUpdating: true } : u))
-      );
+      )
 
       try {
-        const { data } = await axios.put(`/users/${user._id}/toggle`);
+        const { data } = await axios.put(`/users/${user._id}/toggle`)
         setUsers((prev) =>
           prev.map((u) =>
             u._id === user._id
               ? { ...u, isActive: data.isActive, isUpdating: false }
               : u
           )
-        );
+        )
 
         toast.success(
-          `User ${data.isActive ? "enabled" : "disabled"} successfully`
-        );
+          `User ${data.isActive ? 'enabled' : 'disabled'} successfully`
+        )
       } catch (error) {
-        console.error(error);
+        console.error(error)
         setUsers((prev) =>
           prev.map((u) =>
             u._id === user._id ? { ...u, isUpdating: false } : u
           )
-        );
+        )
       }
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const handleEditUser = (userId) => {
-    router.push(`/admin/users/${userId}`);
-  };
+    router.push(`/admin/users/${userId}`)
+  }
 
   useEffect(() => {
     const handleResize = () => {
-      setCurrentWindowWidth(window.innerWidth);
-    };
+      setCurrentWindowWidth(window.innerWidth)
+    }
 
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      setCurrentWindowWidth(window.innerWidth);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize)
+      setCurrentWindowWidth(window.innerWidth)
 
       return () => {
-        window.removeEventListener("resize", handleResize);
-      };
+        window.removeEventListener('resize', handleResize)
+      }
     }
-  }, []);
+  }, [])
 
   const renderUserCard = (role, usersInRole) => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const usersToDisplay = usersInRole.slice(startIndex, endIndex);
+    const startIndex = (currentPage - 1) * pageSize
+    const endIndex = startIndex + pageSize
+    const usersToDisplay = usersInRole.slice(startIndex, endIndex)
 
     return (
       <Card
@@ -166,8 +169,8 @@ export default function AllUsers() {
         style={{
           marginBottom: 20,
           borderRadius: 10,
-          backgroundColor: theme === "dark" ? "#333" : "#f0f2f5",
-          color: theme === "dark" ? "white" : "black",
+          backgroundColor: theme === 'dark' ? '#333' : '#f0f2f5',
+          color: theme === 'dark' ? 'white' : 'black',
         }}
       >
         <List
@@ -175,9 +178,9 @@ export default function AllUsers() {
           dataSource={usersToDisplay}
           renderItem={(user) => (
             <List.Item
-              className={user.isActive ? "active-user" : "disabled-user"}
+              className={user.isActive ? 'active-user' : 'disabled-user'}
               style={{
-                border: `1px solid ${theme === "dark" ? "#444" : "#ddd"}`,
+                border: `1px solid ${theme === 'dark' ? '#444' : '#ddd'}`,
                 borderRadius: 8,
                 marginBottom: 12,
                 padding: 16,
@@ -187,21 +190,21 @@ export default function AllUsers() {
                 avatar={
                   <Avatar
                     src={user?.image?.url}
-                    style={{ backgroundColor: "#87d068" }}
+                    style={{ backgroundColor: '#87d068' }}
                   >
                     {user?.name ? user.name[0] : ''}
                   </Avatar>
                 }
                 title={
                   <div>
-                    {user.name}{" "}
-                    <Tag color={user.isActive ? "green" : "red"}>
-                      {user.isActive ? "Active" : "Disabled"}
+                    {user.name}{' '}
+                    <Tag color={user.isActive ? 'green' : 'red'}>
+                      {user.isActive ? 'Active' : 'Disabled'}
                     </Tag>
                   </div>
                 }
                 description={
-                  <div style={{ maxWidth: "80%" }}>
+                  <div style={{ maxWidth: '80%' }}>
                     {currentWindowWidth > 576
                       ? user.email
                       : user.email.replace(
@@ -210,24 +213,24 @@ export default function AllUsers() {
                             `${firstTwoChars}...`
                         )}
 
-                    {(user.role === "Admin" || user.role === "Author") && (
+                    {(user.role === 'Admin' || user.role === 'Author') && (
                       <div className="posts-info">
-                        <Typography.Text strong>Posts:</Typography.Text>{" "}
+                        <Typography.Text strong>Posts:</Typography.Text>{' '}
                         {user?.posts?.length !== undefined ? (
                           <span className="post-count">
                             <Badge
                               count={user?.posts?.length}
                               overflowCount={999}
                               style={{
-                                backgroundColor: "#328f68",
-                                color: "white",
-                                fontWeight: "bold",
-                                borderRadius: "10px",
+                                backgroundColor: '#328f68',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                borderRadius: '10px',
                               }}
                             />
                           </span>
                         ) : (
-                          "N/A"
+                          'N/A'
                         )}
                       </div>
                     )}
@@ -236,13 +239,13 @@ export default function AllUsers() {
               />
               <div className="user-info">
                 <div className="button-group">
-                  {!user.isUpdating && user.role !== "Admin" && (
+                  {!user.isUpdating && user.role !== 'Admin' && (
                     <Button
-                      type={user.isActive ? "danger" : "success"}
+                      type={user.isActive ? 'danger' : 'success'}
                       onClick={() => handleToggleUserStatus(user)}
                       id="disable"
                     >
-                      {user.isActive ? "Disable" : "Enable"}
+                      {user.isActive ? 'Disable' : 'Enable'}
                     </Button>
                   )}
                   <Button
@@ -262,12 +265,12 @@ export default function AllUsers() {
             pageSize={pageSize}
             total={usersInRole.length}
             onChange={(page) => setCurrentPage(page)}
-            style={{ marginTop: 16, textAlign: "center" }}
+            style={{ marginTop: 16, textAlign: 'center' }}
           />
         )}
       </Card>
-    );
-  };
+    )
+  }
 
   return (
     <AdminLayout>
@@ -277,7 +280,7 @@ export default function AllUsers() {
           marginLeft: 150,
           marginRight: 50,
           marginTop: 60,
-          backgroundColor: theme === "dark" ? "#222" : "transparent",
+          backgroundColor: theme === 'dark' ? '#222' : 'transparent',
         }}
       >
         <Col span={24}>
@@ -285,7 +288,7 @@ export default function AllUsers() {
             style={{
               marginBottom: 20,
               fontSize: 24,
-              color: theme === "dark" ? "white" : "black",
+              color: theme === 'dark' ? 'white' : 'black',
             }}
           >
             All Users ({users?.length})
@@ -317,13 +320,13 @@ export default function AllUsers() {
 
             <Select
               placeholder="Filter by status"
-              value={filter.isActive === null ? "" : filter.isActive.toString()}
+              value={filter.isActive === null ? '' : filter.isActive.toString()}
               onChange={(value) => {
                 setFilter({
                   ...filter,
                   isActive:
-                    value === "" ? null : value === "true" ? true : false,
-                });
+                    value === '' ? null : value === 'true' ? true : false,
+                })
               }}
               style={{ width: 150, marginRight: 10 }}
             >
@@ -356,26 +359,26 @@ export default function AllUsers() {
           {loading ? (
             <Spin tip="Loading..." />
           ) : (
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
               {renderUserCard(
-                "Admin",
-                users.filter((user) => user.role === "Admin")
+                'Admin',
+                users.filter((user) => user.role === 'Admin')
               )}
               {renderUserCard(
-                "Author",
-                users.filter((user) => user.role === "Author")
+                'Author',
+                users.filter((user) => user.role === 'Author')
               )}
               {renderUserCard(
-                "Subscriber",
-                users.filter((user) => user.role === "Subscriber")
+                'Subscriber',
+                users.filter((user) => user.role === 'Subscriber')
               )}
               {renderUserCard(
-                "Reviewer",
-                users.filter((user) => user.role === "Reviewer")
+                'Reviewer',
+                users.filter((user) => user.role === 'Reviewer')
               )}
               {renderUserCard(
-                "Reader",
-                users.filter((user) => user.role === "Reader")
+                'Reader',
+                users.filter((user) => user.role === 'Reader')
               )}
             </div>
           )}
@@ -408,5 +411,5 @@ export default function AllUsers() {
         }
       `}</style>
     </AdminLayout>
-  );
+  )
 }

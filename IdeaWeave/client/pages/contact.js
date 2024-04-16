@@ -1,32 +1,35 @@
-import { useState } from "react";
-import { Form, Input, Button, Col, Row } from "antd";
-import { UserOutlined, MailOutlined } from "@ant-design/icons";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useRouter } from "next/router";
+import { useState } from 'react'
+import { Form, Input, Button, Col, Row } from 'antd'
+import { UserOutlined, MailOutlined } from '@ant-design/icons'
+import axios from 'axios'
+import { toast } from 'react-hot-toast'
+import { useRouter } from 'next/router'
 
 function ContactForm() {
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const [form] = Form.useForm()
 
   const onFinish = async (values) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const { data } = await axios.post("/contact", values);
+      const { data } = await axios.post('/contact', values)
       if (data?.error) {
-        toast.error(data?.error);
+        toast.error(data?.error)
       } else {
-        toast.success("Your message has been sent");
-        form.resetFields();
+        toast.success('Your message has been sent')
+        form.resetFields()
       }
     } catch (err) {
-      console.error("Error:", err);
-      toast.error("Email failed. Try again.");
+      console.error('Error:', err)
+      toast.error('Email failed. Try again.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const formItemLayout = {
     labelCol: {
@@ -37,10 +40,10 @@ function ContactForm() {
       xs: { span: 24 },
       sm: { span: 16 },
     },
-  };
+  }
 
   return (
-    <Row justify="center" align="middle" style={{ height: "100vh" }}>
+    <Row justify="center" align="middle" style={{ height: '100vh' }}>
       <Col span={12}>
         <h1>Contact</h1>
         <Form
@@ -58,11 +61,15 @@ function ContactForm() {
             rules={[
               {
                 required: true,
-                message: "Please enter your name",
+                message: 'Please enter your name',
               },
             ]}
           >
-            <Input prefix={<UserOutlined />} placeholder="Your Name" id="name" />
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="Your Name"
+              id="name"
+            />
           </Form.Item>
 
           <Form.Item
@@ -71,12 +78,16 @@ function ContactForm() {
             rules={[
               {
                 required: true,
-                type: "email",
-                message: "Please enter a valid email address",
+                type: 'email',
+                message: 'Please enter a valid email address',
               },
             ]}
           >
-            <Input prefix={<MailOutlined />} placeholder="Your Email" id="email" />
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="Your Email"
+              id="email"
+            />
           </Form.Item>
 
           <Form.Item
@@ -85,22 +96,30 @@ function ContactForm() {
             rules={[
               {
                 required: true,
-                message: "Please enter your message",
+                message: 'Please enter your message',
               },
             ]}
           >
-            <Input.TextArea placeholder="Write your message here..." id="message" />
+            <Input.TextArea
+              placeholder="Write your message here..."
+              id="message"
+            />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" loading={loading} id="submit">
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              id="submit"
+            >
               Submit
             </Button>
           </Form.Item>
         </Form>
       </Col>
     </Row>
-  );
+  )
 }
 
-export default ContactForm;
+export default ContactForm

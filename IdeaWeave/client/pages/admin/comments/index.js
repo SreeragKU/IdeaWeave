@@ -1,117 +1,120 @@
-import { useEffect, useState, useContext } from "react";
-import { Row, Col, Button, Input, List, Modal, Spin, Card } from "antd";
-import AdminLayout from "../../../components/layout/AdminLayout";
-import Link from "next/link";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
-import axios from "axios";
-import { useRouter } from "next/router";
-import { AuthContext } from "../../../context/auth";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-import CommentForm from "../../../components/comments/CommentForm";
-import { toast } from "react-hot-toast";
+import { useEffect, useState, useContext } from 'react'
+import { Row, Col, Button, Input, List, Modal, Spin, Card } from 'antd'
+import AdminLayout from '../../../components/layout/AdminLayout'
+import Link from 'next/link'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import axios from 'axios'
+import { useRouter } from 'next/router'
+import { AuthContext } from '../../../context/auth'
+import dayjs from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import CommentForm from '../../../components/comments/CommentForm'
+import { toast } from 'react-hot-toast'
 
-dayjs.extend(localizedFormat);
+dayjs.extend(localizedFormat)
 
-const { confirm } = Modal;
+const { confirm } = Modal
 
 function Comments() {
-  const [auth, setAuth] = useContext(AuthContext);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedComment, setSelectedComment] = useState({});
-  const [content, setContent] = useState("");
-  const [visible, setVisible] = useState(false);
-  const [keyword, setKeyword] = useState("");
-  const [selectedPost, setSelectedPost] = useState(null);
-  const router = useRouter();
-  const [commentFormVisible, setCommentFormVisible] = useState(false);
+  const [auth, setAuth] = useContext(AuthContext)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedComment, setSelectedComment] = useState({})
+  const [content, setContent] = useState('')
+  const [visible, setVisible] = useState(false)
+  const [keyword, setKeyword] = useState('')
+  const [selectedPost, setSelectedPost] = useState(null)
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const [commentFormVisible, setCommentFormVisible] = useState(false)
 
   useEffect(() => {
     if (auth?.token) {
-      fetchComments();
-      getTotal();
+      fetchComments()
+      getTotal()
     }
-  }, [auth?.token]);
+  }, [auth?.token])
 
   const fetchComments = async () => {
     try {
-      const { data } = await axios.get(`/all-comments`);
-      setComments([...comments, ...data]);
-      setLoading(false);
+      const { data } = await axios.get(`/all-comments`)
+      setComments([...comments, ...data])
+      setLoading(false)
     } catch (err) {
-      console.error(err);
-      setLoading(false);
+      console.error(err)
+      setLoading(false)
     }
-  };
+  }
 
   const handleEdit = (comment) => {
-    setSelectedComment(comment);
-    setContent(comment.content);
-    setCommentFormVisible(true);
-  };
+    setSelectedComment(comment)
+    setContent(comment.content)
+    setCommentFormVisible(true)
+  }
 
   const getTotal = async () => {
     try {
-      const { data } = await axios.get("/comment-count");
-      setTotal(data);
+      const { data } = await axios.get('/comment-count')
+      setTotal(data)
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
-  };
+  }
 
   const handleHide = async (comment) => {
     confirm({
-      title: "Are you sure you want to hide this comment?",
+      title: 'Are you sure you want to hide this comment?',
       icon: <ExclamationCircleOutlined />,
-      content: "This action cannot be undone.",
+      content: 'This action cannot be undone.',
       async onOk() {
         try {
-          const { data } = await axios.put(`/hide-comment/${comment._id}`);
+          const { data } = await axios.put(`/hide-comment/${comment._id}`)
           if (data?.success) {
-            setComments(comments.filter((c) => c._id !== comment._id));
-            setTotal(total - 1);
-            toast.success("Comment hidden successfully");
+            setComments(comments.filter((c) => c._id !== comment._id))
+            setTotal(total - 1)
+            toast.success('Comment hidden successfully')
           }
         } catch (error) {
-          console.error(error);
+          console.error(error)
         }
       },
       onCancel() {
-        return;
+        return
       },
-    });
-  };
+    })
+  }
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const { data } = await axios.put(`/comment/${selectedComment._id}`, {
         content,
-      });
+      })
 
       setComments((prevComments) =>
         prevComments.map((c) =>
           c._id === selectedComment._id ? { ...c, content: data.content } : c
         )
-      );
+      )
 
-      setVisible(false);
-      setLoading(false);
-      setSelectedComment({});
-      setContent(""); 
+      setVisible(false)
+      setLoading(false)
+      setSelectedComment({})
+      setContent('')
 
-      toast.success("Comment updated");
+      toast.success('Comment updated')
     } catch (err) {
-      console.error(err);
-      setVisible(false);
+      console.error(err)
+      setVisible(false)
     }
-  };
+  }
 
   const filteredComments = comments?.filter((comment) => {
-    const keywordsArray = keyword.toLowerCase().split(" ");
+    const keywordsArray = keyword.toLowerCase().split(' ')
 
     return keywordsArray.every((kw) =>
       [
@@ -120,22 +123,22 @@ function Comments() {
         comment?.postedBy?.role,
         comment?.postId?.title,
       ].some((field) => field && field.toLowerCase().includes(kw))
-    );
-  });
+    )
+  })
 
-  const [modalKeyword, setModalKeyword] = useState("");
+  const [modalKeyword, setModalKeyword] = useState('')
 
   const handlePostClick = (postTitle) => {
     const postComments = comments.filter(
       (comment) => comment?.postId?.title === postTitle
-    );
-    setSelectedPost({ title: postTitle, comments: postComments });
-    setVisible(true);
-  };
+    )
+    setSelectedPost({ title: postTitle, comments: postComments })
+    setVisible(true)
+  }
 
   const uniquePostTitles = [
     ...new Set(filteredComments.map((item) => item?.postId?.title)),
-  ];
+  ]
 
   return (
     <AdminLayout>
@@ -150,7 +153,7 @@ function Comments() {
                 key={postTitle}
                 title={postTitle}
                 onClick={() => handlePostClick(postTitle)}
-                style={{ marginBottom: 16, cursor: "pointer" }}
+                style={{ marginBottom: 16, cursor: 'pointer' }}
               />
             ))}
           </Col>
@@ -181,9 +184,9 @@ function Comments() {
                   <p>{comment.content}</p>
                   <p>{`${comment?.postedBy?.name} | ${dayjs(
                     comment.createdAt
-                  ).format("L LT")}`}</p>
+                  ).format('L LT')}`}</p>
                   <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <Link
                       href={`/post/${comment?.postId?.slug}#${comment._id}`}
@@ -194,8 +197,8 @@ function Comments() {
                       <>
                         <a
                           onClick={() => {
-                            handleEdit(comment);
-                            setCommentFormVisible(true);
+                            handleEdit(comment)
+                            setCommentFormVisible(true)
                           }}
                         >
                           Edit
@@ -229,7 +232,7 @@ function Comments() {
         </Col>
       </Row>
     </AdminLayout>
-  );
+  )
 }
 
-export default Comments;
+export default Comments

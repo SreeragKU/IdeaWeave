@@ -1,75 +1,78 @@
-import { useState, useEffect, useContext } from "react";
-import { Form, Input, Button, Checkbox } from "antd";
-import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
-import { Row, Col, Typography } from "antd";
-import toast from "react-hot-toast";
-import { useRouter } from "next/router";
-import Link from "next/link";
-import axios from "axios";
+import { useState, useEffect, useContext } from 'react'
+import { Form, Input, Button, Checkbox } from 'antd'
+import { MailOutlined, LockOutlined, UserOutlined } from '@ant-design/icons'
+import { Row, Col, Typography } from 'antd'
+import toast from 'react-hot-toast'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
+import axios from 'axios'
 
-const { Title } = Typography;
+const { Title } = Typography
 
 const ForgotPassword = () => {
   // hooks
-  const router = useRouter();
-  const [form] = Form.useForm();
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const [form] = Form.useForm()
   // state
-  const [loading, setLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false)
 
   const forgotPasswordRequest = async (values) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const { data } = await axios.post("/forgot-password", values);
-      console.log(data);
+      const { data } = await axios.post('/forgot-password', values)
+      console.log(data)
       if (data.error) {
-        toast.error(data.error);
-        setLoading(false);
+        toast.error(data.error)
+        setLoading(false)
       } else {
-        toast.success("Check your email. The request code is sent.");
-        setVisible(true);
-        setLoading(false);
+        toast.success('Check your email. The request code is sent.')
+        setVisible(true)
+        setLoading(false)
       }
     } catch (err) {
-      toast.error("ForgotPassword failed. Try again.");
-      console.log(err);
-      setLoading(false);
+      toast.error('ForgotPassword failed. Try again.')
+      console.log(err)
+      setLoading(false)
     }
-  };
+  }
 
   const resetPasswordRequest = async (values) => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const { data } = await axios.post("/reset-password", values);
-      console.log(data);
+      const { data } = await axios.post('/reset-password', values)
+      console.log(data)
       if (data.error) {
-        toast.error(data.error);
-        setLoading(false);
+        toast.error(data.error)
+        setLoading(false)
       } else {
         toast.success(
-          "Password successfully changed. Please login with new password"
-        );
+          'Password successfully changed. Please login with new password'
+        )
         // clear form fields using ant form hook
-        form.resetFields(["email"]);
-        setVisible(false);
-        setLoading(false);
+        form.resetFields(['email'])
+        setVisible(false)
+        setLoading(false)
         // redirect
         setTimeout(() => {
-          router.push("/signin");
-        }, 3000);
+          router.push('/signin')
+        }, 3000)
       }
     } catch (err) {
-      toast.error("ForgotPassword failed. Try again.");
-      console.log(err);
-      setLoading(false);
+      toast.error('ForgotPassword failed. Try again.')
+      console.log(err)
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Row>
-      <Col span={12} offset={6} style={{ paddingTop: "10%" }}>
+      <Col span={12} offset={6} style={{ paddingTop: '10%' }}>
         <Title>Forgot Password</Title>
 
         <Form
@@ -80,12 +83,12 @@ const ForgotPassword = () => {
             name="email"
             rules={[
               {
-                type: "email",
-                message: "The input is not valid E-mail!",
+                type: 'email',
+                message: 'The input is not valid E-mail!',
               },
               {
                 required: true,
-                message: "Please input your E-mail!",
+                message: 'Please input your E-mail!',
               },
             ]}
             hasFeedback
@@ -101,7 +104,7 @@ const ForgotPassword = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please input your password!",
+                    message: 'Please input your password!',
                     min: 6,
                     max: 24,
                   },
@@ -120,7 +123,7 @@ const ForgotPassword = () => {
                 rules={[
                   {
                     required: true,
-                    message: "Please enter reset code!",
+                    message: 'Please enter reset code!',
                   },
                 ]}
                 hasFeedback
@@ -134,15 +137,12 @@ const ForgotPassword = () => {
             <Button type="primary" htmlType="submit" loading={loading}>
               Submit
             </Button>
-            <br /> Or{" "}
-            <Link href="/signin">
-              Login
-            </Link>
+            <br /> Or <Link href="/signin">Login</Link>
           </Form.Item>
         </Form>
       </Col>
     </Row>
-  );
-};
+  )
+}
 
-export default ForgotPassword;
+export default ForgotPassword

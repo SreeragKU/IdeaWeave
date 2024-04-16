@@ -1,89 +1,91 @@
-import { useEffect, useState, useContext } from "react";
-import { Row, Col, Button, Input, List, Modal, Spin } from "antd";
-import Link from "next/link";
-import axios from "axios";
-import { useRouter } from "next/router";
-import { AuthContext } from "../../context/auth";
-import dayjs from "dayjs";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-import CommentForm from "./CommentForm";
-import { ExclamationCircleOutlined} from '@ant-design/icons';
-import {toast} from "react-hot-toast";
+import { useEffect, useState, useContext } from 'react'
+import { Row, Col, Button, Input, List, Modal, Spin } from 'antd'
+import Link from 'next/link'
+import axios from 'axios'
+import { useRouter } from 'next/router'
+import { AuthContext } from '../../context/auth'
+import dayjs from 'dayjs'
+import localizedFormat from 'dayjs/plugin/localizedFormat'
+import CommentForm from './CommentForm'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { toast } from 'react-hot-toast'
 
-dayjs.extend(localizedFormat);
+dayjs.extend(localizedFormat)
 
 function UserComments() {
-  const [auth, setAuth] = useContext(AuthContext);
-  const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [keyword, setKeyword] = useState("");
-  const [selectedComment, setSelectedComment] = useState({});
-  const [content, setContent] = useState("");
-  const [visible, setVisible] = useState(false);
-  const router = useRouter();
-
+  const [auth, setAuth] = useContext(AuthContext)
+  const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [keyword, setKeyword] = useState('')
+  const [selectedComment, setSelectedComment] = useState({})
+  const [content, setContent] = useState('')
+  const [visible, setVisible] = useState(false)
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
   useEffect(() => {
     if (auth?.token) {
-      fetchComments();
+      fetchComments()
     }
-  }, [auth?.token]);
+  }, [auth?.token])
 
   const fetchComments = async () => {
     try {
-      const { data } = await axios.get(`/user-comments`);
-      setComments(data);
-      setLoading(false);
+      const { data } = await axios.get(`/user-comments`)
+      setComments(data)
+      setLoading(false)
     } catch (err) {
-      console.log(err);
-      setLoading(false);
+      console.log(err)
+      setLoading(false)
     }
-  };
+  }
 
   const handleDelete = async (comment) => {
     confirm({
-      title: "Are you sure you want to delete this comment?",
+      title: 'Are you sure you want to delete this comment?',
       icon: <ExclamationCircleOutlined />,
-      content: "This action cannot be undone.",
+      content: 'This action cannot be undone.',
       async onOk() {
         try {
-          const { data } = await axios.delete(`/comment/${comment._id}`);
+          const { data } = await axios.delete(`/comment/${comment._id}`)
           if (data?.ok) {
-            setComments(comments.filter((c) => c._id !== comment._id));
-            setTotal(total - 1);
-            toast.success("Comment deleted successfully");
+            setComments(comments.filter((c) => c._id !== comment._id))
+            setTotal(total - 1)
+            toast.success('Comment deleted successfully')
           }
         } catch (error) {
-          console.log(error);
+          console.log(error)
         }
       },
       onCancel() {
-        return;
+        return
       },
-    });
-  };
+    })
+  }
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const { data } = await axios.put(`/comment/${selectedComment._id}`, {
         content,
-      });
+      })
 
-      let arr = comments;
-      const index = arr.findIndex((c) => c._id === selectedComment._id);
-      arr[index].content = data.content;
-      setComments(arr);
+      let arr = comments
+      const index = arr.findIndex((c) => c._id === selectedComment._id)
+      arr[index].content = data.content
+      setComments(arr)
 
-      setVisible(false);
-      setLoading(false);
-      setSelectedComment({});
+      setVisible(false)
+      setLoading(false)
+      setSelectedComment({})
 
-      toast.success("Comment updated");
+      toast.success('Comment updated')
     } catch (err) {
-      console.log(err);
-      setVisible(false);
+      console.log(err)
+      setVisible(false)
     }
-  };
+  }
 
   const filteredComments = comments?.filter(
     (comment) =>
@@ -91,7 +93,7 @@ function UserComments() {
       comment?.postedBy?.name.toLowerCase().includes(keyword) ||
       (comment?.postedBy?.role &&
         comment.postedBy.role.toLowerCase().includes(keyword))
-  );
+  )
 
   return (
     <>
@@ -120,9 +122,9 @@ function UserComments() {
                     </Link>,
                     <a
                       onClick={() => {
-                        setSelectedComment(item);
-                        setVisible(true);
-                        setContent(item.content);
+                        setSelectedComment(item)
+                        setVisible(true)
+                        setContent(item.content)
                       }}
                     >
                       edit
@@ -133,7 +135,7 @@ function UserComments() {
                   <List.Item.Meta
                     description={`On ${item?.postId?.title} | ${
                       item?.postedBy?.name
-                    } | ${dayjs(item.createdAt).format("L LT")}`}
+                    } | ${dayjs(item.createdAt).format('L LT')}`}
                     title={item.content}
                   />
                 </List.Item>
@@ -161,7 +163,7 @@ function UserComments() {
         </Col>
       </Row>
     </>
-  );
+  )
 }
 
-export default UserComments;
+export default UserComments

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
-import { useRouter } from "next/router";
+import React, { useState, useEffect, useContext } from 'react'
+import axios from 'axios'
+import { useRouter } from 'next/router'
 import {
   Row,
   Col,
@@ -11,104 +11,106 @@ import {
   List,
   Avatar,
   Divider,
-} from "antd";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import BookFront from "./BookFront";
-import BubbleNav from "../../components/nav/BubbleNav";
-import dayjs from "dayjs";
-import CommentForm from "../../components/comments/CommentForm";
-import useLatestPosts from "../../hooks/useLatestPosts";
-import Link from "next/link";
-import { AuthContext } from "../../context/auth";
-import { toast } from "react-hot-toast";
+} from 'antd'
+import Head from 'next/head'
+import dynamic from 'next/dynamic'
+import BookFront from './BookFront'
+import BubbleNav from '../../components/nav/BubbleNav'
+import dayjs from 'dayjs'
+import CommentForm from '../../components/comments/CommentForm'
+import useLatestPosts from '../../hooks/useLatestPosts'
+import Link from 'next/link'
+import { AuthContext } from '../../context/auth'
+import { toast } from 'react-hot-toast'
 
-import relativeTime from "dayjs/plugin/relativeTime";
-dayjs.extend(relativeTime);
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
-const { Title } = Typography;
-const { Option } = Select;
+const { Title } = Typography
+const { Option } = Select
 
 const ReactQuillNoSSR = dynamic(
-  () => import("react-quill").then((module) => module.default),
+  () => import('react-quill').then((module) => module.default),
   { ssr: false }
-);
+)
 
 const themes = {
   Default: {
     fontSize: 1.2,
     lineHeight: 1.6,
-    backgroundColor: "#F0F2F5",
-    color: "black",
+    backgroundColor: '#F0F2F5',
+    color: 'black',
   },
   Fire: {
     fontSize: 1.3,
     lineHeight: 1.7,
-    backgroundColor: "#FF6B6B",
-    color: "black",
+    backgroundColor: '#FF6B6B',
+    color: 'black',
   },
   Ocean: {
     fontSize: 1.3,
     lineHeight: 1.7,
-    backgroundColor: "#36A2A6",
-    color: "white",
+    backgroundColor: '#36A2A6',
+    color: 'white',
   },
   Forest: {
     fontSize: 1.3,
     lineHeight: 1.7,
-    backgroundColor: "#4CAF50",
-    color: "white",
+    backgroundColor: '#4CAF50',
+    color: 'white',
   },
   Sunset: {
     fontSize: 1.3,
     lineHeight: 1.7,
-    backgroundColor: "#FFAC5D",
-    color: "black",
+    backgroundColor: '#FFAC5D',
+    color: 'black',
   },
   Midnight: {
     fontSize: 1.2,
     lineHeight: 1.6,
-    backgroundColor: "#20232A",
-    color: "white",
+    backgroundColor: '#20232A',
+    color: 'white',
   },
-};
+}
 
 const SinglePost = ({ post, postComments }) => {
-  const router = useRouter();
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [selectedTheme, setSelectedTheme] = useState("Default");
-  const [postContent, setPostContent] = useState(post ? post.content : "");
-  const [currentVolume, setCurrentVolume] = useState(0);
-  const [currentChapter, setCurrentChapter] = useState(0);
-  const [comments, setComments] = useState(postComments);
-  const [comment, setComment] = useState("");
-  const [loading, setLoading] = useState(false);
-  const { latestPosts } = useLatestPosts();
-  const [auth, setAuth] = useContext(AuthContext);
-
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const [zoomLevel, setZoomLevel] = useState(1)
+  const [selectedTheme, setSelectedTheme] = useState('Default')
+  const [postContent, setPostContent] = useState(post ? post.content : '')
+  const [currentVolume, setCurrentVolume] = useState(0)
+  const [currentChapter, setCurrentChapter] = useState(0)
+  const [comments, setComments] = useState(postComments)
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { latestPosts } = useLatestPosts()
+  const [auth, setAuth] = useContext(AuthContext)
 
   useEffect(() => {
     if (post && post.volumes && post.volumes.length > 0) {
-      setZoomLevel(1);
+      setZoomLevel(1)
       setPostContent(
-        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ""
-      );
+        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ''
+      )
     }
-  }, [post, currentVolume, currentChapter]);  
+  }, [post, currentVolume, currentChapter])
 
   useEffect(() => {
     if (!post) {
-      router.push("/_error");
+      router.push('/_error')
     }
-  }, [post, router]);  
+  }, [post, router])
 
   useEffect(() => {
     if (post && post.volumes && post.volumes.length > 0) {
       setPostContent(
-        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ""
-      );
+        post.volumes[currentVolume]?.chapters[currentChapter]?.content || ''
+      )
     }
-  }, [zoomLevel, post, currentVolume, currentChapter]);
+  }, [zoomLevel, post, currentVolume, currentChapter])
 
   useEffect(() => {
     if (
@@ -120,141 +122,140 @@ const SinglePost = ({ post, postComments }) => {
     ) {
       setPostContent(
         post.volumes[currentVolume].chapters[currentChapter].content
-      );
+      )
     }
-  }, [post, currentVolume, currentChapter]);
-  
+  }, [post, currentVolume, currentChapter])
 
   const handleZoomIn = () => {
     if (zoomLevel < 2) {
-      setZoomLevel(zoomLevel + 0.1);
+      setZoomLevel(zoomLevel + 0.1)
     }
-  };
+  }
 
   const handleZoomOut = () => {
     if (zoomLevel > 0.5) {
-      setZoomLevel(zoomLevel - 0.1);
+      setZoomLevel(zoomLevel - 0.1)
     }
-  };
+  }
 
   const handleThemeChange = (theme) => {
-    setSelectedTheme(theme);
-  };
+    setSelectedTheme(theme)
+  }
 
   const handleTextToSpeech = () => {
-    sendPostContentToBubbleNav(post.content);
-  };
+    sendPostContentToBubbleNav(post.content)
+  }
 
   const handleNextChapter = () => {
     if (currentChapter < post.volumes[currentVolume].chapters.length - 1) {
-      setCurrentChapter(currentChapter + 1);
+      setCurrentChapter(currentChapter + 1)
     } else {
       if (currentVolume < post.volumes.length - 1) {
-        setCurrentVolume(currentVolume + 1);
-        setCurrentChapter(0);
+        setCurrentVolume(currentVolume + 1)
+        setCurrentChapter(0)
       }
     }
-  };
+  }
 
   const handlePrevChapter = () => {
     if (currentChapter > 0) {
-      setCurrentChapter(currentChapter - 1);
+      setCurrentChapter(currentChapter - 1)
     } else {
       if (currentVolume > 0) {
-        setCurrentVolume(currentVolume - 1);
-        setCurrentChapter(post.volumes[currentVolume - 1].chapters.length - 1);
+        setCurrentVolume(currentVolume - 1)
+        setCurrentChapter(post.volumes[currentVolume - 1].chapters.length - 1)
       }
     }
-  };
+  }
 
   const handleSelect = (value) => {
-    const [selectedVolume, selectedChapter] = value.split(":").map(Number);
+    const [selectedVolume, selectedChapter] = value.split(':').map(Number)
 
-    setCurrentVolume(selectedVolume - 1);
-    setCurrentChapter(selectedChapter - 1);
-  };
+    setCurrentVolume(selectedVolume - 1)
+    setCurrentChapter(selectedChapter - 1)
+  }
 
-  const [isQuillLoaded, setIsQuillLoaded] = useState(false);
+  const [isQuillLoaded, setIsQuillLoaded] = useState(false)
 
   useEffect(() => {
-    setIsQuillLoaded(true);
-    handleQuillLoad();
-  }, []);
+    setIsQuillLoaded(true)
+    handleQuillLoad()
+  }, [])
 
-  const isAtFirstChapter = currentVolume === 0 && currentChapter === 0;
+  const isAtFirstChapter = currentVolume === 0 && currentChapter === 0
   const isAtLastChapter =
     post?.volumes &&
     currentVolume === post.volumes.length - 1 &&
-    currentChapter === post.volumes[currentVolume]?.chapters?.length - 1;
+    currentChapter === post.volumes[currentVolume]?.chapters?.length - 1
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
-      const { data } = await axios.post(`/comment/${post._id}`, { comment });
-      setComments([data, ...comments]);
-      setComment("");
-      toast.success("Comment posted successfully");
-      setLoading(false);
+      setLoading(true)
+      const { data } = await axios.post(`/comment/${post._id}`, { comment })
+      setComments([data, ...comments])
+      setComment('')
+      toast.success('Comment posted successfully')
+      setLoading(false)
     } catch (err) {
-      console.log(err);
-      setLoading(false);
+      console.log(err)
+      setLoading(false)
     }
-  };
+  }
 
   const addToLibrary = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       const { data } = await axios.post(`/add-to-library/${post._id}`, {
         postId: post._id,
-      });
+      })
       if (data.success) {
-        toast.success("Added to library successfully");
+        toast.success('Added to library successfully')
       } else {
-        toast.error("Failed to add to library");
+        toast.error('Failed to add to library')
       }
 
-      setLoading(false);
+      setLoading(false)
     } catch (err) {
-      console.error(err);
-      toast.error("An error occurred while adding to the library");
-      setLoading(false);
+      console.error(err)
+      toast.error('An error occurred while adding to the library')
+      setLoading(false)
     }
-  };
+  }
 
   const handleQuillLoad = () => {
-    setIsQuillLoaded(true);
+    setIsQuillLoaded(true)
     if (isQuillLoaded) {
-      const quill = document.querySelector(".ql-editor");
+      const quill = document.querySelector('.ql-editor')
       if (quill) {
         quill.style.fontSize = `${
           themes[selectedTheme].fontSize * zoomLevel
-        }rem`;
+        }rem`
         quill.style.lineHeight = `${
           themes[selectedTheme].lineHeight * zoomLevel
-        }`;
-        quill.style.backgroundColor = themes[selectedTheme].backgroundColor;
-        quill.style.color = themes[selectedTheme].color;
-        quill.style.padding = "16px";
+        }`
+        quill.style.backgroundColor = themes[selectedTheme].backgroundColor
+        quill.style.color = themes[selectedTheme].color
+        quill.style.padding = '16px'
       }
     }
-  };
+  }
 
   useEffect(() => {
     if (isQuillLoaded) {
-      const quill = document.querySelector(".ql-editor");
+      const quill = document.querySelector('.ql-editor')
       if (quill) {
         quill.style.fontSize = `${
           themes[selectedTheme].fontSize * zoomLevel
-        }rem`;
+        }rem`
         quill.style.lineHeight = `${
           themes[selectedTheme].lineHeight * zoomLevel
-        }`;
-        quill.style.backgroundColor = themes[selectedTheme].backgroundColor;
-        quill.style.color = themes[selectedTheme].color;
-        quill.style.padding = "16px";
+        }`
+        quill.style.backgroundColor = themes[selectedTheme].backgroundColor
+        quill.style.color = themes[selectedTheme].color
+        quill.style.padding = '16px'
       }
     }
-  }, [zoomLevel, selectedTheme, isQuillLoaded]);
+  }, [zoomLevel, selectedTheme, isQuillLoaded])
 
   return (
     <>
@@ -272,11 +273,11 @@ const SinglePost = ({ post, postComments }) => {
       <BookFront post={post} />
 
       <Head>
-        <title>{post?.title || "Untitled Post"}</title>
+        <title>{post?.title || 'Untitled Post'}</title>
         <meta
           name="description"
           content={
-            post?.content?.substring(0, 160) || "No description available"
+            post?.content?.substring(0, 160) || 'No description available'
           }
         />
       </Head>
@@ -290,21 +291,21 @@ const SinglePost = ({ post, postComments }) => {
             </Button>
           )}
           <Card>
-            <div style={{ marginBottom: 16, textAlign: "center" }}>
+            <div style={{ marginBottom: 16, textAlign: 'center' }}>
               <Button
                 type="primary"
                 onClick={handlePrevChapter}
                 disabled={isAtFirstChapter}
               >
                 Previous Chapter
-              </Button>{" "}
+              </Button>{' '}
               <Select
                 value={`${currentVolume + 1}:${currentChapter + 1}`}
                 style={{
                   width: 200,
                   marginRight: 8,
                   borderRadius: 8,
-                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
                 }}
                 dropdownStyle={{ borderRadius: 8 }}
                 onChange={handleSelect}
@@ -332,12 +333,12 @@ const SinglePost = ({ post, postComments }) => {
                 disabled={isAtLastChapter}
               >
                 Next Chapter
-              </Button>{" "}
+              </Button>{' '}
             </div>
             <div
               style={{
-                height: "650px",
-                overflow: "auto",
+                height: '650px',
+                overflow: 'auto',
               }}
             >
               <ReactQuillNoSSR
@@ -346,7 +347,7 @@ const SinglePost = ({ post, postComments }) => {
                 theme="bubble"
                 modules={{ toolbar: false }}
                 style={{
-                  visibility: isQuillLoaded ? "visible" : "hidden",
+                  visibility: isQuillLoaded ? 'visible' : 'hidden',
                 }}
                 onLoad={handleQuillLoad}
               />
@@ -354,7 +355,7 @@ const SinglePost = ({ post, postComments }) => {
             <div
               style={{
                 marginBottom: 16,
-                textAlign: "center",
+                textAlign: 'center',
                 marginTop: 16,
               }}
             >
@@ -364,14 +365,14 @@ const SinglePost = ({ post, postComments }) => {
                 disabled={isAtFirstChapter}
               >
                 Previous Chapter
-              </Button>{" "}
+              </Button>{' '}
               <Select
                 value={`${currentVolume + 1}:${currentChapter + 1}`}
                 style={{
                   width: 200,
                   marginRight: 8,
                   borderRadius: 8,
-                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                  boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
                 }}
                 dropdownStyle={{ borderRadius: 8 }}
                 onChange={handleSelect}
@@ -399,7 +400,7 @@ const SinglePost = ({ post, postComments }) => {
                 disabled={isAtLastChapter}
               >
                 Next Chapter
-              </Button>{" "}
+              </Button>{' '}
             </div>
             {isAtLastChapter && (
               <div>
@@ -440,27 +441,27 @@ const SinglePost = ({ post, postComments }) => {
         </Col>
       </Row>
     </>
-  );
-};
+  )
+}
 
 export async function getServerSideProps({ params }) {
   try {
-    const { data } = await axios.get(`${process.env.API}/post/${params.slug}`);
+    const { data } = await axios.get(`${process.env.API}/post/${params.slug}`)
     return {
       props: {
         post: data.post,
         postComments: data.comments,
       },
-    };
+    }
   } catch (error) {
-    console.error(error);
+    console.error(error)
     return {
       props: {
         post: null,
         postComments: [],
       },
-    };
+    }
   }
 }
 
-export default SinglePost;
+export default SinglePost

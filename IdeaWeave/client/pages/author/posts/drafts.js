@@ -1,86 +1,89 @@
-import { useEffect, useContext, useState } from "react";
-import { Row, Col, Button, Grid, Typography, Spin } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import axios from "axios";
-import { PostContext } from "../../../context/post";
-import { useRouter } from "next/router";
-import AuthorLayout from "../../../components/layout/AuthorLayout";
-import Link from "next/link";
-import DraftsList from "../../../components/posts/DraftsList";
-import { AuthContext } from "../../../context/auth";
+import { useEffect, useContext, useState } from 'react'
+import { Row, Col, Button, Grid, Typography, Spin } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
+import axios from 'axios'
+import { PostContext } from '../../../context/post'
+import { useRouter } from 'next/router'
+import AuthorLayout from '../../../components/layout/AuthorLayout'
+import Link from 'next/link'
+import DraftsList from '../../../components/posts/DraftsList'
+import { AuthContext } from '../../../context/auth'
 
-const { useBreakpoint } = Grid;
-const { Title, Text } = Typography;
+const { useBreakpoint } = Grid
+const { Title, Text } = Typography
 
-function Posts({ page = "author" }) {
-  const [post, setPost] = useContext(PostContext);
-  const [auth, setAuth] = useContext(AuthContext);
-  const { posts } = post;
-  const router = useRouter();
-  const screens = useBreakpoint();
-  const [loading, setLoading] = useState(true);
-  const [selectedPosts, setSelectedPosts] = useState([]);
+function Posts({ page = 'author' }) {
+  const [post, setPost] = useContext(PostContext)
+  const [auth, setAuth] = useContext(AuthContext)
+  const { posts } = post
+  const router = useRouter()
+  if (!router.isFallback && !post) {
+    return <ErrorPage statusCode={404} />
+  }
+  const screens = useBreakpoint()
+  const [loading, setLoading] = useState(true)
+  const [selectedPosts, setSelectedPosts] = useState([])
 
   useEffect(() => {
-    if (auth.token) fetchPosts();
-  }, [auth?.token]);
+    if (auth.token) fetchPosts()
+  }, [auth?.token])
 
   const fetchPosts = async () => {
     try {
-      setLoading(true);
-      const { data } = await axios.get("/draft-by-author");
-      setPost((prev) => ({ ...prev, posts: data }));
+      setLoading(true)
+      const { data } = await axios.get('/draft-by-author')
+      setPost((prev) => ({ ...prev, posts: data }))
     } catch (err) {
-      console.log(err);
+      console.log(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEdit = async (post) => {
-    return router.push(`/author/drafts/${post.slug}`);
-  };
+    return router.push(`/author/drafts/${post.slug}`)
+  }
 
   const handleDelete = async (post) => {
     try {
-      const { data } = await axios.delete(`/draft/${post._id}`);
+      const { data } = await axios.delete(`/draft/${post._id}`)
       if (data.ok) {
         setPost((prev) => ({
           ...prev,
           posts: prev.posts.filter((p) => p._id !== post._id),
-        }));
+        }))
       }
     } catch (err) {
-      console.log(err);
+      console.log(err)
     }
-  };
+  }
 
   const handleCardClick = (postId) => {
     setSelectedPosts((prevSelected) =>
       prevSelected.includes(postId)
         ? prevSelected.filter((id) => id !== postId)
         : [...prevSelected, postId]
-    );
-  };
+    )
+  }
 
   const handlePublish = async () => {
     try {
-      const { data } = await axios.post("/publish-draft-posts", {
+      const { data } = await axios.post('/publish-draft-posts', {
         postIds: selectedPosts,
-      });
+      })
 
       if (data.ok) {
         console.log(
-          "Selected posts published successfully",
+          'Selected posts published successfully',
           data.publishedPosts
-        );
-        setSelectedPosts([]);
-        router.push(`/${page}/posts`);
+        )
+        setSelectedPosts([])
+        router.push(`/${page}/posts`)
       }
     } catch (err) {
-      console.error("Error publishing posts", err);
+      console.error('Error publishing posts', err)
     }
-  };
+  }
 
   return (
     <AuthorLayout>
@@ -111,7 +114,7 @@ function Posts({ page = "author" }) {
         </Col>
       </Row>
     </AuthorLayout>
-  );
+  )
 }
 
-export default Posts;
+export default Posts
