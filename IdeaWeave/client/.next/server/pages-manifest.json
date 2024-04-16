@@ -2,10 +2,6 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/admin/library": "pages/admin/library.js",
-  "/signin": "pages/signin.js",
-  "/subscriber": "pages/subscriber.js",
   "/": "pages/index.js",
-  "/plans": "pages/plans.js",
-  "/admin": "pages/admin.js"
+  "/signin": "pages/signin.js"
 }
