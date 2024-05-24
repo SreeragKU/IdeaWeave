@@ -35,39 +35,39 @@ const FullWidthImage = ({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (window.matchMedia('(min-width: 1200px)').matches) {
-        setTitleStyles({
-          ...titleStyles,
+        setTitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '8vw',
-        })
-        setSubtitleStyles({
-          ...subtitleStyles,
+        }))
+        setSubtitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '3vw',
-        })
+        }))
       } else if (
         window.matchMedia('(min-width: 768px) and (max-width: 1199px)').matches
       ) {
-        setTitleStyles({
-          ...titleStyles,
+        setTitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '8vw',
-        })
-        setSubtitleStyles({
-          ...subtitleStyles,
+        }))
+        setSubtitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '3vw',
-        })
+        }))
       }
       // Media query conditions for mobile screens
       else if (window.matchMedia('(max-width: 767px)').matches) {
-        setTitleStyles({
-          ...titleStyles,
+        setTitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '27vw',
-        })
-        setSubtitleStyles({
-          ...subtitleStyles,
+        }))
+        setSubtitleStyles((prevStyles) => ({
+          ...prevStyles,
           fontSize: '8vw',
-        })
+        }))
       }
     }
-  }, [titleStyles, subtitleStyles, theme])
+  }, [theme]) // Only depend on 'theme'
 
   const getRedirectLink = () => {
     if (auth?.role === 'Admin') {

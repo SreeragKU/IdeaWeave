@@ -8,6 +8,8 @@ import {
   LogoutOutlined,
   BookOutlined,
   MailOutlined,
+  ShoppingCartOutlined,
+  RobotFilled,
 } from '@ant-design/icons'
 import ToggleTheme from './ToggleTheme'
 import Link from 'next/link'
@@ -68,6 +70,12 @@ const TopNav = () => {
       </Menu.Item>
       <Menu.Item key="contact" icon={<MailOutlined />}>
         <Link href="/contact">Contact</Link>
+      </Menu.Item>
+      <Menu.Item key="shop" icon={<ShoppingCartOutlined />}>
+        <Link href="https://weave-wagon.vercel.app/">Shop Merchendise</Link>
+      </Menu.Item>
+      <Menu.Item key="ai" icon={<RobotFilled />}>
+        <Link href="http://127.0.0.1:5000/">Cognisynth</Link>
       </Menu.Item>
       {auth?.user === null && (
         <>
